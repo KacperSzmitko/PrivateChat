@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Client.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,13 +16,17 @@ using System.Windows.Shapes;
 
 namespace Client
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow() {
             InitializeComponent();
+            ServerConnection connection = new ServerConnection("bd-projekt.ddns.net", 13579);
+            Navigator navigator = new Navigator();
+            MainViewModel viewModel = new MainViewModel(connection, navigator);
+            navigator.ViewChanged += viewModel.OnViewChanged;
+            Closing += viewModel.OnWindowClosing;
+            DataContext = viewModel;
+            
         }
     }
 }
