@@ -1,6 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 
-namespace Server
+namespace DbLibrary
 {
     public abstract class DbConnection
     {
@@ -12,7 +12,7 @@ namespace Server
         public DbConnection()
         {
             server = "10.8.0.1";
-            database = "projekt_io";
+            database = "projekt_wti";
             uid = "user_io";
             password = "DN8OHj8mUkNmXBRm";
             string connectionString;
