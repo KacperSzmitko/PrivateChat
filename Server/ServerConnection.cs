@@ -11,10 +11,12 @@ namespace Server
     class ServerConnection
     {
         public ClientProcessing menager { get; set; }
+
+
         public void RunServer()
         {
             // Create a TCP/IP (IPv4) socket and listen for incoming connections.
-            TcpListener listener = new TcpListener(IPAddress.Any, 17777);
+            TcpListener listener = new TcpListener(IPAddress.Any, 13579);
             listener.Start();
             while (true)
             {
@@ -22,6 +24,8 @@ namespace Server
                 Task.Run(() => { ClientConnectionAsync(client); });
             }
         }
+
+
         /// <summary>
         /// Used to request-response type of communication like: 
         /// Login, Registry, Start new conversation, End conversation, Get Friends
@@ -31,7 +35,7 @@ namespace Server
         {
             TcpClient client = obj as TcpClient;
             NetworkStream stream = client.GetStream();
-
+            int clientId = menager.AddActiveUser();
             byte[] message;
 
             //Task.Run(() => { ServerMessagesAsync(stream, clientID); });
@@ -54,18 +58,18 @@ namespace Server
                     messageData.Append(chars);
 
                     //Prepare response
-                    sendMessage = "";
+                    sendMessage = menager.ProccesClient(messageData.ToString(), clientId);
 
                     //Disconnection
                     if (sendMessage == "")
                     {
                         message = Encoding.ASCII.GetBytes("Response:0$$");
                         stream.Write(message);
-                        Thread.Sleep(2000);
+                        Thread.Sleep(1000);
                         break;
                     }
-                    message = Encoding.ASCII.GetBytes(sendMessage);
 
+                    message = Encoding.ASCII.GetBytes(sendMessage);
                     //Send response
                     stream.Write(message);
                 }
@@ -94,16 +98,8 @@ namespace Server
                     //Prepare response
                     sendMessage = "";
 
-                    //Disconnection
-                    if (sendMessage == "")
-                    {
-                        message = Encoding.ASCII.GetBytes("Response:0$$");
-                        stream.Write(message);
-                        Thread.Sleep(2000);
-                        break;
-                    }
-                    message = Encoding.ASCII.GetBytes(sendMessage);
 
+                    message = Encoding.ASCII.GetBytes(sendMessage);
                     //Send response
                     stream.Write(message);
                 }

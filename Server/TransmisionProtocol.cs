@@ -53,13 +53,13 @@ namespace Server
         /// <summary>
         /// Function used to add single arguments to message
         /// </summary>
-        /// <param name="fieldName">Name of filed which you want to add</param>
-        /// <param name="value">Value of that field</param>
+        /// <param name="fieldsNames">Name of filed which you want to add</param>
+        /// <param name="values">Values of fields</param>
         /// <param name="result">Reference to your result message</param>
-        public static void AddFields(string[] fieldsNames, ref string result, params string[] fields)
+        public static void AddFields(string[] fieldsNames, ref string result, params string[] values)
         {
             for (int i = 0; i < fieldsNames.Length; i++)
-                result += fieldsNames[i] + ":" + fields[i] + "$$";
+                result += fieldsNames[i] + ":" + values[i] + "$$";
         }
     }
 }
