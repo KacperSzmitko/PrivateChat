@@ -66,7 +66,7 @@ namespace Client.ViewModels
                     loginCommand = new RelayCommand(_ => {
                         User user = model.LoginUser(Username, Pass);
                         if (user != null) {
-                            navigator.CurrentViewModel = new HomeViewModel(connection, navigator, user);
+                            //navigator.CurrentViewModel = new HomeViewModel(connection, navigator, user);
                         }
                         else {
                             loginError = true;

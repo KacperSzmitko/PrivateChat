@@ -21,9 +21,6 @@
         <DataTemplate DataType="{x:Type viewmodels:RegisterViewModel}">
             <views:RegisterView/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:HomeViewModel}">
-            <views:HomeView/>
-        </DataTemplate>
 
         <converters:StringToIntConverter x:Key="stringToIntConverter"/>
 
