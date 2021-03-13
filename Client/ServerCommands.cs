@@ -16,6 +16,7 @@ namespace Client
         private static string CreateClientMessage(int option, params string[] fields) {
             string result = "";
             try {
+                result += AddField("option", option.ToString());
                 switch (option) {
                     case 0:
                         break;

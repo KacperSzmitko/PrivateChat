@@ -52,11 +52,11 @@ namespace DbLibrary
             try
             {
                 dataReader.Read();
-                string password = dataReader.GetString(0);
+                string usernameFromDatabase = dataReader.GetString(0);
             }
             catch
             {
-                this.CloseConnection();
+                dataReader.Close();
                 return false;
             }
             //close Data Reader

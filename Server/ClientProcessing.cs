@@ -79,6 +79,7 @@ namespace Server
                             }
                         }
                     }
+                    activeUsers[clientId].logged = true;
                     activeUsers[clientId].name = username;
                 }
                 return TransmisionProtocol.CreateServerMessage((int)ErrorCodes.NO_ERROR, (int)Options.LOGIN);
