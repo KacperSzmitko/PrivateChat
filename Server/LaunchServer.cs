@@ -11,7 +11,7 @@ namespace Server
         {
             //ServerConnection connection = new ServerConnection();
             Redis redis = new Redis();
-            redis.test();
+
 
         }
     }
