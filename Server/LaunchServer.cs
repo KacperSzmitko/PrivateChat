@@ -9,7 +9,9 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            ServerConnection connection = new ServerConnection();
+            //ServerConnection connection = new ServerConnection();
+            Redis redis = new Redis();
+
 
         }
     }

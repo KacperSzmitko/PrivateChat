@@ -14,21 +14,22 @@ namespace DbLibrary
 
         public void test()
         {
-            Message m = new Message { message = "Witaj", date = DateTime.Now, username= "Piotr" };
-            db.ListRightPush("3", JsonConvert.SerializeObject(m));
+            //Message m = new Message { message = "Witaj", date = DateTime.Now, username= "Piotr" };
+            //db.ListRightPush("3", JsonConvert.SerializeObject(m));
+            StringBuilder res = new StringBuilder("[");
             var x = db.ListRange("3",0,-1);
-
-            Message m1 = new Message { message = "Ziom", date = DateTime.Now, username = "Piotr" };
-            db.ListRightPush("3", JsonConvert.SerializeObject(m1));
-
-            string ret = "";
-            foreach(var t in x)
+            foreach(var k in x)
             {
-                ret += t;
+                res.Append(k + ",");
             }
-
-            Console.WriteLine(ret);
+            res[res.Length-1] = ']';
             
+            
+            //Console.WriteLine(res);
+
+            List<Message> des = JsonConvert.DeserializeObject<List<Message>>(res.ToString());
+            Console.WriteLine(des);
+
         }
 
         public Redis()
