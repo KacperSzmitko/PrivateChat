@@ -9,11 +9,20 @@ namespace Client
     {
 
         //******************** COMMANDS RESPONSES (MULTIPLE FIELDS) ********************
-        
 
-        //******************** TOOLS FOR CREATING COMMANDS ********************
+        public struct GetFriendsCommandResponse
+        {
+            public readonly int error;
+            public readonly string friendsJSON;
+            public GetFriendsCommandResponse(int error, string friendsJSON) {
+                this.error = error;
+                this.friendsJSON = friendsJSON;
+            }
+        }
 
-        private static string CreateClientMessage(int option, params string[] fields) {
+            //******************** TOOLS FOR CREATING COMMANDS ********************
+
+            private static string CreateClientMessage(int option, params string[] fields) {
             string result = "";
             try {
                 result += AddField("option", option.ToString());
@@ -122,11 +131,19 @@ namespace Client
             return Int32.Parse(args[0]);
         }
 
-        public static int LogoutCommand(ref ServerConnection connection, string sessionID) {
-            string command = CreateClientMessage((int)Options.LOGOUT, sessionID);
+        public static int LogoutCommand(ref ServerConnection connection) {
+            string command = CreateClientMessage((int)Options.LOGOUT);
             connection.SendMessage(command);
             string[] args = GetArgArrayFromResponse(connection.ReadMessage());
             return Int32.Parse(args[0]);
+        }
+
+        public static GetFriendsCommandResponse GetFriendsCommand(ref ServerConnection connection) {
+            string command = CreateClientMessage((int)Options.GET_FRIENDS);
+            connection.SendMessage(command);
+            string[] args = GetArgArrayFromResponse(connection.ReadMessage());
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return new GetFriendsCommandResponse(Int32.Parse(args[0]), "");
+            return new GetFriendsCommandResponse(Int32.Parse(args[0]), args[1]);
         }
 
     }

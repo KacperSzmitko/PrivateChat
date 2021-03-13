@@ -13,9 +13,9 @@ using System.Windows.Shapes;
 
 namespace Client.Views
 {
-    public partial class HomeView : UserControl
+    public partial class ChatView : UserControl
     {
-        public HomeView() {
+        public ChatView() {
             InitializeComponent();
         }
     }

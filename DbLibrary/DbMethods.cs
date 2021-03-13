@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -74,7 +75,7 @@ namespace DbLibrary
             //Create a data reader and Execute the command
             MySqlDataReader dataReader = cmd.ExecuteReader();
 
-            List<User> friends = new List<User>();
+            List<Friend> friends = new List<Friend>();
 
             try
             {
@@ -82,10 +83,10 @@ namespace DbLibrary
                 {
                     while (dataReader.Read())
                     {
-                        User friend = new User();
-                        friend.username = dataReader.GetString(0);
-                        if (activeUsers.Contains(friend.username)) friend.active = 1;
-                        else friend.active = 0;
+                        Friend friend = new Friend();
+                        friend.Username = dataReader.GetString(0);
+                        if (activeUsers.Contains(friend.Username)) friend.Active = 1;
+                        else friend.Active = 0;
                         friends.Add(friend);
                     }
                     query = string.Format("SELECT u2.username FROM friends f JOIN users u ON u.user_id = f.user2_id " +
