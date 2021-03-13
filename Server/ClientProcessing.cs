@@ -140,6 +140,7 @@ namespace Server
 
         public string GetConversation(string msg, int clientId)
         {
+
             return "";
         }
         public string StartNewConversation(string msg, int clientId)
