@@ -121,7 +121,20 @@ namespace Server
 
         public string GetFriends(string msg, int clientId)
         {
-            return "";
+            DbMethods dbConnection = new DbMethods();
+            string username;
+            List<string> activeUsersNames = new List<string>();
+            lock (activeUsers[clientId]) 
+            { 
+                if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage((int)ErrorCodes.NOT_LOGGED_IN, (int)Options.LOGIN);
+                dbConnection = activeUsers[clientId].dbConnection;
+                username = activeUsers[clientId].name;
+                foreach(User user in activeUsers)
+                {
+                    if (user.logged) activeUsersNames.Add(user.name);
+                }
+            }
+            return TransmisionProtocol.CreateServerMessage((int)ErrorCodes.NO_ERROR,(int)Options.LOGIN,dbConnection.GetFriends(username,activeUsersNames));
         }
 
         public string GetConversation(string msg, int clientId)

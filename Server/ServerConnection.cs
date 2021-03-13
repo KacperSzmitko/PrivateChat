@@ -114,6 +114,7 @@ namespace Server
         public ServerConnection()
         {
             menager = new ClientProcessing();
+            RunServer();
         }
     }
 }
