@@ -124,6 +124,7 @@ namespace Server
             DbMethods dbConnection = new DbMethods();
             string username;
             List<string> activeUsersNames = new List<string>();
+
             lock (activeUsers[clientId]) 
             { 
                 if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage((int)ErrorCodes.NOT_LOGGED_IN, (int)Options.LOGIN);
@@ -195,6 +196,7 @@ namespace Server
             functions.Add(new Functions(SendMessage));
 
             security = new Security();
+            activeUsers = new List<User>();
         }
     }
 }
