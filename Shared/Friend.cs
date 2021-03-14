@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DbLibrary
 {
-    public class User
+    public class Friend
     {
         public string username { get; set; }
         public int active { get; set; }

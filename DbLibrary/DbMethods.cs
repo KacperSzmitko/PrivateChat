@@ -9,6 +9,79 @@ namespace DbLibrary
 {
     public class DbMethods : DbConnection
     {
+
+        public bool SetUserConversationKey(string userId, string key, string conversationId)
+        {
+            string query = string.Format("UPDATE conversations SET user1_encrypted_key = '{0}' WHERE " +
+                "conversation_id = '{1}' AND user1_id = '{2}'", key,conversationId,userId);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            dataReader.Close();
+
+            query = string.Format("UPDATE conversations SET user2_encrypted_key = '{0}' WHERE " +
+            "conversation_id = '{1}' AND user2_id = '{2}'", key, conversationId, userId);
+            cmd = new MySqlCommand(query, connection);
+            dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            dataReader.Close();
+            return true;
+
+        }
+
+        public string AddFriends(string userAId, string usernameB)
+        {
+            string userBId = GetUserId(usernameB);
+            string query = string.Format("INSERT INTO friends(user1_id,user2_id) VALUES({0},{1})", userAId, userBId);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            dataReader.Close();
+
+            query = "SELECT LAST_INSERT_ID()";
+            cmd = new MySqlCommand(query, connection);
+            dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            try
+            {
+                return dataReader.GetString(0);
+            }
+            catch
+            {
+                return "";
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+            
+        }
+
+        public bool CheckFriends(string usernameA, string usernameB)
+        {
+            string userAId = GetUserId(usernameA);
+            string userBId = GetUserId(usernameB);
+
+            string query = string.Format("SELECT friend_id FROM friends WHERE (user1_id = '{0}' AND user2_id = '{1}') OR (user1_id = '{1}'  AND user2_id = '{0}')", userAId, userBId);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            try
+            {
+                string Id = dataReader.GetString(0);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+
+        }
+
         public bool AddNewUser(string username, string password)
         {
             string query = String.Format("INSERT INTO users(username,password_hash) VALUES('{0}','{1}')", username, password);
@@ -73,7 +146,7 @@ namespace DbLibrary
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
 
-            List<User> friends = new List<User>();
+            List<Friend> friends = new List<Friend>();
 
             try
             {
@@ -81,7 +154,7 @@ namespace DbLibrary
                 {
                     while (dataReader.Read())
                     {
-                        User friend = new User();
+                        Friend friend = new Friend();
                         friend.username = dataReader.GetString(0);
                         if (activeUsers.Contains(friend.username)) friend.active = 1;
                         else friend.active = 0;

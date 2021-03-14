@@ -14,6 +14,7 @@ namespace DbLibrary
 
         public bool AddMessage(string conversationId,Message message)
         {
+            db = redis.GetDatabase(0);
             try
             {
                 db.ListRightPush(conversationId, JsonConvert.SerializeObject(message));
@@ -28,11 +29,13 @@ namespace DbLibrary
 
         public string GetConversation(string conversationId)
         {
+            db = redis.GetDatabase(0);
             StringBuilder res = new StringBuilder("[");
             RedisValue[] conversation;
             try
             {
                 conversation = db.ListRange(conversationId, 0, -1);
+                var x = conversation[0];
             }
             catch
             {
@@ -51,6 +54,7 @@ namespace DbLibrary
             //Message m = new Message { message = "Witaj", date = DateTime.Now, username= "Piotr" };
             StringBuilder res = new StringBuilder("[");
             var x = db.ListRange("3",0,-1);
+
             foreach(var k in x)
             {
                 res.Append(k + ",");
@@ -65,7 +69,6 @@ namespace DbLibrary
         public Redis()
         {
             redis = ConnectionMultiplexer.Connect("192.168.0.9:6381");
-            db = redis.GetDatabase();
 
         }
     }

@@ -10,7 +10,7 @@ namespace Server
         /// <summary>
         /// Function which formats server data by using our transmition protocol
         /// </summary>
-        public static string CreateServerMessage(int errorCode, int option, params string[] fields)
+        public static string CreateServerMessage(ErrorCodes errorCode, Options option, params string[] fields)
         {
             string result = "";
 
@@ -23,24 +23,24 @@ namespace Server
 
                     if (option < 0) throw new ArgumentException("Invalid option!");
 
-                    else if (option == (int)Options.GET_CONVERSATION)
+                    else if (option == Options.GET_CONVERSATION)
                     {
                         AddFields(new[] { "ConversationKey","ConversationID", "Data" }, ref result, fields);
                     }
-                    else if (option == (int)Options.GET_FRIENDS || option == (int)Options.NEW_MESSAGES || option == (int)Options.NOTIFICATION
-                           ||option == (int)Options.SEND_INVITATION)
+                    else if (option == Options.GET_FRIENDS || option == Options.NEW_MESSAGES || option == Options.NOTIFICATION
+                           ||option == Options.SEND_INVITATION)
                     {
                         AddFields(new[] { "Data" }, ref result, fields);
                     }
-                    else if (option == (int)Options.ADD_FRIEND)
+                    else if (option == Options.ADD_FRIEND)
                     {
                         AddFields(new[] { "G", "P", "InvitationId" }, ref result, fields);
                     }
-                    else if (option == (int)Options.ACCEPT_FRIEND)
+                    else if (option == Options.ACCEPT_FRIEND)
                     {
                         AddFields(new[] { "ConversationID"}, ref result, fields);
                     }
-                    else if (option == (int)Options.ACCEPTED_FRIEND)
+                    else if (option == Options.ACCEPTED_FRIEND)
                     {
                         AddFields(new[] { "InvitationID","PK","ConversationID" }, ref result, fields);
                     }

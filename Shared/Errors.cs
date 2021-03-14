@@ -15,5 +15,10 @@ namespace Shared
         USER_ALREADY_EXISTS = 6,
         CONVERSATION_ALREADY_STARTED = 7,
         WRONG_CONVERSATION_ID = 8,
+        ALREADY_FRIENDS = 9,
+        DH_EXCHANGE_ERROR = 10,
+        DECLINE_FRIEND_ERROR = 11,
+        ADDING_FRIENDS_ERROR = 12,
+        WRONG_INVATATION_ID = 13,
     }
 }
