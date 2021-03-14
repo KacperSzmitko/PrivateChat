@@ -8,7 +8,7 @@ namespace DbLibrary
 {
     public class Redis
     {
-        private ConnectionMultiplexer redis;
+        public ConnectionMultiplexer redis { get; set; }
         public IDatabase db { get; set; }
 
 
