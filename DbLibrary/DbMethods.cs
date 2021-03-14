@@ -54,11 +54,11 @@ namespace DbLibrary
             try
             {
                 dataReader.Read();
-                string password = dataReader.GetString(0);
+                string usernameFromDatabase = dataReader.GetString(0);
             }
             catch
             {
-                this.CloseConnection();
+                dataReader.Close();
                 return false;
             }
             //close Data Reader
@@ -74,7 +74,7 @@ namespace DbLibrary
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
 
-            List<User> friends = new List<User>();
+            List<Friend> friends = new List<Friend>();
 
             try
             {
@@ -82,10 +82,10 @@ namespace DbLibrary
                 {
                     while (dataReader.Read())
                     {
-                        User friend = new User();
-                        friend.username = dataReader.GetString(0);
-                        if (activeUsers.Contains(friend.username)) friend.active = 1;
-                        else friend.active = 0;
+                        Friend friend = new Friend();
+                        friend.Username = dataReader.GetString(0);
+                        if (activeUsers.Contains(friend.Username)) friend.Active = 1;
+                        else friend.Active = 0;
                         friends.Add(friend);
                     }
                     query = string.Format("SELECT u2.username FROM friends f JOIN users u ON u.user_id = f.user2_id " +

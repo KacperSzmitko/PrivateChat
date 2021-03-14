@@ -11,7 +11,7 @@ namespace DbLibrary
         protected string password;
         public DbConnection()
         {
-            server = "10.8.0.1";
+            server = "192.168.1.250";
             database = "projekt_wti";
             uid = "user_io";
             password = "DN8OHj8mUkNmXBRm";

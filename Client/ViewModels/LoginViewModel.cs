@@ -64,9 +64,9 @@ namespace Client.ViewModels
             get {
                 if (loginCommand == null) {
                     loginCommand = new RelayCommand(_ => {
-                        User user = model.LoginUser(Username, Pass);
-                        if (user != null) {
-                            //navigator.CurrentViewModel = new HomeViewModel(connection, navigator, user);
+                        string username = model.LoginUser(Username, Pass);
+                        if (username != null) {
+                            navigator.CurrentViewModel = new ChatViewModel(connection, navigator, username);
                         }
                         else {
                             loginError = true;

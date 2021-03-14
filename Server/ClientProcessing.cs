@@ -81,6 +81,7 @@ namespace Server
                             }
                         }
                     }
+                    activeUsers[clientId].logged = true;
                     activeUsers[clientId].name = username;
                     activeUsers[clientId].userId = dbConnection.GetUserId(username);
                 }
