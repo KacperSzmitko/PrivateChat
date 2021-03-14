@@ -26,6 +26,8 @@ namespace Server
         public List<Functions> functions { get; set; }
         public List<User> activeUsers { get; set; }
         public Security security { get; set; }
+
+        public List<Tuple<int,int>> waitingInvitations { get; set; }
         /// <summary>
         /// Function that takes message from client procces it and return server response
         /// </summary>
@@ -80,6 +82,7 @@ namespace Server
                         }
                     }
                     activeUsers[clientId].name = username;
+                    activeUsers[clientId].userId = dbConnection.GetUserId(username);
                 }
                 return TransmisionProtocol.CreateServerMessage((int)ErrorCodes.NO_ERROR, (int)Options.LOGIN);
             }
@@ -132,28 +135,90 @@ namespace Server
                 username = activeUsers[clientId].name;
                 foreach(User user in activeUsers)
                 {
-                    if (user.logged) activeUsersNames.Add(user.name);
+                    activeUsersNames.Add(user.name);
                 }
             }
-            return TransmisionProtocol.CreateServerMessage((int)ErrorCodes.NO_ERROR,(int)Options.LOGIN,dbConnection.GetFriends(username,activeUsersNames));
+            return TransmisionProtocol.CreateServerMessage((int)ErrorCodes.NO_ERROR,(int)Options.GET_FRIENDS,dbConnection.GetFriends(username,activeUsersNames));
         }
 
         public string GetConversation(string msg, int clientId)
         {
+            string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
+            string secondUserName = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+            
+
+            lock(activeUsers[clientId])
+            {
+                string username = activeUsers[clientId].name;
+                string conversationId = activeUsers[clientId].dbConnection.GetConversationId(username, secondUserName);
+                string conversation = activeUsers[clientId].redis.GetConversation(conversationId);
+                string conversationKey = activeUsers[clientId].dbConnection.GetConversationKey(conversationId, username);
+                return TransmisionProtocol.CreateServerMessage((int)ErrorCodes.NO_ERROR,(int)Options.GET_CONVERSATION,conversationKey,conversationId,conversation);
+            }
+
+        }
+
+        private string AddFriend(string msg, int clientID)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        //TODO store parameters and send them to second user
+        public string ActivateConversation(string msg, int clientId)
+        {
+            string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
+            string secondUserName = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
 
             return "";
-        }
-        public string StartNewConversation(string msg, int clientId)
-        {
-            return "";
+    
         }
         public string SendConversationKey(string msg, int clientId)
         {
             return "";
         }
+
+        //TODO Check if ConversationId is in list
         public string SendMessage(string msg, int clientId)
         {
             return "";
+        }
+
+        public string NewMessage(string msg, int clientId)
+        {
+            return "";
+        }
+
+        private string AcceptedFriend(string msg, int clientID)
+        {
+            throw new NotImplementedException();
+        }
+
+        private string AcceptFriend(string msg, int clientID)
+        {
+            throw new NotImplementedException();
+        }
+
+        private string DeclineFriend(string msg, int clientID)
+        {
+            throw new NotImplementedException();
+        }
+
+        private string SendInvitation(string msg, int clientID)
+        {
+            throw new NotImplementedException();
+        }
+
+        private string DhExchange(string msg, int clientID)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        private string Notification(string msg, int clientID)
+        {
+            throw new NotImplementedException();
         }
 
         public int AddActiveUser()
@@ -170,9 +235,16 @@ namespace Server
             return activeUsers.Count - 1;
         }
 
-        public bool DeleteActiveUser(int userId)
+        public bool DeleteActiveUser(int clientId)
         {
-            try { lock(activeUsers[userId]) activeUsers[userId] = null; }
+            try {
+                lock (activeUsers[clientId])
+                {
+                    activeUsers[clientId].dbConnection.CloseConnection();
+                    activeUsers[clientId].redis.redis.Close();
+                    activeUsers[clientId] = null;
+                }
+            }
             catch
             {
                 return false;
@@ -192,12 +264,23 @@ namespace Server
             functions.Add(new Functions(Disconnect));
             functions.Add(new Functions(GetFriends));
             functions.Add(new Functions(GetConversation));
-            functions.Add(new Functions(StartNewConversation));
-            functions.Add(new Functions(SendConversationKey));
+            functions.Add(new Functions(ActivateConversation));
             functions.Add(new Functions(SendMessage));
+            functions.Add(new Functions(NewMessage));
+            functions.Add(new Functions(Notification));
+            functions.Add(new Functions(AddFriend));
+            functions.Add(new Functions(DhExchange));
+            functions.Add(new Functions(SendInvitation));
+            functions.Add(new Functions(DeclineFriend));
+            functions.Add(new Functions(AcceptFriend));
+            functions.Add(new Functions(SendConversationKey));
+            functions.Add(new Functions(AcceptedFriend));
 
             security = new Security();
             activeUsers = new List<User>();
+            waitingInvitations = new List<Tuple<int, int>>();
         }
+
+
     }
 }

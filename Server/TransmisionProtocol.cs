@@ -25,15 +25,24 @@ namespace Server
 
                     else if (option == (int)Options.GET_CONVERSATION)
                     {
-                        AddFields(new[] { "Data","ConversationKey","ConversationID" }, ref result, fields);
+                        AddFields(new[] { "ConversationKey","ConversationID", "Data" }, ref result, fields);
                     }
-                    else if (option == (int)Options.GET_FRIENDS)
+                    else if (option == (int)Options.GET_FRIENDS || option == (int)Options.NEW_MESSAGES || option == (int)Options.NOTIFICATION
+                           ||option == (int)Options.SEND_INVITATION)
                     {
                         AddFields(new[] { "Data" }, ref result, fields);
                     }
-                    else if (option == (int)Options.START_NEW_CONVERSATION)
+                    else if (option == (int)Options.ADD_FRIEND)
                     {
-                        AddFields(new[] { "ConversationID", "N", "G" }, ref result, fields);
+                        AddFields(new[] { "G", "P", "InvitationId" }, ref result, fields);
+                    }
+                    else if (option == (int)Options.ACCEPT_FRIEND)
+                    {
+                        AddFields(new[] { "ConversationID"}, ref result, fields);
+                    }
+                    else if (option == (int)Options.ACCEPTED_FRIEND)
+                    {
+                        AddFields(new[] { "InvitationID","PK","ConversationID" }, ref result, fields);
                     }
                 }
                 catch (ArgumentOutOfRangeException)

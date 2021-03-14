@@ -13,5 +13,7 @@ namespace Shared
         INCORRECT_PASSWORD = 5,
         // Registry
         USER_ALREADY_EXISTS = 6,
+        CONVERSATION_ALREADY_STARTED = 7,
+        WRONG_CONVERSATION_ID = 8,
     }
 }
