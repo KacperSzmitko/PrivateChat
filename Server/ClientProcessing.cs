@@ -139,7 +139,7 @@ namespace Server
                     activeUsersNames.Add(user.name);
                 }
             }
-            return TransmisionProtocol.CreateServerMessage((int)ErrorCodes.NO_ERROR,(int)Options.GET_FRIENDS,dbConnection.GetFriends(username,activeUsersNames));
+            return TransmisionProtocol.CreateServerMessage((int)ErrorCodes.NO_ERROR,(int)Options.LOGIN,dbConnection.GetFriends(username,activeUsersNames));
         }
 
         public string GetConversation(string msg, int clientId)

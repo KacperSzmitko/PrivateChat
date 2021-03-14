@@ -37,6 +37,8 @@ namespace Client.Models
             else throw new Exception(GetErrorCodeName(error));
         }
 
-        public RegisterModel(ServerConnection connection) : base(connection) {}
+        public RegisterModel(ServerConnection connection) : base(connection) {
+            
+        }
     }
 }

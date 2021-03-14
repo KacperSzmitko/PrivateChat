@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Shared;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -65,7 +64,8 @@ namespace DbLibrary
 
         public Redis()
         {
-            
+            redis = ConnectionMultiplexer.Connect("192.168.0.9:6381");
+            db = redis.GetDatabase();
 
         }
     }

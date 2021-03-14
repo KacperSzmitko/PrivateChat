@@ -21,12 +21,8 @@
         <DataTemplate DataType="{x:Type viewmodels:RegisterViewModel}">
             <views:RegisterView/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:ChatViewModel}">
-            <views:ChatView/>
-        </DataTemplate>
 
         <converters:StringToIntConverter x:Key="stringToIntConverter"/>
-        <converters:IntToColorConverter x:Key="intToColorConverter"/>
 
     </Application.Resources>
 </Application>

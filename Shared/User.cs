@@ -4,11 +4,9 @@ using System.Text;
 
 namespace DbLibrary
 {
-    public class Message
+    public class User
     {
-        public string message { get; set; }
-        public DateTime date { get; set; }
         public string username { get; set; }
-        
+        public int active { get; set; }
     }
 }
