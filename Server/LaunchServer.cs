@@ -11,6 +11,7 @@ namespace Server
         {
             //ServerConnection connection = new ServerConnection();
             Redis redis = new Redis();
+            //redis.AddMessage("23", new Shared.Message { date = DateTime.Now, message = "Nowa", username = "Łukasz" });
 
 
         }
