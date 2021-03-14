@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Shared;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;

@@ -9,8 +9,9 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            //ServerConnection connection = new ServerConnection();
+            ServerConnection connection = new ServerConnection();
 
+            /*
             ClientProcessing cp = new ClientProcessing();
             int id = cp.AddActiveUser();
             int id1 = cp.AddActiveUser();
@@ -19,7 +20,7 @@ namespace Server
             cp.AddFriend("SecondUserName:test7$$", id);
             cp.DhExchange("InvitationID:0$$PK:656665$$",id);
             Console.WriteLine(cp.SendInvitation("",id1));
-            /*
+            
             Security s = new Security();
             var par = s.GenerateParameters();
             var Akeys = s.GenerateKeys(par);
