@@ -1,8 +1,6 @@
 ﻿using Client.Commands;
 using Client.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Windows.Input;
 
@@ -17,21 +15,17 @@ namespace Client.ViewModels
         private RelayCommand registerCommand;
         private RelayCommand goLoginCommand;
 
-        private string username;
-        private string pass1;
-        private string pass2;
-
         private bool goodUsername;
         private bool usernameAvailable;
         private bool goodPass1;
         private bool goodPass2;
 
         public string Username {
-            get { return username; }
+            get { return model.Username; }
             set {
-                if (value != username) {
-                    username = value;
-                    if (model.CheckUsernameText(username)) goodUsername = true;
+                if (value != model.Username) {
+                    model.Username = value;
+                    if (model.CheckUsernameText(model.Username)) goodUsername = true;
                     else goodUsername = false;
                     UpdateUsernameBox();
                     if (goodUsername) {
@@ -43,11 +37,11 @@ namespace Client.ViewModels
         }
 
         public string Pass1 {
-            get { return pass1; }
+            get { return model.Pass1; }
             set {
-                if (value != pass1) {
-                    pass1 = value;
-                    if (model.CheckPasswordText(pass1)) goodPass1 = true;
+                if (value != model.Pass1) {
+                    model.Pass1 = value;
+                    if (model.CheckPasswordText(model.Pass1)) goodPass1 = true;
                     else goodPass1 = false;
                     UpdatePass1Box();
                 }
@@ -55,11 +49,11 @@ namespace Client.ViewModels
         }
 
         public string Pass2 {
-            get { return pass2; }
+            get { return model.Pass2; }
             set {
-                if (value != pass2) {
-                    pass2 = value;
-                    if (model.CheckPasswordText(pass2) && model.CheckPasswordsAreEqual(Pass1, pass2)) goodPass2 = true;
+                if (value != model.Pass2) {
+                    model.Pass2 = value;
+                    if (model.CheckPasswordText(model.Pass2) && model.CheckPasswordsAreEqual(model.Pass1, model.Pass2)) goodPass2 = true;
                     else goodPass2 = false;
                     UpdatePass2Box();
                 }

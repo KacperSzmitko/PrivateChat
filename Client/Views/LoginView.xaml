@@ -10,8 +10,8 @@
 
     <Border Padding="110 0 110 0">
         <Grid>
-            <TextBlock Margin="0 525 0 0" HorizontalAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow" Visibility="{Binding SuccessfulRegistrationMessageVisibility}" d:Visibility="Collapsed">Zarejstrowano, możesz się teraz zalogować</TextBlock>
-            <TextBlock Margin="0 525 0 0" HorizontalAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow" Foreground="Crimson" Visibility="{Binding LoginErrorMessageVisibility}" d:Visibility="Collapsed">Błędny login i/lub hasło</TextBlock>
+            <TextBlock Margin="0 475 0 0" HorizontalAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow" Visibility="{Binding SuccessfulRegistrationMessageVisibility}" d:Visibility="Collapsed">Zarejstrowano, możesz się teraz zalogować</TextBlock>
+            <TextBlock Margin="0 475 0 0" HorizontalAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow" Foreground="Crimson" Visibility="{Binding LoginErrorMessageVisibility}" d:Visibility="Visible">Błędny login i/lub hasło</TextBlock>
             <StackPanel VerticalAlignment="Center">
                 <TextBlock FontWeight="Bold" FontSize="30" TextAlignment="Center" Text="Zaloguj się do Private Chat"/>
                 <Grid Margin="0 25 0 0">

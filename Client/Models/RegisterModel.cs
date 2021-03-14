@@ -9,6 +9,16 @@ namespace Client.Models
 {
     public class RegisterModel : BaseModel
     {
+        private string username;
+        private string pass1;
+        private string pass2;
+
+        public string Username { get { return username; } set { username = value; } }
+        public string Pass1 { get { return pass1; } set { pass1 = value; } }
+        public string Pass2 { get { return pass2; } set { pass2 = value; } }
+
+        public RegisterModel(ServerConnection connection) : base(connection) { }
+
         public bool CheckUsernameText(string username) {
             if (Regex.Match(username, @"^[\w]{3,}$").Success) return true;
             else return false;
@@ -37,8 +47,6 @@ namespace Client.Models
             else throw new Exception(GetErrorCodeName(error));
         }
 
-        public RegisterModel(ServerConnection connection) : base(connection) {
-            
-        }
+       
     }
 }

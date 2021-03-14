@@ -1,9 +1,6 @@
 ﻿using Client.Commands;
 using Client.Models;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
 using System.Windows.Input;
 
 namespace Client.ViewModels 
@@ -15,19 +12,17 @@ namespace Client.ViewModels
         private RelayCommand loginCommand;
         private RelayCommand goRegistratonCommand;
 
-        private string username;
-        private string pass;
         private bool goodUsername;
         private bool goodPass;
         private bool successRegistration;
         private bool loginError;
 
         public string Username {
-            get { return username; }
+            get { return model.Username; }
             set {
-                if (value != username) {
-                    username = value;
-                    if (!String.IsNullOrEmpty(username)) goodUsername = true;
+                if (value != model.Username) {
+                    model.Username = value;
+                    if (!String.IsNullOrEmpty(model.Username)) goodUsername = true;
                     else goodUsername = false;
                     OnPropertyChanged(nameof(Username));
                 }
@@ -35,11 +30,11 @@ namespace Client.ViewModels
         }
 
         public string Pass {
-            get { return pass; }
+            get { return model.Pass; }
             set {
-                if (value != pass) {
-                    pass = value;
-                    if (!String.IsNullOrEmpty(pass)) goodPass = true;
+                if (value != model.Pass) {
+                    model.Pass = value;
+                    if (!String.IsNullOrEmpty(model.Pass)) goodPass = true;
                     else goodPass = false;
                     OnPropertyChanged(nameof(Pass));
                 }
