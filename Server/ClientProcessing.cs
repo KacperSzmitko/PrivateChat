@@ -251,11 +251,12 @@ namespace Server
             {
                 lock (invitations)
                 {
-                    conversationId = activeUsers[clientId].dbConnection.AddFriends(activeUsers[clientId].userId, invitations[invId].sender);
-                    if(conversationId == "") return TransmisionProtocol.CreateServerMessage(ErrorCodes.ADDING_FRIENDS_ERROR, Options.LOGIN);
-
                     try
                     {
+                        conversationId = activeUsers[clientId].dbConnection.AddFriends(activeUsers[clientId].userId, invitations[invId].sender);
+                    if(conversationId == "") return TransmisionProtocol.CreateServerMessage(ErrorCodes.ADDING_FRIENDS_ERROR, Options.LOGIN);
+
+
                         invitations[invId].publicKeyReciver = reciverPk;
                         invitations[invId].accepted = true;
                         invitations[invId].conversationId = conversationId;
@@ -274,8 +275,8 @@ namespace Server
         public string SendConversationKey(string msg, int clientId)
         {
             string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
-            string conversationKey = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
-            string conversationId = fields[1].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+            string conversationId = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+            string conversationKey = fields[1].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
 
  
             lock(activeUsers[clientId])
@@ -291,7 +292,7 @@ namespace Server
             string username;
             lock(activeUsers[clientId])
             {
-                if (!activeUsers[clientId].logged) return "";
+                if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOTHING_TO_SEND, Options.LOGIN);
                 username = activeUsers[clientId].name;
             }
             List<Invitation> invs = new List<Invitation>();
@@ -311,13 +312,13 @@ namespace Server
             {
                 return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_INVITATION, JsonConvert.SerializeObject(invs));
             }
-            else return "";
+            else return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOTHING_TO_SEND, Options.LOGIN);
         }
 
         public string AcceptedFriend(string msg, int clientId)
         {
             string username;
-            if (!activeUsers[clientId].logged) return "";
+            if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOTHING_TO_SEND, Options.LOGIN);
             username = activeUsers[clientId].name;
             lock(invitations)
             {
@@ -332,7 +333,7 @@ namespace Server
                         return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ACCEPTED_FRIEND, invId.ToString(), pk, conversationId);
                     }
                 }
-                return "";
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOTHING_TO_SEND, Options.LOGIN);
             }
         }
 

@@ -38,7 +38,6 @@ namespace Server
             int clientId = menager.AddActiveUser();
             byte[] message;
 
-            //Task.Run(() => { ServerMessagesAsync(stream, clientID); });
             while (true)
             {
                 try
@@ -68,36 +67,6 @@ namespace Server
                         Thread.Sleep(1000);
                         break;
                     }
-
-                    message = Encoding.ASCII.GetBytes(sendMessage);
-                    //Send response
-                    stream.Write(message);
-                }
-                catch
-                {
-                    return;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Used in async comunication like:
-        /// Revice message from another user
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="clientID"></param>
-        public async void ServerMessagesAsync(Object obj, int clientID)
-        {
-            NetworkStream stream = obj as NetworkStream;
-            string sendMessage = "";
-            byte[] message;
-            while (true)
-            {
-                try
-                {
-                    //Prepare response
-                    sendMessage = "";
-
 
                     message = Encoding.ASCII.GetBytes(sendMessage);
                     //Send response

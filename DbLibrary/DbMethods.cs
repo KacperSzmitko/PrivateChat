@@ -63,7 +63,7 @@ namespace DbLibrary
             string userAId = GetUserId(usernameA);
             string userBId = GetUserId(usernameB);
 
-            string query = string.Format("SELECT friend_id FROM friends WHERE (user1_id = '{0}' AND user2_id = '{1}') OR (user1_id = '{1}'  AND user2_id = '{0}')", userAId, userBId);
+            string query = string.Format("SELECT friend_id FROM friends WHERE (user1_id = {0} AND user2_id = {1}) OR (user1_id = {1}  AND user2_id = {0})", userAId, userBId);
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
             dataReader.Read();
