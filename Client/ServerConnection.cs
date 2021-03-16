@@ -11,6 +11,8 @@ namespace Client
         private readonly TcpClient tcpClient;
         private readonly NetworkStream stream;
 
+        private int connectionSemaphore;
+
         public bool DataAvailable {
             get { return stream.DataAvailable; }
         }
@@ -18,9 +20,14 @@ namespace Client
         public ServerConnection(string serverAddress, ushort serverPort) {
             this.tcpClient = new TcpClient(serverAddress, serverPort);
             this.stream = tcpClient.GetStream();
+            this.connectionSemaphore = 0;
         }
 
         public void SendMessage(string message) {
+
+            while (connectionSemaphore != 0) ;
+            connectionSemaphore++;
+
             byte[] messageBytes = Encoding.ASCII.GetBytes(message);
             this.stream.Write(messageBytes);
             this.stream.Flush();
@@ -37,6 +44,8 @@ namespace Client
                 decoder.GetChars(buffer, 0, bytesRead, chars, 0);
                 messageString += new string(chars);
             } while (stream.DataAvailable);
+
+            connectionSemaphore--;
 
             return messageString;
         }
