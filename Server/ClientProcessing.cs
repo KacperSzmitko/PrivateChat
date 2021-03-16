@@ -29,6 +29,16 @@ namespace Server
         public Security security { get; set; }
 
         public List<ExtendedInvitation> invitations { get; set; }
+
+        //D(recvUserId:Dict(convId:List<message>))
+        public Dictionary<int,Dictionary<int,List<Message>>> messagesToSend { get; set; }
+
+        // D(recvUserId:Dict(convId:notification))
+        public Dictionary<int, Dictionary<int, Notification>> notifications { get; set; }
+        // userId:convId
+        public Dictionary<int,int> activeConversations { get; set; }
+
+
         /// <summary>
         /// Function that takes message from client procces it and return server response
         /// </summary>
@@ -85,6 +95,7 @@ namespace Server
                     activeUsers[clientId].logged = true;
                     activeUsers[clientId].name = username;
                     activeUsers[clientId].userId = dbConnection.GetUserId(username);
+
                 }
                 return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.LOGIN);
             }
@@ -119,6 +130,10 @@ namespace Server
 
         public string Disconnect(string msg, int clientId)
         {
+            lock (activeConversations)
+            {
+                if (activeConversations.ContainsKey(activeUsers[clientId].userId)) activeConversations.Remove(activeUsers[clientId].userId);
+            }
             if (DeleteActiveUser(clientId))
                 return "";
             return TransmisionProtocol.CreateServerMessage(ErrorCodes.DISCONNECT_ERROR, Options.DISCONNECT);
@@ -154,10 +169,10 @@ namespace Server
             {
                 if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
                 string username = activeUsers[clientId].name;
-                string conversationId = activeUsers[clientId].dbConnection.GetConversationId(username, secondUserName);
+                int conversationId = activeUsers[clientId].dbConnection.GetConversationId(username, secondUserName);
                 string conversation = activeUsers[clientId].redis.GetConversation(conversationId);
                 string conversationKey = activeUsers[clientId].dbConnection.GetConversationKey(conversationId, username);
-                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.GET_CONVERSATION,conversationKey,conversationId,conversation);
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.GET_CONVERSATION,conversationKey,conversationId.ToString(),conversation);
             }
 
         }
@@ -239,7 +254,7 @@ namespace Server
             return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.DECLINE_FRIEND);
         }
 
-        // Errors
+        // TEST
         public string AcceptFriend(string msg, int clientId)
         {
             string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
@@ -281,7 +296,7 @@ namespace Server
  
             lock(activeUsers[clientId])
             {
-                activeUsers[clientId].dbConnection.SetUserConversationKey(activeUsers[clientId].userId, conversationKey, conversationId);
+                activeUsers[clientId].dbConnection.SetUserConversationKey(activeUsers[clientId].userId, conversationKey, int.Parse(conversationId));
             }
             return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_CONVERSATION_KEY);
         }
@@ -338,26 +353,132 @@ namespace Server
         }
 
 
+        public string Notification(string msg, int clientId)
+        {
+            if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
+            int userId = activeUsers[clientId].userId;
+
+            lock (notifications)
+            {
+                try
+                {
+                    string notify = JsonConvert.SerializeObject(notifications[userId].Values);
+                    notifications[userId].Clear();
+                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.NOTIFICATION,notify );
+                }
+                catch
+                {
+                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_NOTIFICATIONS, Options.NOTIFICATION, "");
+                }
+
+            }
+
+        }
+
+        //TODO Backup invitations
+
         //TODO store parameters and send them to second user
         public string ActivateConversation(string msg, int clientId)
         {
             string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
-            string secondUserName = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
-
-            return "";
-    
+            int conversationId = int.Parse(fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1]);
+            int userId = activeUsers[clientId].userId;
+            try
+            {
+                lock(activeConversations)
+                {
+                    activeConversations[userId] = conversationId;
+                    activeUsers[clientId].activeConversation = conversationId;
+                }
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ACTIVATE_CONVERSATION);
+            }
+            catch
+            {
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.CANNOT_ACTIVATE_CONVERSATION, Options.ACTIVATE_CONVERSATION);
+            }   
         }
 
 
-        //TODO Check if ConversationId is in list
+        //TEST
         public string SendMessage(string msg, int clientId)
         {
-            return "";
+            string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
+            string username = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+            string message = fields[1].Split(":", 2,StringSplitOptions.RemoveEmptyEntries)[1];
+            int id = activeUsers[clientId].dbConnection.GetUserId(username);
+            int conversationId = activeUsers[clientId].dbConnection.GetConversationId(username, activeUsers[clientId].name);
+            activeUsers[clientId].redis.AddMessage(conversationId, message);
+
+
+            lock (messagesToSend)
+            {
+
+                if (messagesToSend.ContainsKey(id))
+                {
+                    messagesToSend[id][conversationId].Add(JsonConvert.DeserializeObject<Message>(message));
+                }
+                else
+                {
+                    messagesToSend.Add(id, new Dictionary<int, List<Message>>()
+                    {
+                        [conversationId] =
+                        new List<Message> { JsonConvert.DeserializeObject<Message>(message) }
+                    });
+                }
+
+            }
+            lock (activeConversations)
+            {
+                if (!activeConversations.ContainsKey(id))
+                {
+                    activeConversations[id] = -1;
+                }
+                if (!(conversationId == activeConversations[id]))
+                {
+                    lock (notifications)
+                    {
+                        if (notifications.ContainsKey(id))
+                        {
+                            notifications[id][conversationId].numberOfMessages += 1;
+                        }
+                        else
+                        {
+                            notifications.Add(id, new Dictionary<int, Notification>()
+                            {
+                                [conversationId] =
+                                new Notification { numberOfMessages = 1, username = username }
+                            });
+                        }
+                    }
+                }
+
+            }
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_MESSAGE);
         }
 
-        public string NewMessage(string msg, int clientId)
+        public string NewMessages(string msg, int clientId)
         {
-            return "";
+            int id = activeUsers[clientId].userId;
+            int activeConversationId = 0;
+            lock (activeConversations)
+            {
+                activeConversationId = activeConversations[id];
+            }
+            try
+            {               
+                lock (messagesToSend[id])
+                {
+                    var messages = JsonConvert.SerializeObject(messagesToSend[id][activeConversationId]);
+                    messagesToSend[id][activeConversationId].Clear();
+                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.NEW_MESSAGES,
+                        messages);
+                }                
+            }
+            catch
+            {
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_MESSAGES, Options.SEND_MESSAGE);
+            }
+
         }
 
 
@@ -367,10 +488,7 @@ namespace Server
 
 
 
-        public string Notification(string msg, int clientId)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public int AddActiveUser()
         {
@@ -430,7 +548,7 @@ namespace Server
             functions.Add(new Functions(GetConversation));
             functions.Add(new Functions(ActivateConversation));
             functions.Add(new Functions(SendMessage));
-            functions.Add(new Functions(NewMessage));
+            functions.Add(new Functions(NewMessages));
             functions.Add(new Functions(Notification));
             functions.Add(new Functions(AddFriend));
             functions.Add(new Functions(DhExchange));
@@ -443,6 +561,9 @@ namespace Server
             security = new Security();
             activeUsers = new List<User>();
             invitations = new List<ExtendedInvitation>();
+            messagesToSend = new Dictionary<int, Dictionary<int, List<Message>>>();
+            notifications = new Dictionary<int, Dictionary<int, Notification>>();
+            activeConversations = new Dictionary<int, int>();
         }
 
 

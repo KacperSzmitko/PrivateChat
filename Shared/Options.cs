@@ -14,7 +14,7 @@ namespace Shared
         GET_CONVERSATION = 6,       //  SecondUserName:<>                           Error:<>$$ConversationKey:<>$$ConversationID:<>$$Data:<JSONMessage>$$
 
         ACTIVATE_CONVERSATION = 7,  //  ConversationID:<>$$                         Error:<>$$
-        SEND_MESSAGE = 8,           //  ConversationID:<>$$Data:<JSON>$$            Error:<>$$
+        SEND_MESSAGE = 8,           //  Username:<>$$Data:<JSON>$$                  Error:<>$$
         NEW_MESSAGES = 9,           //  SERVER ONLY                                 Error:<>$$Data:<JSONDataMessage>$$
         NOTIFICATION = 10,          //  SERVER ONLY                                 Error:<>$$Data:<JSONData>$$ (user:numerOfMessages)
 

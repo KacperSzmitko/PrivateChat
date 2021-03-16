@@ -13,16 +13,16 @@ namespace Server
         public Redis redis { get; set; }
         public bool logged { get; set; }
 
-        public SortedSet<int> activeConversations { get; set; }
+        public int activeConversation { get; set; }
 
-        public string userId { get; set; }
+        public int userId { get; set; }
 
         public User()
         {
             name = "";
             dbConnection = new DbMethods();
             redis = new Redis();
-            activeConversations = new SortedSet<int>();
+            activeConversation = -1;
             logged = false;
         }
     }

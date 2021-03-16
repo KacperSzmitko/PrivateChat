@@ -1,4 +1,6 @@
 ﻿using DbLibrary;
+using Newtonsoft.Json;
+using Shared;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -9,6 +11,7 @@ namespace Server
     {
         public static void Main(string[] args)
         {
+
             ServerConnection connection = new ServerConnection();
 
             /*
@@ -17,6 +20,19 @@ namespace Server
             int id1 = cp.AddActiveUser();
             cp.Login("Username:test8$$Password:test1234$$", id);
             cp.Login("Username:test7$$Password:12345678$$", id1);
+
+            Console.WriteLine(cp.ActivateConversation("ConversationID:6$$", id));
+            Console.WriteLine(cp.NewMessages("", id));
+            Message m = new Message { date = DateTime.Now, message = "test", username = "tar" };
+            string s = JsonConvert.SerializeObject(m);
+            Console.WriteLine(cp.SendMessage(String.Format("Username:test7$$Data:{0}$$",s),id));
+            Console.WriteLine(cp.SendMessage(String.Format("Username:test7$$Data:{0}$$", s), id));
+            Console.WriteLine(cp.Notification("",id1));
+            Console.WriteLine(cp.Notification("", id1));
+            Console.WriteLine(cp.ActivateConversation("ConversationID:6$$", id1));
+            Console.WriteLine(cp.NewMessages("", id1));
+
+            
             Console.WriteLine(cp.AddFriend("SecondUserName:test7$$", id));
             Console.WriteLine(cp.DhExchange("InvitationID:0$$PK:656665$$",id));
             Console.WriteLine(cp.SendInvitation("",id1));
