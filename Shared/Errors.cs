@@ -20,5 +20,9 @@ namespace Shared
         DECLINE_FRIEND_ERROR = 11,
         ADDING_FRIENDS_ERROR = 12,
         WRONG_INVATATION_ID = 13,
+        NOTHING_TO_SEND = 14,
+        NO_NOTIFICATIONS = 15,
+        CANNOT_ACTIVATE_CONVERSATION = 16,
+        NO_MESSAGES = 17,
     }
 }

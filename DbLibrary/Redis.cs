@@ -13,12 +13,13 @@ namespace DbLibrary
         public IDatabase db { get; set; }
 
 
-        public bool AddMessage(string conversationId,Message message)
+        public bool AddMessage(int conversationID,string message)
         {
+            string conversationId = conversationID.ToString();
             db = redis.GetDatabase(0);
             try
             {
-                db.ListRightPush(conversationId, JsonConvert.SerializeObject(message));
+                db.ListRightPush(conversationId, message);
                 return true;
             }
             catch
@@ -28,8 +29,9 @@ namespace DbLibrary
         }
 
 
-        public string GetConversation(string conversationId)
+        public string GetConversation(int conversationID)
         {
+            string conversationId = conversationID.ToString();
             db = redis.GetDatabase(0);
             StringBuilder res = new StringBuilder("[");
             RedisValue[] conversation;
@@ -50,22 +52,38 @@ namespace DbLibrary
             return res.ToString();
         }
 
-        public void test()
+
+        public List<T> GetFromRedis<T>(string key) where T: ExtendedInvitation
         {
-            //Message m = new Message { message = "Witaj", date = DateTime.Now, username= "Piotr" };
-            StringBuilder res = new StringBuilder("[");
-            var x = db.ListRange("3",0,-1);
+            db = redis.GetDatabase(1);
 
-            foreach(var k in x)
+            try
             {
-                res.Append(k + ",");
+                var data = db.StringGet(key);
+                return JsonConvert.DeserializeObject<List<T>>(data);
             }
-            res[res.Length-1] = ']';
-
-
-            //List<Message> des = JsonConvert.DeserializeObject<List<Message>>(res.ToString());
-
+            catch
+            {
+                return null;
+            }
         }
+
+
+        public void StoreInRedis<T>(List<T> data)
+        {
+            db = redis.GetDatabase(1);
+            if (data.Count < 1) return;
+            if(data[0].GetType() == typeof(Invitation))
+            {
+                db.StringSet("invs", JsonConvert.SerializeObject(data));
+            }
+            else
+            {
+                db.StringSet("messagesToSend", JsonConvert.SerializeObject(data));
+            }
+            
+        }
+
 
         public Redis()
         {

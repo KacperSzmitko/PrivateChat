@@ -11,8 +11,11 @@ namespace DbLibrary
     public class DbMethods : DbConnection
     {
 
-        public bool SetUserConversationKey(string userId, string key, string conversationId)
+        public bool SetUserConversationKey(int userID, string key, int conversationID)
         {
+            string userId = userID.ToString();
+            string conversationId = conversationID.ToString();
+
             string query = string.Format("UPDATE conversations SET user1_encrypted_key = '{0}' WHERE " +
                 "conversation_id = '{1}' AND user1_id = '{2}'", key,conversationId,userId);
             MySqlCommand cmd = new MySqlCommand(query, connection);
@@ -30,40 +33,27 @@ namespace DbLibrary
 
         }
 
-        public string AddFriends(string userAId, string usernameB)
+        public string AddFriends(int userAID, string usernameB)
         {
-            string userBId = GetUserId(usernameB);
+            string userAId = userAID.ToString();
+            string userBId = GetUserId(usernameB).ToString();
             string query = string.Format("INSERT INTO friends(user1_id,user2_id) VALUES({0},{1})", userAId, userBId);
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
             dataReader.Read();
             dataReader.Close();
-
-            query = "SELECT LAST_INSERT_ID()";
-            cmd = new MySqlCommand(query, connection);
-            dataReader = cmd.ExecuteReader();
-            dataReader.Read();
-            try
-            {
-                return dataReader.GetString(0);
-            }
-            catch
-            {
-                return "";
-            }
-            finally
-            {
-                dataReader.Close();
-            }
+            return CreateNewConversation(userAId, usernameB);
             
         }
 
+
+
         public bool CheckFriends(string usernameA, string usernameB)
         {
-            string userAId = GetUserId(usernameA);
-            string userBId = GetUserId(usernameB);
+            string userAId = GetUserId(usernameA).ToString();
+            string userBId = GetUserId(usernameB).ToString();
 
-            string query = string.Format("SELECT friend_id FROM friends WHERE (user1_id = '{0}' AND user2_id = '{1}') OR (user1_id = '{1}'  AND user2_id = '{0}')", userAId, userBId);
+            string query = string.Format("SELECT friend_id FROM friends WHERE (user1_id = {0} AND user2_id = {1}) OR (user1_id = {1}  AND user2_id = {0})", userAId, userBId);
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
             dataReader.Read();
@@ -179,9 +169,9 @@ namespace DbLibrary
         }
 
         // TEST
-        public bool CreateNewConversation(string IdA, string bUsername)
+        public string CreateNewConversation(string IdA, string bUsername)
         {
-            string IdB = GetUserId(bUsername);
+            string IdB = GetUserId(bUsername).ToString();
             string query = string.Format("SELECT * FROM conversations WHERE (user1_id = '{0}' AND user2_id = '{1}') OR (user1_id = '{1}'  AND user2_id = '{0}')", IdA, IdB);
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
@@ -191,7 +181,7 @@ namespace DbLibrary
             {
                 dataReader.Read();
                 dataReader.GetString(0);
-                return false;
+                return "";
             }
             catch
             {
@@ -204,13 +194,29 @@ namespace DbLibrary
             cmd = new MySqlCommand(query, connection);
             dataReader = cmd.ExecuteReader();
             dataReader.Close();
-            return true;
+
+            query = "SELECT LAST_INSERT_ID()";
+            cmd = new MySqlCommand(query, connection);
+            dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            try
+            {
+                return dataReader.GetString(0);
+            }
+            catch
+            {
+                return "";
+            }
+            finally
+            {
+                dataReader.Close();
+            }
         }
 
-        public string GetConversationId(string usernameA, string usernameB)
+        public int GetConversationId(string usernameA, string usernameB)
         {
-            string userAId = GetUserId(usernameA);
-            string userBId = GetUserId(usernameB);
+            string userAId = GetUserId(usernameA).ToString();
+            string userBId = GetUserId(usernameB).ToString();
 
             string query = string.Format("SELECT conversation_id FROM conversations WHERE (user1_id = '{0}' AND user2_id = '{1}') OR (user1_id = '{1}'  AND user2_id = '{0}')", userAId, userBId);
             MySqlCommand cmd = new MySqlCommand(query, connection);
@@ -218,12 +224,13 @@ namespace DbLibrary
             dataReader.Read();
             string Id = dataReader.GetString(0);
             dataReader.Close();
-            return Id;
+            return int.Parse(Id);
         }
 
-        public string GetConversationKey(string conversationId, string username)
+        public string GetConversationKey(int conversationID, string username)
         {
-            string id = GetUserId(username);
+            string conversationId = conversationID.ToString();
+            string id = GetUserId(username).ToString();
             string query = string.Format("SELECT * FROM conversations WHERE conversation_id = '{0}'", conversationId);
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
@@ -251,7 +258,7 @@ namespace DbLibrary
             return "";
         }
 
-        public string GetUserId(string username)
+        public int GetUserId(string username)
         {
             string query = "SELECT user_id FROM users " + String.Format("WHERE username = '{0}'", username);
 
@@ -263,7 +270,7 @@ namespace DbLibrary
                 dataReader.Read();
                 string userId = dataReader.GetString(0);
                 dataReader.Close();
-                return userId;
+                return int.Parse(userId);
             }
             catch
             {
