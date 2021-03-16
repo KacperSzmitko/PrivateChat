@@ -89,7 +89,9 @@ namespace Client.ViewModels
                 }
                 if (userAlredyAFriend) lastInvitationStatus = InvitationStatus.USER_ALREADY_A_FRIEND;
                 else {
-                    //Send invitation
+                    var p_g_invitationID = model.SendInvitation(Username);
+                    
+
                     lastInvitationStatus = InvitationStatus.INVITATION_SENT;
                 }
             }
@@ -98,7 +100,7 @@ namespace Client.ViewModels
             OnPropertyChanged(nameof(UserAlreadyAFriendErrorVisibility));
             OnPropertyChanged(nameof(InvitationSentInfoVisibility));
 
-            Thread.Sleep(5000);
+            Thread.Sleep(10000);
 
             model.InvitationUsername = "";
             lastInvitationStatus = InvitationStatus.NO_INVITATION;

@@ -1,4 +1,5 @@
-﻿using Shared;
+﻿using Org.BouncyCastle.Crypto.Parameters;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -38,6 +39,18 @@ namespace Client.Models
             if (error == (int)ErrorCodes.NO_ERROR) return false;
             else if (error == (int)ErrorCodes.USER_ALREADY_EXISTS) return true;
             else throw new Exception(GetErrorCodeName(error));
+        }
+
+        public (string g, string p, int invitationID) SendInvitation(string username) {
+            ServerCommands.SendInvitationCommandResponse response = ServerCommands.SendInvitationCommand(ref connection, username);
+            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
+            return (response.g, response.p, response.invitationID);
+        }
+
+        public (string publicDHKey, string privateDHKey) GenerateDHKeys(string g, string p) {
+            var parameters = new DHParameters(new Org.BouncyCastle.Math.BigInteger(p), new Org.BouncyCastle.Math.BigInteger(g));
+            var keys = Security.GenerateKeys(parameters);
+            return (Security.GetPublicKey(keys), Security.GetPrivateKey(keys));
         }
 
     }
