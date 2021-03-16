@@ -14,7 +14,7 @@ namespace Shared
     public class Security
     {
 
-        public string HashPassword(string passwd)
+        public static string HashPassword(string passwd)
         {
             int saltSize = 16;
             int totalSize = saltSize + passwd.Length;
@@ -30,7 +30,7 @@ namespace Shared
             return Convert.ToBase64String(hashBytes);
         }
 
-        public bool VerifyPassword(string passwdHash, string passwd)
+        public static bool VerifyPassword(string passwdHash, string passwd)
         {
             byte[] hashBytes = Convert.FromBase64String(passwdHash);
             /* Get the salt */
@@ -46,31 +46,25 @@ namespace Shared
             return true;
         }
 
-        public void test()
-        {
-            DHParameters d = GenerateParameters();
-            
 
-        }
-
-        public DHParameters GenerateParameters()
+        public static DHParameters GenerateParameters()
         {
             var generator = new DHParametersGenerator();
             generator.Init(512,10, new SecureRandom());
             return generator.GenerateParameters();
         }
 
-        public string GetG(DHParameters parameters)
+        public static string GetG(DHParameters parameters)
         {
             return parameters.G.ToString();
         }
 
-        public string GetP(DHParameters parameters)
+        public static string GetP(DHParameters parameters)
         {
             return parameters.P.ToString();
         }
 
-        public AsymmetricCipherKeyPair GenerateKeys(DHParameters parameters)
+        public static AsymmetricCipherKeyPair GenerateKeys(DHParameters parameters)
         {
             var keyGen = GeneratorUtilities.GetKeyPairGenerator("DH");
             var kgp = new DHKeyGenerationParameters(new SecureRandom(), parameters);
@@ -79,7 +73,7 @@ namespace Shared
         }
 
         // This returns A
-        public string GetPublicKey(AsymmetricCipherKeyPair keyPair)
+        public static string GetPublicKey(AsymmetricCipherKeyPair keyPair)
         {
             var dhPublicKeyParameters = keyPair.Public as DHPublicKeyParameters;
             if (dhPublicKeyParameters != null)
@@ -90,7 +84,7 @@ namespace Shared
         }
 
         // This returns a
-        public string GetPrivateKey(AsymmetricCipherKeyPair keyPair)
+        public static string GetPrivateKey(AsymmetricCipherKeyPair keyPair)
         {
             var dhPrivateKeyParameters = keyPair.Private as DHPrivateKeyParameters;
             if (dhPrivateKeyParameters != null)
@@ -100,7 +94,7 @@ namespace Shared
             throw new NullReferenceException("The key pair provided is not a valid DH keypair.");
         }
 
-        public Org.BouncyCastle.Math.BigInteger ComputeSharedSecret(string A, AsymmetricKeyParameter bPrivateKey, DHParameters internalParameters)
+        public static Org.BouncyCastle.Math.BigInteger ComputeSharedSecret(string A, AsymmetricKeyParameter bPrivateKey, DHParameters internalParameters)
         {
             var importedKey = new DHPublicKeyParameters(new Org.BouncyCastle.Math.BigInteger(A), internalParameters);
             var internalKeyAgree = AgreementUtilities.GetBasicAgreement("DH");

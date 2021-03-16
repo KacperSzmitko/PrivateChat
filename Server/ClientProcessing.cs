@@ -26,7 +26,6 @@ namespace Server
         /// </summary>
         public List<Functions> functions { get; set; }
         public List<User> activeUsers { get; set; }
-        public Security security { get; set; }
 
         public List<ExtendedInvitation> invitations { get; set; }
 
@@ -78,7 +77,7 @@ namespace Server
             try { passwordHash = dbConnection.GetUserPasswordHash(username); }
             catch { return TransmisionProtocol.CreateServerMessage(ErrorCodes.USER_NOT_FOUND, Options.LOGIN); }
 
-            if (security.VerifyPassword(passwordHash, password))
+            if (Security.VerifyPassword(passwordHash, password))
             {
                 lock (activeUsers)
                 {
@@ -112,7 +111,7 @@ namespace Server
             if (dbConnection.CheckIfNameExist(username))
                 return TransmisionProtocol.CreateServerMessage(ErrorCodes.USER_ALREADY_EXISTS, Options.CREATE_USER);
 
-            password = security.HashPassword(password);
+            password = Security.HashPassword(password);
             if (dbConnection.AddNewUser(username, password)) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.CREATE_USER);
             else return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.CREATE_USER);
         }
@@ -199,9 +198,9 @@ namespace Server
                 ei.sender = activeUsers[clientId].name;
             }
 
-            var param = security.GenerateParameters();
-            ei.g = security.GetG(param); 
-            ei.p = security.GetP(param);
+            var param = Security.GenerateParameters();
+            ei.g = Security.GetG(param); 
+            ei.p = Security.GetP(param);
 
             ei.reciver = userName;
 
@@ -558,7 +557,6 @@ namespace Server
             functions.Add(new Functions(SendConversationKey));
             functions.Add(new Functions(AcceptedFriend));
 
-            security = new Security();
             activeUsers = new List<User>();
             invitations = new List<ExtendedInvitation>();
             messagesToSend = new Dictionary<int, Dictionary<int, List<Message>>>();
