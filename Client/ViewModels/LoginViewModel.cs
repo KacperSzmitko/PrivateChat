@@ -62,7 +62,7 @@ namespace Client.ViewModels
                         byte[] userIV = model.LoginUser(model.Username, model.Pass);
                         if (userIV != null) {
                             byte[] credentialsHash = model.CreateCredentialsHash(model.Username, model.Pass, userIV);
-                            navigator.CurrentViewModel = new ChatViewModel(connection, navigator, username, credentialsHash);
+                            navigator.CurrentViewModel = new ChatViewModel(connection, navigator, model.Username, credentialsHash);
                         }
                         else {
                             loginError = true;

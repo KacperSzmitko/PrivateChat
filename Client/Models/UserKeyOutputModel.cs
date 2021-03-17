@@ -9,6 +9,8 @@ namespace Client.Models
 
         public string UserKeyHexString { get { return userKeyHexString; } }
 
-        public UserKeyOutputModel(ServerConnection connection, string userKeyHexString) : base(connection) { }
+        public UserKeyOutputModel(ServerConnection connection, string userKeyHexString) : base(connection) {
+            this.userKeyHexString = userKeyHexString;
+        }
     }
 }
