@@ -137,6 +137,14 @@ namespace Shared
             }
         }
 
+        public static byte[] GenerateIV() {
+            byte[] iv = new byte[8];
+            using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider()) {
+                rng.GetBytes(iv);
+            }
+            return iv;
+        }
+
         public static byte[] AESEncrypt(byte[] bytesToEncrypt, byte[] encryptingKey, byte[] iv) {
             using (Aes aes = Aes.Create()) {
                 aes.KeySize = 256;

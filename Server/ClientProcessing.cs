@@ -206,7 +206,7 @@ namespace Server
             ei.p = Security.GetP(param);
 
             ei.reciver = userName;
-            ei.conversationIv = "0";
+            ei.conversationIv = Security.ByteArrayToHexString(Security.GenerateIV());
 
             lock(invitations)
             {
