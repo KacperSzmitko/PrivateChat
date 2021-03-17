@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Client.Models
 {
-    class UserKeyOutputModel : BaseModel
+    public class UserKeyOutputModel : BaseModel
     {
         private readonly string userKeyHexString;
 

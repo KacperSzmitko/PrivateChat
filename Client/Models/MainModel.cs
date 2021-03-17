@@ -3,7 +3,7 @@ using System;
 
 namespace Client.Models
 {
-    class MainModel : BaseModel
+    public class MainModel : BaseModel
     {
         public MainModel(ServerConnection connection) : base(connection) { }
 

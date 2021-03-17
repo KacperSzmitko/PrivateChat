@@ -90,7 +90,7 @@ namespace Client.ViewModels
         }
 
         public LoginViewModel(ServerConnection connection, Navigator navigator, bool successRegistration = false) : base(connection, navigator) {
-            model = new LoginModel(connection);
+            this.model = new LoginModel(connection);
             this.successRegistration = successRegistration;
             this.goodUsername = false;
             this.goodPass = false;

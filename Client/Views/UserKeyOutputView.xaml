@@ -7,5 +7,10 @@
              Height="680" Width="600"
              Background="White"
              >
+    <StackPanel VerticalAlignment="Center">
+        <TextBlock HorizontalAlignment="Center" FontSize="40">Zapisz swój klucz użytkownika!</TextBlock>
+        <TextBox Margin="10 15 10 0" Padding="2" FontSize="15.85" TextAlignment="Center" Text="{Binding Path=UserKeyHexString, Mode=OneWay}" IsReadOnly="True" d:Text="A2C6C335720A056BFD963DB9C40B12EB407F3B17E5931C8F555E7963DB4015F2"/>
+        <Button Margin="140 15 140 0" Padding="2" FontWeight="Bold" FontSize="22" Content="Przejdź do strony logowania" Command="{Binding GoLoginCommand}"/>
+    </StackPanel>
     
 </UserControl>

@@ -55,6 +55,7 @@ namespace Client.Models
             string encryptedUserKeyFilePath = Path.Combine(userPath, encryptedUserKeyFileName);
             byte[] encryptedUserKey = Security.AESEncrypt(userKey, encryptingKey, userIV);
             string encryptedUserKeyHexString = Security.ByteArrayToHexString(encryptedUserKey);
+            Directory.CreateDirectory(userPath);
             File.WriteAllText(encryptedUserKeyFilePath, encryptedUserKeyHexString);
         }
     }
