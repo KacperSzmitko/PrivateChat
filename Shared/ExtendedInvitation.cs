@@ -5,20 +5,21 @@ using System.Text;
 
 namespace Shared
 {
+    [Serializable]
     public class ExtendedInvitation
     {
-        public string sender { get; set; }
-        public string reciver { get; set; }
-        public bool sended { get; set; } = false;
-        public string publicKeySender { get; set; }
-        public string g { get; set; }
-        public string p { get; set; }
-        public int invitationId { get; set; }
-        public string publicKeyReciver { get; set; }
-        public bool accepted { get; set; } = false;
-        public string conversationId { get; set; }
+        [NonSerialized] public string sender;
+        [NonSerialized] public string reciver;
+        [NonSerialized] public bool sended  = false;
+        [NonSerialized] public string publicKeySender;
+        [NonSerialized] public string g;
+        [NonSerialized] public string p;
+        public int invitationId;
+        public string publicKeyReciver;
+        [NonSerialized] public bool accepted = false;
+        public string conversationId;
+        public string conversationIv;
 
-        public static implicit operator Invitation(ExtendedInvitation e) => new Invitation { g = e.g, p = e.p, invitationId = e.invitationId, publicKeySender = e.publicKeySender };
-
+        public static implicit operator Invitation(ExtendedInvitation e) => new Invitation { g = e.g, p = e.p, invitationId = e.invitationId, publicKeySender = e.publicKeySender,conversationIv = e.conversationIv };
     }
 }

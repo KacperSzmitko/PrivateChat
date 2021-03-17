@@ -16,14 +16,14 @@ namespace DbLibrary
             string userId = userID.ToString();
             string conversationId = conversationID.ToString();
 
-            string query = string.Format("UPDATE conversations SET user1_encrypted_key = '{0}' WHERE " +
+            string query = string.Format("UPDATE conversations SET user1_encrypted_conversation_key = '{0}' WHERE " +
                 "conversation_id = '{1}' AND user1_id = '{2}'", key,conversationId,userId);
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
             dataReader.Read();
             dataReader.Close();
 
-            query = string.Format("UPDATE conversations SET user2_encrypted_key = '{0}' WHERE " +
+            query = string.Format("UPDATE conversations SET user2_encrypted_conversation_key = '{0}' WHERE " +
             "conversation_id = '{1}' AND user2_id = '{2}'", key, conversationId, userId);
             cmd = new MySqlCommand(query, connection);
             dataReader = cmd.ExecuteReader();
@@ -33,7 +33,7 @@ namespace DbLibrary
 
         }
 
-        public string AddFriends(int userAID, string usernameB)
+        public string AddFriends(int userAID, string usernameB, string iv)
         {
             string userAId = userAID.ToString();
             string userBId = GetUserId(usernameB).ToString();
@@ -42,7 +42,7 @@ namespace DbLibrary
             MySqlDataReader dataReader = cmd.ExecuteReader();
             dataReader.Read();
             dataReader.Close();
-            return CreateNewConversation(userAId, usernameB);
+            return CreateNewConversation(userAId, usernameB,iv);
             
         }
 
@@ -73,9 +73,10 @@ namespace DbLibrary
 
         }
 
-        public bool AddNewUser(string username, string password)
+
+        public bool AddNewUser(string username, string password, string IV,string keyHash)
         {
-            string query = String.Format("INSERT INTO users(username,password_hash) VALUES('{0}','{1}')", username, password);
+            string query = String.Format("INSERT INTO users(username,password_hash,iv_to_decrypt_user_key,user_key_hash) VALUES('{0}','{1}','{2}','{3}')", username, password,IV, keyHash);
             //Create Command
             MySqlCommand cmd = new MySqlCommand(query, connection);
             //Create a data reader and Execute the command
@@ -84,9 +85,9 @@ namespace DbLibrary
             return true;
         }
 
-        public string GetUserPasswordHash(string username)
+        public string GetFromUser(string fieldName, string username)
         {
-                string query = "SELECT password_hash FROM users " + String.Format("WHERE username = '{0}'", username);
+                string query = String.Format("SELECT {0} FROM users WHERE username = '{1}'",fieldName, username);
                 //Create Command
                 MySqlCommand cmd = new MySqlCommand(query, connection);
                 //Create a data reader and Execute the command
@@ -169,7 +170,7 @@ namespace DbLibrary
         }
 
         // TEST
-        public string CreateNewConversation(string IdA, string bUsername)
+        public string CreateNewConversation(string IdA, string bUsername,string iv)
         {
             string IdB = GetUserId(bUsername).ToString();
             string query = string.Format("SELECT * FROM conversations WHERE (user1_id = '{0}' AND user2_id = '{1}') OR (user1_id = '{1}'  AND user2_id = '{0}')", IdA, IdB);
@@ -190,7 +191,7 @@ namespace DbLibrary
             finally { dataReader.Close(); }
 
 
-            query = string.Format("INSERT INTO conversations(user1_id,user2_id) VALUES({0},{1})", IdA, IdB);
+            query = string.Format("INSERT INTO conversations(user1_id,user2_id,iv_to_decrypt_converstion_key) VALUES({0},{1},{2})", IdA, IdB,iv);
             cmd = new MySqlCommand(query, connection);
             dataReader = cmd.ExecuteReader();
             dataReader.Close();
@@ -277,6 +278,9 @@ namespace DbLibrary
                 throw new Exception("Nie ma takiego uzytkownika!");
             }
         }
+
+
+
         public void CloseConnection()
         {
             connection.Close();
