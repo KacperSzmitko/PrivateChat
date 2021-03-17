@@ -22,28 +22,24 @@ namespace Server
                 {
 
                     if (option < 0) throw new ArgumentException("Invalid option!");
-
+                    else if (option == Options.LOGIN)
+                    {
+                        AddFields(new[] { "IV"}, ref result, fields);
+                    }
                     else if (option == Options.GET_CONVERSATION)
                     {
                         AddFields(new[] { "ConversationKey","ConversationID", "Data" }, ref result, fields);
                     }
                     else if (option == Options.GET_FRIENDS || option == Options.NEW_MESSAGES || option == Options.NOTIFICATION
-                           ||option == Options.SEND_INVITATION)
+                           ||option == Options.SEND_INVITATION || option == Options.ACCEPTED_FRIEND || option == Options.ADD_FRIEND)
                     {
                         AddFields(new[] { "Data" }, ref result, fields);
-                    }
-                    else if (option == Options.ADD_FRIEND)
-                    {
-                        AddFields(new[] { "G", "P", "InvitationId" }, ref result, fields);
                     }
                     else if (option == Options.ACCEPT_FRIEND)
                     {
                         AddFields(new[] { "ConversationID"}, ref result, fields);
                     }
-                    else if (option == Options.ACCEPTED_FRIEND)
-                    {
-                        AddFields(new[] { "InvitationID","PK","ConversationID" }, ref result, fields);
-                    }
+
                 }
                 catch (ArgumentOutOfRangeException)
                 {
