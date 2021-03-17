@@ -100,7 +100,7 @@ namespace Client.ViewModels
                     RefreshFriendInvitationMessage();
 
                     var (publicDHKey, privateDHKey) = model.GenerateDHKeys(g, p);
-                    byte[] encryptedPrivateDHKey = model.AESEncrypt(privateDHKey, new byte[0], new byte[0]);
+                    byte[] encryptedPrivateDHKey = Security.AESEncrypt(privateDHKey, new byte[0], new byte[0]);
                     model.SaveEncryptedPrivateDHKey(invitationID, encryptedPrivateDHKey);
                     model.SendPublicDHKey(invitationID, publicDHKey);
                 }

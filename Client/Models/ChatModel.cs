@@ -76,24 +76,14 @@ namespace Client.Models
             return (Security.GetPublicKey(keys), Security.GetPrivateKeyBytes(keys));
         }
 
-        public byte[] AESEncrypt(byte[] bytesToEncrypt, byte[] encryptingKey, byte[] iv) {
-            //TODO
-            return bytesToEncrypt;
-        }
-
-        public byte[] AESDecrypt(byte[] bytesToDecrypt, byte[] decryptingKey, byte[] iv) {
-            //TODO
-            return bytesToDecrypt;
-        }
-
         public void SaveEncryptedPrivateDHKey(string invitationID, byte[] encryptedPrivateDHKey) {
-            Dictionary<string, byte[]> invitationKeys;
-            if (!File.Exists(invitationKeysFilePath)) invitationKeys = new Dictionary<string, byte[]>();
+            Dictionary<string, string> invitationKeys;
+            if (!File.Exists(invitationKeysFilePath)) invitationKeys = new Dictionary<string, string>();
             else {
                 string invitationKeysFileContent = File.ReadAllText(invitationKeysFilePath);
-                invitationKeys = JsonConvert.DeserializeObject<Dictionary<string, byte[]>>(invitationKeysFileContent);
+                invitationKeys = JsonConvert.DeserializeObject<Dictionary<string, string>>(invitationKeysFileContent);
             }
-            invitationKeys.Add(invitationID, encryptedPrivateDHKey);
+            invitationKeys.Add(invitationID, Security.ByteArrayToHexString(encryptedPrivateDHKey));
             string invitationKeysFileContentToSave = JsonConvert.SerializeObject(invitationKeys);
             File.WriteAllText(invitationKeysFilePath, invitationKeysFileContentToSave);
         }

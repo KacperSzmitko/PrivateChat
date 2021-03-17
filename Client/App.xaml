@@ -24,6 +24,9 @@
         <DataTemplate DataType="{x:Type viewmodels:ChatViewModel}">
             <views:ChatView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:UserKeyOutputViewModel}">
+            <views:UserKeyOutputView/>
+        </DataTemplate>
 
         <converters:StringToIntConverter x:Key="stringToIntConverter"/>
         <converters:IntToColorConverter x:Key="intToColorConverter"/>

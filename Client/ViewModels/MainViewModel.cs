@@ -1,9 +1,5 @@
-﻿using Client.Commands;
-using Client.Models;
+﻿using Client.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Input;
 
 namespace Client.ViewModels
 {

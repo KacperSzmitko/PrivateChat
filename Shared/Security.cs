@@ -131,5 +131,23 @@ namespace Shared
                 bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
             return bytes;
         }
+
+        public static byte[] AESEncrypt(byte[] bytesToEncrypt, byte[] encryptingKey, byte[] iv) {
+            //TODO
+            return bytesToEncrypt;
+        }
+
+        public static byte[] AESDecrypt(byte[] bytesToDecrypt, byte[] decryptingKey, byte[] iv) {
+            //TODO
+            return bytesToDecrypt;
+        }
+        
+        public static (byte[] key, byte[] iv) GenerateAESKeyAndIV() {
+            using (Aes aes = Aes.Create()) {
+                aes.KeySize = 256;
+                aes.Mode = CipherMode.CBC;
+                return (aes.Key, aes.IV);
+            }
+        }
     }
 }
