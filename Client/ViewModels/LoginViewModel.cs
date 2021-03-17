@@ -59,9 +59,10 @@ namespace Client.ViewModels
             get {
                 if (loginCommand == null) {
                     loginCommand = new RelayCommand(_ => {
-                        string username = model.LoginUser(Username, Pass);
-                        if (username != null) {
-                            navigator.CurrentViewModel = new ChatViewModel(connection, navigator, username);
+                        byte[] userIV = model.LoginUser(model.Username, model.Pass);
+                        if (userIV != null) {
+                            byte[] credentialsHash = model.CreateCredentialsHash(model.Username, model.Pass, userIV);
+                            navigator.CurrentViewModel = new ChatViewModel(connection, navigator, model.Username, credentialsHash);
                         }
                         else {
                             loginError = true;
@@ -89,7 +90,7 @@ namespace Client.ViewModels
         }
 
         public LoginViewModel(ServerConnection connection, Navigator navigator, bool successRegistration = false) : base(connection, navigator) {
-            model = new LoginModel(connection);
+            this.model = new LoginModel(connection);
             this.successRegistration = successRegistration;
             this.goodUsername = false;
             this.goodPass = false;

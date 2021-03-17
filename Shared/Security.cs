@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Numerics;
 using System.Security.Cryptography;
-using System.Text;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -72,7 +69,6 @@ namespace Shared
             return keyGen.GenerateKeyPair();
         }
 
-        // This returns A
         public static string GetPublicKey(AsymmetricCipherKeyPair keyPair)
         {
             var dhPublicKeyParameters = keyPair.Public as DHPublicKeyParameters;
@@ -83,7 +79,6 @@ namespace Shared
             throw new NullReferenceException("The key pair provided is not a valid DH keypair.");
         }
 
-        // This returns a
         public static string GetPrivateKey(AsymmetricCipherKeyPair keyPair)
         {
             var dhPrivateKeyParameters = keyPair.Private as DHPrivateKeyParameters;
@@ -94,12 +89,96 @@ namespace Shared
             throw new NullReferenceException("The key pair provided is not a valid DH keypair.");
         }
 
+        public static byte[] GetPublicKeyBytes(AsymmetricCipherKeyPair keyPair) {
+            var dhPublicKeyParameters = keyPair.Public as DHPublicKeyParameters;
+            if (dhPublicKeyParameters != null) {
+                return dhPublicKeyParameters.Y.ToByteArray();
+            }
+            throw new NullReferenceException("The key pair provided is not a valid DH keypair.");
+        }
+
+        public static byte[] GetPrivateKeyBytes(AsymmetricCipherKeyPair keyPair) {
+            var dhPrivateKeyParameters = keyPair.Private as DHPrivateKeyParameters;
+            if (dhPrivateKeyParameters != null) {
+                return dhPrivateKeyParameters.X.ToByteArray();
+            }
+            throw new NullReferenceException("The key pair provided is not a valid DH keypair.");
+        }
+
         public static Org.BouncyCastle.Math.BigInteger ComputeSharedSecret(string A, AsymmetricKeyParameter bPrivateKey, DHParameters internalParameters)
         {
             var importedKey = new DHPublicKeyParameters(new Org.BouncyCastle.Math.BigInteger(A), internalParameters);
             var internalKeyAgree = AgreementUtilities.GetBasicAgreement("DH");
             internalKeyAgree.Init(bPrivateKey);
             return internalKeyAgree.CalculateAgreement(importedKey);
+        }
+
+        public static string ByteArrayToHexString(byte[] ba) {
+            return BitConverter.ToString(ba).Replace("-", "");
+        }
+
+        public static byte[] HexStringToByteArray(string hex) {
+            int NumberChars = hex.Length;
+            byte[] bytes = new byte[NumberChars / 2];
+            for (int i = 0; i < NumberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
+        }
+
+        public static byte[] CreateSHA256Hash(byte[] bytes) {
+            return SHA256.Create().ComputeHash(bytes);
+        }
+
+        public static (byte[] key, byte[] iv) GenerateAESKeyAndIV() {
+            using (Aes aes = Aes.Create()) {
+                aes.Mode = CipherMode.CBC;
+                aes.KeySize = 256;
+                return (aes.Key, aes.IV);
+            }
+        }
+
+        public static byte[] GenerateIV() {
+            byte[] iv = new byte[8];
+            using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider()) {
+                rng.GetBytes(iv);
+            }
+            return iv;
+        }
+
+        public static byte[] AESEncrypt(byte[] bytesToEncrypt, byte[] encryptingKey, byte[] iv) {
+            using (Aes aes = Aes.Create()) {
+                aes.KeySize = 256;
+                aes.BlockSize = 128;
+                aes.Padding = PaddingMode.Zeros;
+                aes.Key = encryptingKey;
+                aes.IV = iv;
+                using (var encryptor = aes.CreateEncryptor(aes.Key, aes.IV)) {
+                    return AESPerformCryptography(bytesToEncrypt, encryptor);
+                }
+            }
+        }
+
+        public static byte[] AESDecrypt(byte[] bytesToDecrypt, byte[] decryptingKey, byte[] iv) {
+            using (Aes aes = Aes.Create()) {
+                aes.KeySize = 256;
+                aes.BlockSize = 128;
+                aes.Padding = PaddingMode.Zeros;
+                aes.Key = decryptingKey;
+                aes.IV = iv;
+                using (var decryptor = aes.CreateDecryptor(aes.Key, aes.IV)) {
+                    return AESPerformCryptography(bytesToDecrypt, decryptor);
+                }
+            }
+        }
+        
+        private static byte[] AESPerformCryptography(byte[] data, ICryptoTransform cryptoTransform) {
+            using (MemoryStream ms = new MemoryStream()) {
+                using (CryptoStream cryptoStream = new CryptoStream(ms, cryptoTransform, CryptoStreamMode.Write)) {
+                    cryptoStream.Write(data, 0, data.Length);
+                    cryptoStream.FlushFinalBlock();
+                    return ms.ToArray();
+                }
+            }
         }
     }
 }

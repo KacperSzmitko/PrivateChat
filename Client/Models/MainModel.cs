@@ -1,11 +1,9 @@
 ﻿using Shared;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Client.Models
 {
-    class MainModel : BaseModel
+    public class MainModel : BaseModel
     {
         public MainModel(ServerConnection connection) : base(connection) { }
 

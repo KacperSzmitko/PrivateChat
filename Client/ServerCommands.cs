@@ -8,21 +8,11 @@ namespace Client
     public static class ServerCommands
     {
 
-        //******************** COMMANDS RESPONSES (MULTIPLE FIELDS) ********************
+        private static readonly object comunicateLock = new object(); //Only one thread can use client-server communcation methods at the same time
 
-        public struct GetFriendsCommandResponse
-        {
-            public readonly int error;
-            public readonly string friendsJSON;
-            public GetFriendsCommandResponse(int error, string friendsJSON) {
-                this.error = error;
-                this.friendsJSON = friendsJSON;
-            }
-        }
+        //******************** TOOLS FOR CREATING COMMANDS ********************
 
-            //******************** TOOLS FOR CREATING COMMANDS ********************
-
-            private static string CreateClientMessage(int option, params string[] fields) {
+        private static string CreateClientMessage(int option, params string[] fields) {
             string result = "";
             try {
                 result += AddField("option", option.ToString());
@@ -36,6 +26,8 @@ namespace Client
                     case 2:
                         result += AddField("Username", fields[0]);
                         result += AddField("Password", fields[1]);
+                        result += AddField("UserIV", fields[2]);
+                        result += AddField("Hash", fields[3]);
                         break;
                     case 3:
                         result += AddField("Username", fields[0]);
@@ -48,15 +40,18 @@ namespace Client
                         result += AddField("SecondUserName", fields[0]);
                         break;
                     case 7:
-                        result += AddField("SecondUserName", fields[0]);
+                        result += AddField("ConversationID", fields[0]);
                         break;
                     case 8:
-                        result += AddField("ConversationID", fields[0]);
-                        result += AddField("Key", fields[1]);
-                        break;
-                    case 9:
-                        result += AddField("ConversationID", fields[0]);
+                        result += AddField("Username", fields[0]);
                         result += AddField("Data", fields[1]);
+                        break;
+                    case 11:
+                        result += AddField("Username", fields[0]);
+                        break;
+                    case 12:
+                        result += AddField("InvitationID", fields[0]);
+                        result += AddField("PK", fields[1]);
                         break;
                     default: throw new ArgumentException("Invalid option!");
                 }
@@ -101,49 +96,65 @@ namespace Client
             return argArray;
         }
 
+        public static string Communicate(ref ServerConnection connection, string command) {
+            string response = "";
+            lock (comunicateLock) {
+                connection.SendMessage(command);
+                response = connection.ReadMessage();
+            }
+            return response;
+        }
+
         //******************** COMMANDS ********************
 
         public static int DisconnectCommand(ref ServerConnection connection) {
             string command = CreateClientMessage((int)Options.DISCONNECT);
-            connection.SendMessage(command);
-            string[] args = GetArgArrayFromResponse(connection.ReadMessage());
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             return Int32.Parse(args[0]);
         }
 
-        public static int LoginCommand(ref ServerConnection connection, string username, string password) {
+        public static (int error, string userIV) LoginCommand(ref ServerConnection connection, string username, string password) {
             string command = CreateClientMessage((int)Options.LOGIN, username, password);
-            connection.SendMessage(command);
-            string[] args = GetArgArrayFromResponse(connection.ReadMessage());
-            return Int32.Parse(args[0]);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            return (Int32.Parse(args[0]), args[1]);
         }
 
-        public static int RegisterUser(ref ServerConnection connection, string username, string password) {
-            string command = CreateClientMessage((int)Options.CREATE_USER, username, password);
-            connection.SendMessage(command);
-            string[] args = GetArgArrayFromResponse(connection.ReadMessage());
+        public static int RegisterUser(ref ServerConnection connection, string username, string password, string userIV, string userKeyHash) {
+            string command = CreateClientMessage((int)Options.CREATE_USER, username, password, userIV, userKeyHash);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             return Int32.Parse(args[0]);
         }
 
         public static int CheckUsernameExistCommand(ref ServerConnection connection, string username) {
             string command = CreateClientMessage((int)Options.CHECK_USER_NAME, username);
-            connection.SendMessage(command);
-            string[] args = GetArgArrayFromResponse(connection.ReadMessage());
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             return Int32.Parse(args[0]);
         }
 
         public static int LogoutCommand(ref ServerConnection connection) {
             string command = CreateClientMessage((int)Options.LOGOUT);
-            connection.SendMessage(command);
-            string[] args = GetArgArrayFromResponse(connection.ReadMessage());
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             return Int32.Parse(args[0]);
         }
 
-        public static GetFriendsCommandResponse GetFriendsCommand(ref ServerConnection connection) {
+        public static (int error, string friendsJSON) GetFriendsCommand(ref ServerConnection connection) {
             string command = CreateClientMessage((int)Options.GET_FRIENDS);
-            connection.SendMessage(command);
-            string[] args = GetArgArrayFromResponse(connection.ReadMessage());
-            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return new GetFriendsCommandResponse(Int32.Parse(args[0]), "");
-            return new GetFriendsCommandResponse(Int32.Parse(args[0]), args[1]);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
+            return (Int32.Parse(args[0]), args[1]);
+        }
+
+        public static (int error, string g, string p, string invitationID) SendInvitationCommand(ref ServerConnection connection, string username) {
+            string command = CreateClientMessage((int)Options.ADD_FRIEND, username);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "", "", "");
+            return (Int32.Parse(args[0]), args[1], args[2], args[3]);
+        }
+
+        public static int SendPublicDHKeyCommand(ref ServerConnection connection, string invitationID, string publicDHKey) {
+            string command = CreateClientMessage((int)Options.DH_EXCHANGE, invitationID, publicDHKey);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            return Int32.Parse(args[0]);
         }
 
     }

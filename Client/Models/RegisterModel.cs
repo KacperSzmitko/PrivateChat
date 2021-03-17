@@ -1,9 +1,8 @@
 ﻿using Shared;
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Client.Models
 {
@@ -41,12 +40,23 @@ namespace Client.Models
             else return false;
         }
 
-        public bool RegisterUser(string username, string pass) {
-            int error = ServerCommands.RegisterUser(ref connection, username, pass);
+        public bool RegisterUser(string username, string pass, byte[] userIV, byte[] userKeyHash) {
+            int error = ServerCommands.RegisterUser(ref connection, username, pass, Security.ByteArrayToHexString(userIV), Security.ByteArrayToHexString(userKeyHash));
             if (error == (int)ErrorCodes.NO_ERROR) return true;
             else throw new Exception(GetErrorCodeName(error));
         }
 
-       
+        public byte[] CreateCredentialsHash(string username, string password, byte[] userIV) {
+            return Security.CreateSHA256Hash(Encoding.ASCII.GetBytes(username + "$$" + password + "$$" + Security.ByteArrayToHexString(userIV)));
+        }
+
+        public void SaveEncryptedUserKey(byte[] userKey, byte[] encryptingKey, byte[] userIV) {
+            string userPath = Path.Combine(appLocalDataFolderPath, username);
+            string encryptedUserKeyFilePath = Path.Combine(userPath, encryptedUserKeyFileName);
+            byte[] encryptedUserKey = Security.AESEncrypt(userKey, encryptingKey, userIV);
+            string encryptedUserKeyHexString = Security.ByteArrayToHexString(encryptedUserKey);
+            Directory.CreateDirectory(userPath);
+            File.WriteAllText(encryptedUserKeyFilePath, encryptedUserKeyHexString);
+        }
     }
 }
