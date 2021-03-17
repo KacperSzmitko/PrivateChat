@@ -1,5 +1,6 @@
 ﻿using Client.Commands;
 using Client.Models;
+using Shared;
 using System;
 using System.Threading;
 using System.Windows.Input;
@@ -116,9 +117,13 @@ namespace Client.ViewModels
             get {
                 if (registerCommand == null) {
                     registerCommand = new RelayCommand(_ => {
-                        if (model.RegisterUser(Username, Pass2)) {
+                        (byte[] userKey, byte[] userIV) = Security.GenerateAESKeyAndIV();
+                        byte[] userKeyHash = Security.CreateSHA256Hash(userKey);
+                        if (model.RegisterUser(model.Username, model.Pass2, userIV, userKeyHash)) {
+                            byte[] credentialsHash = model.CreateCredentialsHash(model.Username, model.Pass2, userIV);
+                            model.SaveEncryptedUserKey(userKey, credentialsHash, userIV);
                             updateIfUsernameExistThread.Join();
-                            navigator.CurrentViewModel = new LoginViewModel(connection, navigator, true);
+                            navigator.CurrentViewModel = new UserKeyOutputViewModel(connection, navigator, Security.ByteArrayToHexString(userKey));
                         }
                     }, _ => {
                         if (goodUsername && usernameAvailable && goodPass1 && goodPass2) return true;

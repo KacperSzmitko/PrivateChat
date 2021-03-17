@@ -10,13 +10,11 @@ namespace Client.Models
 {
     public class ChatModel : BaseModel
     {
-
         private readonly string username;
-        private readonly byte[] credentialsHash;
-        private readonly string appLocalDataFolderName;
-        private readonly string appPath;
         private readonly string userPath;
         private readonly string invitationKeysFilePath;
+        private readonly string encryptedUserKeyFilePath;
+        private readonly byte[] credentialsHash;
 
         private string invitationUsername;
         private List<Friend> friendsList;
@@ -25,13 +23,12 @@ namespace Client.Models
         public string InvitationUsername { get { return invitationUsername; } set { invitationUsername = value; } }
         public List<Friend> FriendsList { get { return friendsList; } set { friendsList = value; } }
 
-        public ChatModel(ServerConnection connection, string username, byte[] credentialsHash, string appLocalDataFolderName) : base(connection) {
+        public ChatModel(ServerConnection connection, string username, byte[] credentialsHash) : base(connection) {
             this.username = username;
             this.credentialsHash = credentialsHash;
-            this.appLocalDataFolderName = appLocalDataFolderName;
-            this.appPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), appLocalDataFolderName);
-            this.userPath = Path.Combine(appPath, username);
-            this.invitationKeysFilePath = Path.Combine(userPath, "invitation_keys.json");
+            this.userPath = Path.Combine(appLocalDataFolderPath, username);
+            this.invitationKeysFilePath = Path.Combine(userPath, invitationKeysFileName);
+            this.encryptedUserKeyFilePath = Path.Combine(userPath, encryptedUserKeyFileName);
             Directory.CreateDirectory(userPath);
 
         }

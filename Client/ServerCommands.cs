@@ -26,6 +26,8 @@ namespace Client
                     case 2:
                         result += AddField("Username", fields[0]);
                         result += AddField("Password", fields[1]);
+                        result += AddField("UserIV", fields[2]);
+                        result += AddField("Hash", fields[3]);
                         break;
                     case 3:
                         result += AddField("Username", fields[0]);
@@ -111,14 +113,14 @@ namespace Client
             return Int32.Parse(args[0]);
         }
 
-        public static int LoginCommand(ref ServerConnection connection, string username, string password) {
+        public static (int error, string userIV) LoginCommand(ref ServerConnection connection, string username, string password) {
             string command = CreateClientMessage((int)Options.LOGIN, username, password);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
-            return Int32.Parse(args[0]);
+            return (Int32.Parse(args[0]), args[1]);
         }
 
-        public static int RegisterUser(ref ServerConnection connection, string username, string password) {
-            string command = CreateClientMessage((int)Options.CREATE_USER, username, password);
+        public static int RegisterUser(ref ServerConnection connection, string username, string password, string userIV, string userKeyHash) {
+            string command = CreateClientMessage((int)Options.CREATE_USER, username, password, userIV, userKeyHash);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             return Int32.Parse(args[0]);
         }

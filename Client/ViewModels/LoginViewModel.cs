@@ -59,9 +59,9 @@ namespace Client.ViewModels
             get {
                 if (loginCommand == null) {
                     loginCommand = new RelayCommand(_ => {
-                        string username = model.LoginUser(model.Username, model.Pass);
-                        if (username != null) {
-                            byte[] credentialsHash = model.CreateCredentialsHash(model.Username, model.Pass, "4372412310984218424902384480239489213245274532048723");
+                        byte[] userIV = model.LoginUser(model.Username, model.Pass);
+                        if (userIV != null) {
+                            byte[] credentialsHash = model.CreateCredentialsHash(model.Username, model.Pass, userIV);
                             navigator.CurrentViewModel = new ChatViewModel(connection, navigator, username, credentialsHash);
                         }
                         else {

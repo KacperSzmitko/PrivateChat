@@ -5,6 +5,10 @@ namespace Client.Models
 {
     class UserKeyOutputModel : BaseModel
     {
-        public UserKeyOutputModel(ServerConnection connection) : base(connection) { }
+        private readonly string userKeyHexString;
+
+        public string UserKeyHexString { get { return userKeyHexString; } }
+
+        public UserKeyOutputModel(ServerConnection connection, string userKeyHexString) : base(connection) { }
     }
 }
