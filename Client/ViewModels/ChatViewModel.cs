@@ -57,7 +57,7 @@ namespace Client.ViewModels
             get {
                 if (sendInvitationCommand == null) {
                     sendInvitationCommand = new RelayCommand(_ => {
-                        sendInvitationThread = new Thread(SendInvitationAsync);
+                        sendInvitationThread = new Thread(SendInvitationAndGenerateDHKeysAsync);
                         sendInvitationThread.Start();
                     }, _ => {
                         if (lastInvitationStatus == InvitationStatus.NO_INVITATION && model.CheckUsernameText(model.InvitationUsername)) return true;
@@ -68,15 +68,20 @@ namespace Client.ViewModels
             }
         }
 
-        public ChatViewModel(ServerConnection connection, Navigator navigator, string username) : base(connection, navigator) {
-            this.model = new ChatModel(this.connection);
-            this.model.Username = username;
+        public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] credentialsHash) : base(connection, navigator) {
+            this.model = new ChatModel(connection, username, credentialsHash, "private_chat");
             this.model.FriendsList = JsonConvert.DeserializeObject<List<Friend>>(this.model.GetFriendsJSON());
             this.lastInvitationStatus = InvitationStatus.NO_INVITATION;
             OnPropertyChanged(nameof(FriendsList));
         }
 
-        private void SendInvitationAsync() {
+        private void RefreshFriendInvitationMessage() {
+            OnPropertyChanged(nameof(UserNotFoundErrorVisibility));
+            OnPropertyChanged(nameof(UserAlreadyAFriendErrorVisibility));
+            OnPropertyChanged(nameof(InvitationSentInfoVisibility));
+        }
+
+        private void SendInvitationAndGenerateDHKeysAsync() {
             lastInvitationStatus = InvitationStatus.WAITING_FOR_RESPONSE;
 
             bool userExists = model.CheckUserExist(model.InvitationUsername);
@@ -89,25 +94,26 @@ namespace Client.ViewModels
                 }
                 if (userAlredyAFriend) lastInvitationStatus = InvitationStatus.USER_ALREADY_A_FRIEND;
                 else {
-                    var p_g_invitationID = model.SendInvitation(Username);
-                    
-
+                    var (g, p, invitationID) = model.SendInvitation(Username);
                     lastInvitationStatus = InvitationStatus.INVITATION_SENT;
+
+                    RefreshFriendInvitationMessage();
+
+                    var (publicDHKey, privateDHKey) = model.GenerateDHKeys(g, p);
+                    byte[] encryptedPrivateDHKey = model.AESEncrypt(privateDHKey, new byte[0], new byte[0]);
+                    model.SaveEncryptedPrivateDHKey(invitationID, encryptedPrivateDHKey);
+                    model.SendPublicDHKey(invitationID, publicDHKey);
                 }
             }
 
-            OnPropertyChanged(nameof(UserNotFoundErrorVisibility));
-            OnPropertyChanged(nameof(UserAlreadyAFriendErrorVisibility));
-            OnPropertyChanged(nameof(InvitationSentInfoVisibility));
+            if (lastInvitationStatus != InvitationStatus.INVITATION_SENT) RefreshFriendInvitationMessage();
 
             Thread.Sleep(10000);
 
             model.InvitationUsername = "";
             lastInvitationStatus = InvitationStatus.NO_INVITATION;
 
-            OnPropertyChanged(nameof(UserNotFoundErrorVisibility));
-            OnPropertyChanged(nameof(UserAlreadyAFriendErrorVisibility));
-            OnPropertyChanged(nameof(InvitationSentInfoVisibility));
+            RefreshFriendInvitationMessage();
             OnPropertyChanged(nameof(InvitationUsername));
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Shared;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Client.Models
@@ -20,6 +21,10 @@ namespace Client.Models
             if (response == (int)ErrorCodes.NO_ERROR) return username;
             else if (response == (int)ErrorCodes.USER_NOT_FOUND || response == (int)ErrorCodes.INCORRECT_PASSWORD) return null;
             else throw new Exception(GetErrorCodeName(response)); 
+        }
+
+        public byte[] CreateCredentialsHash(string username, string password, string bonus) {
+            return SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(username + "$$" + password + "$$" + bonus + "$$"));
         }
     }
 }

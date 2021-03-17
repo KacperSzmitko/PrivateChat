@@ -8,33 +8,6 @@ namespace Client
     public static class ServerCommands
     {
 
-        //******************** COMMANDS RESPONSES (MULTIPLE FIELDS) ********************
-
-        public struct GetFriendsCommandResponse
-        {
-            public readonly int error;
-            public readonly string friendsJSON;
-            public GetFriendsCommandResponse(int error, string friendsJSON) {
-                this.error = error;
-                this.friendsJSON = friendsJSON;
-            }
-        }
-
-        public struct SendInvitationCommandResponse
-        {
-            public readonly int error;
-            public readonly string g;
-            public readonly string p;
-            public readonly int invitationID;
-
-            public SendInvitationCommandResponse(int error, string g, string p, int invitationID) {
-                this.error = error;
-                this.g = g;
-                this.p = p;
-                this.invitationID = invitationID;
-            }
-        }
-
         private static readonly object comunicateLock = new object(); //Only one thread can use client-server communcation methods at the same time
 
         //******************** TOOLS FOR CREATING COMMANDS ********************
@@ -73,6 +46,10 @@ namespace Client
                         break;
                     case 11:
                         result += AddField("Username", fields[0]);
+                        break;
+                    case 12:
+                        result += AddField("InvitationID", fields[0]);
+                        result += AddField("PK", fields[1]);
                         break;
                     default: throw new ArgumentException("Invalid option!");
                 }
@@ -158,18 +135,24 @@ namespace Client
             return Int32.Parse(args[0]);
         }
 
-        public static GetFriendsCommandResponse GetFriendsCommand(ref ServerConnection connection) {
+        public static (int error, string friendsJSON) GetFriendsCommand(ref ServerConnection connection) {
             string command = CreateClientMessage((int)Options.GET_FRIENDS);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
-            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return new GetFriendsCommandResponse(Int32.Parse(args[0]), "");
-            return new GetFriendsCommandResponse(Int32.Parse(args[0]), args[1]);
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
+            return (Int32.Parse(args[0]), args[1]);
         }
 
-        public static SendInvitationCommandResponse SendInvitationCommand(ref ServerConnection connection, string username) {
+        public static (int error, string g, string p, string invitationID) SendInvitationCommand(ref ServerConnection connection, string username) {
             string command = CreateClientMessage((int)Options.ADD_FRIEND, username);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
-            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return new SendInvitationCommandResponse(Int32.Parse(args[0]), "", "", 0);
-            return new SendInvitationCommandResponse(Int32.Parse(args[0]), args[1], args[2], Int32.Parse(args[3]));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "", "", "");
+            return (Int32.Parse(args[0]), args[1], args[2], args[3]);
+        }
+
+        public static int SendPublicDHKeyCommand(ref ServerConnection connection, string invitationID, string publicDHKey) {
+            string command = CreateClientMessage((int)Options.DH_EXCHANGE, invitationID, publicDHKey);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            return Int32.Parse(args[0]);
         }
 
     }

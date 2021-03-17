@@ -94,12 +94,42 @@ namespace Shared
             throw new NullReferenceException("The key pair provided is not a valid DH keypair.");
         }
 
+        // This returns A
+        public static byte[] GetPublicKeyBytes(AsymmetricCipherKeyPair keyPair) {
+            var dhPublicKeyParameters = keyPair.Public as DHPublicKeyParameters;
+            if (dhPublicKeyParameters != null) {
+                return dhPublicKeyParameters.Y.ToByteArray();
+            }
+            throw new NullReferenceException("The key pair provided is not a valid DH keypair.");
+        }
+
+        // This returns a
+        public static byte[] GetPrivateKeyBytes(AsymmetricCipherKeyPair keyPair) {
+            var dhPrivateKeyParameters = keyPair.Private as DHPrivateKeyParameters;
+            if (dhPrivateKeyParameters != null) {
+                return dhPrivateKeyParameters.X.ToByteArray();
+            }
+            throw new NullReferenceException("The key pair provided is not a valid DH keypair.");
+        }
+
         public static Org.BouncyCastle.Math.BigInteger ComputeSharedSecret(string A, AsymmetricKeyParameter bPrivateKey, DHParameters internalParameters)
         {
             var importedKey = new DHPublicKeyParameters(new Org.BouncyCastle.Math.BigInteger(A), internalParameters);
             var internalKeyAgree = AgreementUtilities.GetBasicAgreement("DH");
             internalKeyAgree.Init(bPrivateKey);
             return internalKeyAgree.CalculateAgreement(importedKey);
+        }
+
+        public static string ByteArrayToHexString(byte[] ba) {
+            return BitConverter.ToString(ba).Replace("-", "");
+        }
+
+        public static byte[] HexStringToByteArray(string hex) {
+            int NumberChars = hex.Length;
+            byte[] bytes = new byte[NumberChars / 2];
+            for (int i = 0; i < NumberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
         }
     }
 }
