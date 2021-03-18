@@ -68,8 +68,8 @@ namespace Client.ViewModels
             }
         }
 
-        public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] credentialsHash) : base(connection, navigator) {
-            this.model = new ChatModel(connection, username, credentialsHash);
+        public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey, byte[] userIV, byte[] credentialsHash) : base(connection, navigator) {
+            this.model = new ChatModel(connection, username, userKey, userIV, credentialsHash);
             this.model.FriendsList = JsonConvert.DeserializeObject<List<Friend>>(this.model.GetFriendsJSON());
             this.lastInvitationStatus = InvitationStatus.NO_INVITATION;
             OnPropertyChanged(nameof(FriendsList));

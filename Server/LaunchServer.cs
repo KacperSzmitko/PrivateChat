@@ -28,18 +28,18 @@ namespace Server
             ClientProcessing cp = new ClientProcessing();
             int id = cp.AddActiveUser();
             int id1 = cp.AddActiveUser();
-            Console.WriteLine(cp.Login("Username:test8$$Password:test1234$$", id));
-            Console.WriteLine(cp.Login("Username:test7$$Password:12345678$$", id1));
+            Console.WriteLine(cp.Login("Username:test10$$Password:test1234$$", id));
+            Console.WriteLine(cp.Login("Username:test11$$Password:test1234$$", id1));
 
 
 
-            Console.WriteLine(cp.AddFriend("SecondUserName:test7$$", id));
+            Console.WriteLine(cp.AddFriend("SecondUserName:test11$$", id));
             Console.WriteLine(cp.DhExchange("InvitationID:0$$PK:656665$$", id));
             Console.WriteLine(cp.SendInvitation("", id1));
             Console.WriteLine(cp.AcceptFriend("InvitationID:0$$PKB:4$$", id1));
-            Console.WriteLine(cp.SendConversationKey("ConversationID:5$$ConversationKey:ytyt$$", id1));
+            Console.WriteLine(cp.SendConversationKey("ConversationID:1$$ConversationKey:ytyt$$", id1));
             Console.WriteLine(cp.AcceptedFriend("", id));
-            Console.WriteLine(cp.SendConversationKey("ConversationID:5$$ConversationKey:ytyoit$$", id));
+            Console.WriteLine(cp.SendConversationKey("ConversationID:1$$ConversationKey:ytyoit$$", id));
         }
 
         public static void MessageTest()

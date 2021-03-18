@@ -26,7 +26,7 @@ namespace Client.ViewModels
             set {
                 if (value != model.Username) {
                     model.Username = value;
-                    if (model.CheckUsernameText(model.Username)) goodUsername = true;
+                    if (model.CheckUsernameText()) goodUsername = true;
                     else goodUsername = false;
                     UpdateUsernameBox();
                     if (goodUsername) {
@@ -42,7 +42,7 @@ namespace Client.ViewModels
             set {
                 if (value != model.Pass1) {
                     model.Pass1 = value;
-                    if (model.CheckPasswordText(model.Pass1)) goodPass1 = true;
+                    if (model.CheckPasswordText()) goodPass1 = true;
                     else goodPass1 = false;
                     UpdatePass1Box();
                 }
@@ -54,7 +54,7 @@ namespace Client.ViewModels
             set {
                 if (value != model.Pass2) {
                     model.Pass2 = value;
-                    if (model.CheckPasswordText(model.Pass2) && model.CheckPasswordsAreEqual(model.Pass1, model.Pass2)) goodPass2 = true;
+                    if (model.CheckPasswordsAreEqual()) goodPass2 = true;
                     else goodPass2 = false;
                     UpdatePass2Box();
                 }
@@ -119,8 +119,8 @@ namespace Client.ViewModels
                     registerCommand = new RelayCommand(_ => {
                         (byte[] userKey, byte[] userIV) = Security.GenerateAESKeyAndIV();
                         byte[] userKeyHash = Security.CreateSHA256Hash(userKey);
-                        if (model.RegisterUser(model.Username, model.Pass2, userIV, userKeyHash)) {
-                            byte[] credentialsHash = model.CreateCredentialsHash(model.Username, model.Pass2, userIV);
+                        if (model.RegisterUser(userIV, userKeyHash)) {
+                            byte[] credentialsHash = model.CreateCredentialsHash(userIV);
                             model.SaveEncryptedUserKey(userKey, credentialsHash, userIV);
                             updateIfUsernameExistThread.Join();
                             navigator.CurrentViewModel = new UserKeyOutputViewModel(connection, navigator, Security.ByteArrayToHexString(userKey));
@@ -172,7 +172,7 @@ namespace Client.ViewModels
         }
 
         private void UpdateIfUsernameExistAsync() {
-            bool exists = model.CheckUsernameExist(Username);
+            bool exists = model.CheckUsernameExist();
             if (exists) usernameAvailable = false;
             else usernameAvailable = true;
             UpdateUsernameBox();
