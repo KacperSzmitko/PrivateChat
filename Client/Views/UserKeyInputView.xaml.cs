@@ -1,10 +1,11 @@
 ﻿using System.Windows.Controls;
 
+
 namespace Client.Views
 {
-    public partial class UserKeyOutputView : UserControl
+    public partial class UserKeyInputView : UserControl
     {
-        public UserKeyOutputView() {
+        public UserKeyInputView() {
             InitializeComponent();
         }
     }

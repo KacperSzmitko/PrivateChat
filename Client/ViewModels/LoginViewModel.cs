@@ -63,7 +63,8 @@ namespace Client.ViewModels
                         if (userIV != null && userKeyHash != null) {
                             byte[] credentialsHash = model.CreateCredentialsHash(userIV);
                             byte[] userKey = model.VerifyAndGetUserKey(credentialsHash, userIV, userKeyHash);
-                            navigator.CurrentViewModel = new ChatViewModel(connection, navigator, model.Username, userKey, userIV, credentialsHash);
+                            if (userKey == null) navigator.CurrentViewModel = new UserKeyInputViewModel(connection, navigator, model.Username, userKeyHash, userIV, credentialsHash);
+                            else navigator.CurrentViewModel = new ChatViewModel(connection, navigator, model.Username, userKey, userIV, credentialsHash);
                         }
                         else {
                             loginError = true;
@@ -91,7 +92,7 @@ namespace Client.ViewModels
         }
 
         public LoginViewModel(ServerConnection connection, Navigator navigator, bool successRegistration = false) : base(connection, navigator) {
-            this.model = new LoginModel(connection);
+            this.model = new LoginModel(this.connection);
             this.successRegistration = successRegistration;
             this.goodUsername = false;
             this.goodPass = false;
