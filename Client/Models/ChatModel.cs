@@ -14,6 +14,8 @@ namespace Client.Models
         private readonly string userPath;
         private readonly string invitationKeysFilePath;
         private readonly string encryptedUserKeyFilePath;
+        private readonly byte[] userKey;
+        private readonly byte[] userIV;
         private readonly byte[] credentialsHash;
 
         private string invitationUsername;
@@ -23,8 +25,10 @@ namespace Client.Models
         public string InvitationUsername { get { return invitationUsername; } set { invitationUsername = value; } }
         public List<Friend> FriendsList { get { return friendsList; } set { friendsList = value; } }
 
-        public ChatModel(ServerConnection connection, string username, byte[] credentialsHash) : base(connection) {
+        public ChatModel(ServerConnection connection, string username, byte[] userKey, byte[] userIV, byte[] credentialsHash) : base(connection) {
             this.username = username;
+            this.userKey = userKey;
+            this.userIV = userIV;
             this.credentialsHash = credentialsHash;
             this.userPath = Path.Combine(appLocalDataFolderPath, username);
             this.invitationKeysFilePath = Path.Combine(userPath, invitationKeysFileName);

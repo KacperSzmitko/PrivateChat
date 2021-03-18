@@ -18,36 +18,36 @@ namespace Client.Models
 
         public RegisterModel(ServerConnection connection) : base(connection) { }
 
-        public bool CheckUsernameText(string username) {
+        public bool CheckUsernameText() {
             if (Regex.Match(username, @"^[\w]{3,}$").Success) return true;
             else return false;
         }
 
-        public bool CheckUsernameExist(string username) {
+        public bool CheckUsernameExist() {
             int error = ServerCommands.CheckUsernameExistCommand(ref connection, username);
             if (error == (int)ErrorCodes.NO_ERROR) return false;
             else if (error == (int)ErrorCodes.USER_ALREADY_EXISTS) return true;
             else throw new Exception(GetErrorCodeName(error));
         }
 
-        public bool CheckPasswordText(string pass) {
-            if (pass.Length >= 8) return true;
+        public bool CheckPasswordText() {
+            if (pass1.Length >= 8) return true;
             else return false;
         }
 
-        public bool CheckPasswordsAreEqual(string pass1, string pass2) {
+        public bool CheckPasswordsAreEqual() {
             if (pass1 == pass2) return true;
             else return false;
         }
 
-        public bool RegisterUser(string username, string pass, byte[] userIV, byte[] userKeyHash) {
-            int error = ServerCommands.RegisterUser(ref connection, username, pass, Security.ByteArrayToHexString(userIV), Security.ByteArrayToHexString(userKeyHash));
+        public bool RegisterUser(byte[] userIV, byte[] userKeyHash) {
+            int error = ServerCommands.RegisterUser(ref connection, username, pass2, Security.ByteArrayToHexString(userIV), Security.ByteArrayToHexString(userKeyHash));
             if (error == (int)ErrorCodes.NO_ERROR) return true;
             else throw new Exception(GetErrorCodeName(error));
         }
 
-        public byte[] CreateCredentialsHash(string username, string password, byte[] userIV) {
-            return Security.CreateSHA256Hash(Encoding.ASCII.GetBytes(username + "$$" + password + "$$" + Security.ByteArrayToHexString(userIV)));
+        public byte[] CreateCredentialsHash(byte[] userIV) {
+            return Security.CreateSHA256Hash(Encoding.ASCII.GetBytes(username + "$$" + pass2 + "$$" + Security.ByteArrayToHexString(userIV)));
         }
 
         public void SaveEncryptedUserKey(byte[] userKey, byte[] encryptingKey, byte[] userIV) {
