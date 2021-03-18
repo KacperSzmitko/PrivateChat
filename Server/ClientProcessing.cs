@@ -96,7 +96,7 @@ namespace Server
                     activeUsers[clientId].userId = dbConnection.GetUserId(username);
 
                 }
-                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.LOGIN,dbConnection.GetFromUser("iv_to_decrypt_user_key",username));
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.LOGIN,dbConnection.GetFromUser("iv_to_decrypt_user_key",username),dbConnection.GetFromUser("user_key_hash", username));
             }
             else return TransmisionProtocol.CreateServerMessage(ErrorCodes.INCORRECT_PASSWORD, Options.LOGIN);
         }

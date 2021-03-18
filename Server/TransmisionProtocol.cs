@@ -24,7 +24,7 @@ namespace Server
                     if (option < 0) throw new ArgumentException("Invalid option!");
                     else if (option == Options.LOGIN)
                     {
-                        AddFields(new[] { "IV"}, ref result, fields);
+                        AddFields(new[] { "IV","UserKeyHash"}, ref result, fields);
                     }
                     else if (option == Options.GET_CONVERSATION)
                     {
