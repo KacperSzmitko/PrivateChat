@@ -116,6 +116,7 @@ namespace Client
         public static (int error, string userIV, string userKeyHash) LoginCommand(ref ServerConnection connection, string username, string password) {
             string command = CreateClientMessage((int)Options.LOGIN, username, password);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "", "");
             return (Int32.Parse(args[0]), args[1], args[2]);
         }
 

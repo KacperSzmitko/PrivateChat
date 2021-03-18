@@ -37,13 +37,14 @@ namespace Client.Models
             //If encryptedUserKey length is wrong - return null
             if (encryptedUserKeyHexString.Length != 64) return null;
             byte[] encryptedUserKey = Security.HexStringToByteArray(encryptedUserKeyHexString);
-            byte[] userKey = Security.AESDecrypt(encryptedUserKey, decryptingKey, userIV);
+            byte[] userKeyFromFile = Security.AESDecrypt(encryptedUserKey, decryptingKey, userIV);
 
-            //If userKey hash dosen't match hash from database - return null
-            if (Security.CreateSHA256Hash(userKey) != userKeyHash) return null;
+            //If userKeyFromFile hash dosen't match userKey hash from database - return null
+            byte[] userKeyFormFileHash = Security.CreateSHA256Hash(userKeyFromFile);
+            if (!Security.CompareByteArrays(userKeyFormFileHash, userKeyHash)) return null;
 
-            //If everything is ok - return userKey
-            return userKey;
+            //If everything is ok - return userKeyFromFile
+            return userKeyFromFile;
         }
     }
 }

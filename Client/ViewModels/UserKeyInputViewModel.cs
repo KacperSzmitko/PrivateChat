@@ -45,6 +45,8 @@ namespace Client.ViewModels
                     checkUserKeyCommand = new RelayCommand(_ => {
                         keyChecked = true;
                         userKeyIsGood = model.IsUserKeyGood();
+                        OnPropertyChanged(nameof(UserKeyOkMessageVisibility));
+                        OnPropertyChanged(nameof(UserKeyNotOkMessageVisibility));
                     }, _ => true);
                 }
                 return checkUserKeyCommand;

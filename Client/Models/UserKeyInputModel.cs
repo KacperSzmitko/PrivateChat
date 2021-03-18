@@ -33,7 +33,8 @@ namespace Client.Models
         public bool IsUserKeyGood() {
             if (userKeyHexStringFromInput.Length != 64) return false;
             byte[] userKeyFromInput = Security.HexStringToByteArray(userKeyHexStringFromInput);
-            if (Security.CreateSHA256Hash(userKeyFromInput) == userKeyHash) {
+            byte[] userKeyFromInputHash = Security.CreateSHA256Hash(userKeyFromInput);
+            if (Security.CompareByteArrays(userKeyFromInputHash, userKeyHash)) {
                 userKey = userKeyFromInput;
                 return true;
             }
