@@ -205,7 +205,7 @@ namespace Server
             {
                 foreach(var i in invitations)
                 {
-                    if(i.sender == userName || i.reciver == userName)
+                    if((i.sender == userName && i.reciver == activeUsers[clientId].name) || ((i.reciver == userName && i.sender == activeUsers[clientId].name)))
                         return TransmisionProtocol.CreateServerMessage(ErrorCodes.INVITATION_ALREADY_EXIST, Options.ADD_FRIEND);
                 }
             }
