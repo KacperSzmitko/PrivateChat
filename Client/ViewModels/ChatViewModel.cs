@@ -83,6 +83,7 @@ namespace Client.ViewModels
                 return sendInvitationCommand;
             }
         }
+
         public ICommand AcceptInvitationCommand {
             get {
                 if (acceptInvitationCommand == null) {
