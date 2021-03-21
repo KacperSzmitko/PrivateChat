@@ -151,11 +151,11 @@ namespace Client
             return (Int32.Parse(args[0]), args[1]);
         }
 
-        public static (int error, string g, string p, string invitationID) SendInvitationCommand(ref ServerConnection connection, string username) {
+        public static (int error, string DHInvitationDataJSON) SendInvitationCommand(ref ServerConnection connection, string username) {
             string command = CreateClientMessage((int)Options.ADD_FRIEND, username);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
-            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "", "", "");
-            return (Int32.Parse(args[0]), args[1], args[2], args[3]);
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
+            return (Int32.Parse(args[0]), args[1]);
         }
 
         public static int SendPublicDHKeyCommand(ref ServerConnection connection, string invitationID, string publicDHKey) {
