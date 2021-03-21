@@ -27,9 +27,14 @@
         <DataTemplate DataType="{x:Type viewmodels:UserKeyOutputViewModel}">
             <views:UserKeyOutputView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:UserKeyInputViewModel}">
+            <views:UserKeyInputView/>
+        </DataTemplate>
 
         <converters:StringToIntConverter x:Key="stringToIntConverter"/>
-        <converters:IntToColorConverter x:Key="intToColorConverter"/>
+        <converters:BoolToColorConverter x:Key="boolToColorConverter"/>
+        <converters:BoolToVisibilityConverter x:Key="boolToVisibilityConverter"/>
+        <converters:IntToVisibilityConverter x:Key="intToVisibilityConverter"/>
 
     </Application.Resources>
 </Application>

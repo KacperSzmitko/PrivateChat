@@ -14,15 +14,15 @@ namespace Shared
 
         ACTIVATE_CONVERSATION = 7,  //  ConversationID:<>$$                                         Error:<>$$
         SEND_MESSAGE = 8,           //  ConversationID:<>$$Data:<JSON>$$                            Error:<>$$
-        NEW_MESSAGES = 9,           //  SERVER ONLY                                                 Error:<>$$Data:<JSONDataMessage>$$
-        NOTIFICATION = 10,          //  SERVER ONLY                                                 Error:<>$$Data:<JSONData>$$ (user:numerOfMessages)
+        NEW_MESSAGES = 9,           //                                                              Error:<>$$Data:<JSONDataMessage>$$
+        NOTIFICATION = 10,          //                                                              Error:<>$$Data:<JSONData>$$ (user:numerOfMessages)
 
         ADD_FRIEND = 11,            //  Username:<>$$                                               Error:<>$$Data:<JSONInvitationPK>$$
         DH_EXCHANGE = 12,           //  InvitationID:<>$$PK:<>$$                                    Error:<>$$
-        SEND_INVITATION = 13,       //  SERVER ONLY                                                 Error:<>$$Data:<JSONInvitationPK>$$
+        SEND_INVITATION = 13,       //                                                              Error:<>$$Data:<JSONInvitationPK>$$
         DECLINE_FRIEND = 14,        //  InvitationID:<>$$                                           Error:<>$$
         ACCEPT_FRIEND = 15,         //  InvitationID:<>$$PKB:<>$$                                   Error:<>$$ConversationID:<>$$
         SEND_CONVERSATION_KEY = 16, //  ConversationID:<>$$ConversationKey:<>$$                     Error:<>$$ 
-        ACCEPTED_FRIEND = 17,       //  SERVER ONLY                                                 Error:<>$$Data:<JSONExtendedInvatation>$$
+        ACCEPTED_FRIEND = 17,       //                                                              Error:<>$$Data:<JSONExtendedInvatation>$$
     }
 }

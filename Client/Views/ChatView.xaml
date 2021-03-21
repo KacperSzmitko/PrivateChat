@@ -12,36 +12,57 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2.5*"/>
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0 0 1 0" Grid.ColumnSpan="2" Margin="0,0,442,0" Grid.RowSpan="3">
-
-                <Grid>
+            <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0 0 1 0">
+                <Grid VerticalAlignment="Center" MinHeight="670">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="0.5*"/>
-                        <RowDefinition Height="8*"/>
-                        <RowDefinition Height="1.35*"/>
-                        <RowDefinition Height="0.3*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="28"/>
+                        <RowDefinition Height="7*"/>
+                        <RowDefinition Height="88"/>
+                        <RowDefinition Height="18"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Margin="0 0 5 0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18">Znajomi</TextBlock>
-                    <ListBox Grid.Row="1" Margin="0 0 5 0" ItemsSource="{Binding}" DataContext="{Binding FriendsList}">
+
+                    <StackPanel Grid.Row="0" Margin="0 0 5 0" Orientation="Vertical" Visibility="{Binding InvitationsBoxVisibility}" d:Visibility="Visible">
+                        <TextBlock HorizontalAlignment="Center" FontSize="18">Nowe zaproszenie</TextBlock>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 3 0 0">
+                            <TextBlock FontSize="18" Text="od: "/>
+                            <TextBlock FontSize="18" Text="{Binding LastInvitationUsername}" d:Text="test2"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 3 0 0">
+                            <Button Padding="2" Width="77" FontSize="14" Content="Zaakceptuj" Command="{Binding AcceptInvitationCommand}"/>
+                            <Button Margin="5 0 0 0" Padding="2" Width="77" FontSize="14" Content="Odrzuć" Command="{Binding DeclineInvitationCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Grid.Row="1" Margin="0 0 5 0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18">Znajomi</TextBlock>
+                    <ListBox Grid.Row="2" Margin="0 0 5 0" ItemsSource="{Binding}" DataContext="{Binding Friends}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontSize="14" Text="&#x25CF; " Foreground="{Binding active, Converter={StaticResource intToColorConverter}}"/>
-                                    <TextBlock FontSize="14" Text="{Binding username}"/>
-                                </StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="20"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <TextBlock Grid.Column="0" FontSize="14" Text="&#x25CF;" Foreground="{Binding Active, Converter={StaticResource boolToColorConverter}}"/>
+                                    <TextBlock Grid.Column="1" FontSize="14" Text="{Binding Name}"/>
+                                    <TextBlock Grid.Column="2" FontSize="14" Text="&#x25CF;" Foreground="Blue" Visibility="{Binding NotificationsAmount, Converter={StaticResource intToVisibilityConverter}}"/>
+                                    <TextBlock Grid.Column="3" FontSize="14" Text="{Binding NotificationsAmount}" Foreground="Blue" Visibility="{Binding NotificationsAmount, Converter={StaticResource intToVisibilityConverter}}"/>
+                                </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                    <StackPanel Grid.Row="2">
+                    <StackPanel Grid.Row="3">
                         <TextBlock Margin="0 5 5 0" HorizontalAlignment="Center" FontSize="16">Dodaj znajomego</TextBlock>
                         <TextBox Margin="0 5 5 0" Padding="2" FontSize="14" Text="{Binding InvitationUsername, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Margin="10 5 15 0" Padding="2" FontSize="14" Content="Wyślij zaproszenie" Command="{Binding SendInvitationCommand}"/>
                     </StackPanel>
-                    <TextBlock Grid.Row="3" Margin="0 0 5 0" FontSize="14" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding UserNotFoundErrorVisibility}" d:Visibility="Hidden">Nie znaleziono</TextBlock>
-                    <TextBlock Grid.Row="3" Margin="0 2 5 0" FontSize="10.5" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding UserAlreadyAFriendErrorVisibility}" d:Visibility="Hidden">Użytkownik jest już znajomym</TextBlock>
-                    <TextBlock Grid.Row="3" Margin="0 0 5 0" FontSize="14" HorizontalAlignment="Center" Visibility="{Binding InvitationSentInfoVisibility}" d:Visibility="Hidden">Wysłano zaproszenie</TextBlock>
+                    <TextBlock Grid.Row="4" Margin="0 0 5 0" FontSize="14" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding UserNotFoundErrorVisibility}" d:Visibility="Hidden">Nie znaleziono</TextBlock>
+                    <TextBlock Grid.Row="4" Margin="0 2 5 0" FontSize="10.5" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding UserAlreadyAFriendErrorVisibility}" d:Visibility="Hidden">Użytkownik jest już znajomym</TextBlock>
+                    <TextBlock Grid.Row="4" Margin="0 0 5 0" FontSize="14" HorizontalAlignment="Center" Visibility="{Binding InvitationSentInfoVisibility}" d:Visibility="Hidden">Wysłano zaproszenie</TextBlock>
                 </Grid>
             </Border>
         </Grid>

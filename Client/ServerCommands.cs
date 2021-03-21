@@ -46,12 +46,18 @@ namespace Client
                         result += AddField("Username", fields[0]);
                         result += AddField("Data", fields[1]);
                         break;
+                    case 9:
+                        break;
+                    case 10:
+                        break;
                     case 11:
                         result += AddField("Username", fields[0]);
                         break;
                     case 12:
                         result += AddField("InvitationID", fields[0]);
                         result += AddField("PK", fields[1]);
+                        break;
+                    case 13:
                         break;
                     default: throw new ArgumentException("Invalid option!");
                 }
@@ -116,6 +122,7 @@ namespace Client
         public static (int error, string userIV, string userKeyHash) LoginCommand(ref ServerConnection connection, string username, string password) {
             string command = CreateClientMessage((int)Options.LOGIN, username, password);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "", "");
             return (Int32.Parse(args[0]), args[1], args[2]);
         }
 
@@ -144,11 +151,11 @@ namespace Client
             return (Int32.Parse(args[0]), args[1]);
         }
 
-        public static (int error, string g, string p, string invitationID) SendInvitationCommand(ref ServerConnection connection, string username) {
+        public static (int error, string DHInvitationDataJSON) SendInvitationCommand(ref ServerConnection connection, string username) {
             string command = CreateClientMessage((int)Options.ADD_FRIEND, username);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
-            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "", "", "");
-            return (Int32.Parse(args[0]), args[1], args[2], args[3]);
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
+            return (Int32.Parse(args[0]), args[1]);
         }
 
         public static int SendPublicDHKeyCommand(ref ServerConnection connection, string invitationID, string publicDHKey) {
@@ -157,5 +164,18 @@ namespace Client
             return Int32.Parse(args[0]);
         }
 
+        public static (int error, string newMessagesInfoJSON) GetNotificationsCommand(ref ServerConnection connection) {
+            string command = CreateClientMessage((int)Options.NOTIFICATION);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
+            return (Int32.Parse(args[0]), args[1]);
+        }
+
+        public static (int error, string invitationsJSON) GetInvitationsCommand(ref ServerConnection connection) {
+            string command = CreateClientMessage((int)Options.SEND_INVITATION);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
+            return (Int32.Parse(args[0]), args[1]);
+        }
     }
 }

@@ -19,11 +19,15 @@ namespace Client.Models
         private readonly byte[] credentialsHash;
 
         private string invitationUsername;
-        private List<Friend> friendsList;
+        private List<FriendStatus> friends;
+        private List<Invitation> receivedInvitations;
 
+        public byte[] CredentialsHash { get { return credentialsHash; } }
+        public byte[] UserIV { get { return userIV; } }
         public string Username { get { return username; } }
         public string InvitationUsername { get { return invitationUsername; } set { invitationUsername = value; } }
-        public List<Friend> FriendsList { get { return friendsList; } set { friendsList = value; } }
+        public List<FriendStatus> Friends { get { return friends; } set { friends = value; } }
+        public List<Invitation> ReceivedInvitations { get { return receivedInvitations; } set { receivedInvitations = value; } }
 
         public ChatModel(ServerConnection connection, string username, byte[] userKey, byte[] userIV, byte[] credentialsHash) : base(connection) {
             this.username = username;
@@ -33,6 +37,8 @@ namespace Client.Models
             this.userPath = Path.Combine(appLocalDataFolderPath, username);
             this.invitationKeysFilePath = Path.Combine(userPath, invitationKeysFileName);
             this.encryptedUserKeyFilePath = Path.Combine(userPath, encryptedUserKeyFileName);
+            this.friends = new List<FriendStatus>();
+            this.receivedInvitations = new List<Invitation>();
             Directory.CreateDirectory(userPath);
 
         }
@@ -40,12 +46,6 @@ namespace Client.Models
         public bool CheckUsernameText(string username) {
             if (!String.IsNullOrEmpty(username) && Regex.Match(username, @"^[\w]{3,}$").Success) return true;
             else return false;
-        }
-
-        public string GetFriendsJSON() {
-            var response = ServerCommands.GetFriendsCommand(ref connection);
-            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
-            return response.friendsJSON;
         }
 
         public void LogoutUser() {
@@ -63,7 +63,8 @@ namespace Client.Models
         public (string g, string p, string invitationID) SendInvitation(string username) {
             var response = ServerCommands.SendInvitationCommand(ref connection, username);
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
-            return (response.g, response.p, response.invitationID);
+            Invitation DHInvitationData = JsonConvert.DeserializeObject<Invitation>(response.DHInvitationDataJSON);
+            return (DHInvitationData.g, DHInvitationData.p, DHInvitationData.invitationId.ToString());
         }
 
         public void SendPublicDHKey(string invitationID, string publicDHKey) {
@@ -84,9 +85,44 @@ namespace Client.Models
                 string invitationKeysFileContent = File.ReadAllText(invitationKeysFilePath);
                 invitationKeys = JsonConvert.DeserializeObject<Dictionary<string, string>>(invitationKeysFileContent);
             }
-            invitationKeys.Add(invitationID, Security.ByteArrayToHexString(encryptedPrivateDHKey));
+            if (invitationKeys.ContainsKey(invitationID)) invitationKeys[invitationID] = Security.ByteArrayToHexString(encryptedPrivateDHKey);
+            else invitationKeys.Add(invitationID, Security.ByteArrayToHexString(encryptedPrivateDHKey));
             string invitationKeysFileContentToSave = JsonConvert.SerializeObject(invitationKeys);
             File.WriteAllText(invitationKeysFilePath, invitationKeysFileContentToSave);
+        }
+        public void GetFriends() {
+            var response = ServerCommands.GetFriendsCommand(ref connection);
+            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
+            List<Friend> friendsNoUnreadMessage = JsonConvert.DeserializeObject<List<Friend>>(response.friendsJSON);
+            foreach (Friend friendNoUnreadMessage in friendsNoUnreadMessage) {
+                bool newFriend = true;
+                for (int i = 0; i < friends.Count; i++) {
+                    if (friendNoUnreadMessage.username == friends[i].Name) {
+                        newFriend = false;
+                        friends[i].Active = Convert.ToBoolean(friendNoUnreadMessage.active);
+                    }
+                }
+                if (newFriend) friends.Add(new FriendStatus(friendNoUnreadMessage.username, Convert.ToBoolean(friendNoUnreadMessage.active)));
+            }
+        }
+
+        public void GetNotifications() {
+            var response = ServerCommands.GetNotificationsCommand(ref connection);
+            if (response.error == (int)ErrorCodes.NO_NOTIFICATIONS) return;
+            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
+            List<Notification> notificationsList = JsonConvert.DeserializeObject<List<Notification>>(response.newMessagesInfoJSON);
+            foreach (Notification notification in notificationsList) {
+                for (int i = 0; i < friends.Count; i++) {
+                    if (notification.username == friends[i].Name) friends[i].NotificationsAmount = notification.numberOfMessages;
+                }
+            }
+        }
+
+        public void GetInvitations() {
+            var response = ServerCommands.GetInvitationsCommand(ref connection);
+            if (response.error == (int)ErrorCodes.NOTHING_TO_SEND) return;
+            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
+            receivedInvitations = JsonConvert.DeserializeObject<List<Invitation>>(response.invitationsJSON);
         }
     }
 }
