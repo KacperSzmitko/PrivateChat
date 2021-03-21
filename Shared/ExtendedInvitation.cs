@@ -20,6 +20,6 @@ namespace Shared
         public string conversationId;
         public string conversationIv;
 
-        public static implicit operator Invitation(ExtendedInvitation e) => new Invitation { g = e.g, p = e.p, invitationId = e.invitationId, publicKeySender = e.publicKeySender,conversationIv = e.conversationIv };
+        public static implicit operator Invitation(ExtendedInvitation e) => new Invitation { g = e.g, p = e.p, invitationId = e.invitationId, publicKeySender = e.publicKeySender,conversationIv = e.conversationIv,sender = e.sender };
     }
 }
