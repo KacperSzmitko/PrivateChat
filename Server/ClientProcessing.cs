@@ -201,6 +201,15 @@ namespace Server
                 ei.sender = activeUsers[clientId].name;
             }
 
+            lock(invitations)
+            {
+                foreach(var i in invitations)
+                {
+                    if(i.sender == userName || i.reciver == userName)
+                        return TransmisionProtocol.CreateServerMessage(ErrorCodes.INVITATION_ALREADY_EXIST, Options.ADD_FRIEND);
+                }
+            }
+
             var param = Security.GenerateParameters();
             ei.g = Security.GetG(param); 
             ei.p = Security.GetP(param);

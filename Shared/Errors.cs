@@ -23,6 +23,7 @@ namespace Shared
         NOTHING_TO_SEND = 14,
         CANNOT_ACTIVATE_CONVERSATION = 15,
         NO_MESSAGES = 16,
-        NO_NOTIFICATIONS = 17
+        NO_NOTIFICATIONS = 17,
+        INVITATION_ALREADY_EXIST = 18
     }
 }
