@@ -28,12 +28,12 @@ namespace Server
             ClientProcessing cp = new ClientProcessing();
             int id = cp.AddActiveUser();
             int id1 = cp.AddActiveUser();
-            Console.WriteLine(cp.Login("Username:test10$$Password:test1234$$", id));
-            Console.WriteLine(cp.Login("Username:test11$$Password:test1234$$", id1));
+            Console.WriteLine(cp.Login("Username:test1$$Password:test1234$$", id));
+            Console.WriteLine(cp.Login("Username:test2$$Password:test1234$$", id1));
 
 
 
-            Console.WriteLine(cp.AddFriend("SecondUserName:test11$$", id));
+            Console.WriteLine(cp.AddFriend("SecondUserName:test2$$", id));
             Console.WriteLine(cp.DhExchange("InvitationID:0$$PK:656665$$", id));
             Console.WriteLine(cp.SendInvitation("", id1));
             Console.WriteLine(cp.AcceptFriend("InvitationID:0$$PKB:4$$", id1));

@@ -181,7 +181,7 @@ namespace Server
 
 
 
-        // GENERATE IV
+        // Check if invatatnion doesnt already exist
         public string AddFriend(string msg, int clientId)
         {
             lock(activeUsers[clientId])

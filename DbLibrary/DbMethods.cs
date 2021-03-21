@@ -191,7 +191,7 @@ namespace DbLibrary
             finally { dataReader.Close(); }
 
 
-            query = string.Format("INSERT INTO conversations(user1_id,user2_id,iv_to_decrypt_converstion_key) VALUES({0},{1},{2})", IdA, IdB,iv);
+            query = string.Format("INSERT INTO conversations(user1_id,user2_id,iv_to_decrypt_converstion_key) VALUES({0},{1},'{2}')", IdA, IdB,iv);
             cmd = new MySqlCommand(query, connection);
             dataReader = cmd.ExecuteReader();
             dataReader.Close();
