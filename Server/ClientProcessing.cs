@@ -213,16 +213,14 @@ namespace Server
             var param = Security.GenerateParameters();
             ei.g = Security.GetG(param); 
             ei.p = Security.GetP(param);
-
             ei.reciver = userName;
-            ei.conversationIv = Security.ByteArrayToHexString(Security.GenerateIV());
 
             lock(invitations)
             {
                 ei.invitationId = AddFriend(ei);
             }
-            Invitation inv = ei;
-            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ADD_FRIEND,JsonConvert.SerializeObject((Invitation)ei));
+
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ADD_FRIEND,ei.p,ei.g,ei.invitationId.ToString());
         }
 
         // Errors
@@ -275,10 +273,12 @@ namespace Server
             string reciverPk = fields[1].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
 
             string conversationId = "";
+            var conversationIv = "";
             lock (activeUsers[clientId])
             {
                 lock (invitations)
                 {
+                    conversationIv = Security.ByteArrayToHexString(Security.GenerateIV());
                     try
                     {
                         conversationId = activeUsers[clientId].dbConnection.AddFriends(activeUsers[clientId].userId, invitations[invId].sender, invitations[invId].conversationIv);
@@ -288,15 +288,17 @@ namespace Server
                         invitations[invId].publicKeyReciver = reciverPk;
                         invitations[invId].accepted = true;
                         invitations[invId].conversationId = conversationId;
+                        invitations[invId].conversationIv = conversationIv;
                     }
                     catch
                     {
                         return TransmisionProtocol.CreateServerMessage(ErrorCodes.WRONG_INVATATION_ID, Options.LOGIN);
                     }
+                    
                 }
             }
 
-            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ACCEPT_FRIEND,conversationId);
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ACCEPT_FRIEND,conversationId, conversationIv);
         }
 
         // Errors

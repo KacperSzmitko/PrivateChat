@@ -31,13 +31,17 @@ namespace Server
                         AddFields(new[] { "ConversationKey","ConversationID", "Data" }, ref result, fields);
                     }
                     else if (option == Options.GET_FRIENDS || option == Options.NEW_MESSAGES || option == Options.NOTIFICATION
-                           ||option == Options.SEND_INVITATION || option == Options.ACCEPTED_FRIEND || option == Options.ADD_FRIEND)
+                           ||option == Options.SEND_INVITATION || option == Options.ACCEPTED_FRIEND)
                     {
                         AddFields(new[] { "Data" }, ref result, fields);
                     }
                     else if (option == Options.ACCEPT_FRIEND)
                     {
-                        AddFields(new[] { "ConversationID"}, ref result, fields);
+                        AddFields(new[] { "ConversationID","IV"}, ref result, fields);
+                    }
+                    else if (option == Options.ADD_FRIEND)
+                    {
+                        AddFields(new[] { "P","G" ,"InvitationId" }, ref result, fields);
                     }
 
                 }

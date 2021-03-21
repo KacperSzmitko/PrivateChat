@@ -17,11 +17,11 @@ namespace Shared
         NEW_MESSAGES = 9,           //                                                              Error:<>$$Data:<JSONDataMessage>$$
         NOTIFICATION = 10,          //                                                              Error:<>$$Data:<JSONData>$$ (user:numerOfMessages)
 
-        ADD_FRIEND = 11,            //  Username:<>$$                                               Error:<>$$Data:<JSONInvitationPK>$$
+        ADD_FRIEND = 11,            //  Username:<>$$                                               Error:<>$$P:<>$$G:<>$$InvitationId:<>$$
         DH_EXCHANGE = 12,           //  InvitationID:<>$$PK:<>$$                                    Error:<>$$
         SEND_INVITATION = 13,       //                                                              Error:<>$$Data:<JSONInvitationPK>$$
         DECLINE_FRIEND = 14,        //  InvitationID:<>$$                                           Error:<>$$
-        ACCEPT_FRIEND = 15,         //  InvitationID:<>$$PKB:<>$$                                   Error:<>$$ConversationID:<>$$
+        ACCEPT_FRIEND = 15,         //  InvitationID:<>$$PKB:<>$$                                   Error:<>$$ConversationID:<>$$IV<>$$
         SEND_CONVERSATION_KEY = 16, //  ConversationID:<>$$ConversationKey:<>$$                     Error:<>$$ 
         ACCEPTED_FRIEND = 17,       //                                                              Error:<>$$Data:<JSONExtendedInvatation>$$
     }

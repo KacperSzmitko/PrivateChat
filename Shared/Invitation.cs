@@ -10,7 +10,6 @@ namespace Shared
         public string p { get; set; }
         public int invitationId { get; set; }
         public string publicKeySender { get; set; }
-        public string conversationIv { get; set; }
         public string sender { get; set; }
     }
 }
