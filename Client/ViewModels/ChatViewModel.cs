@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Shared;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows.Input;
 
@@ -14,6 +15,7 @@ namespace Client.ViewModels
         private ChatModel model;
 
         private Thread sendInvitationThread;
+        private Thread updateThread;
 
         private RelayCommand sendInvitationCommand;
 
@@ -31,7 +33,7 @@ namespace Client.ViewModels
             }
         }
 
-        public List<Friend> FriendsList { get { return model.FriendsList; } }
+        public ObservableCollection<FriendStatus> Friends { get { return new ObservableCollection<FriendStatus>(model.Friends); } }
 
         public string UserNotFoundErrorVisibility {
             get {
@@ -70,9 +72,9 @@ namespace Client.ViewModels
 
         public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey, byte[] userIV, byte[] credentialsHash) : base(connection, navigator) {
             this.model = new ChatModel(connection, username, userKey, userIV, credentialsHash);
-            this.model.FriendsList = JsonConvert.DeserializeObject<List<Friend>>(this.model.GetFriendsJSON());
             this.lastInvitationStatus = InvitationStatus.NO_INVITATION;
-            OnPropertyChanged(nameof(FriendsList));
+            updateThread = new Thread(UpdateAsync);
+            updateThread.Start();
         }
 
         private void RefreshFriendInvitationMessage() {
@@ -89,18 +91,16 @@ namespace Client.ViewModels
             if (!userExists) lastInvitationStatus = InvitationStatus.USER_NOT_FOUND;
             else {
                 bool userAlredyAFriend = false;
-                foreach (Friend f in model.FriendsList) {
-                    if (f.username == model.InvitationUsername) userAlredyAFriend = true;
+                foreach (FriendStatus f in model.Friends) {
+                    if (f.Name == model.InvitationUsername) userAlredyAFriend = true;
                 }
                 if (userAlredyAFriend) lastInvitationStatus = InvitationStatus.USER_ALREADY_A_FRIEND;
                 else {
                     var (g, p, invitationID) = model.SendInvitation(Username);
                     lastInvitationStatus = InvitationStatus.INVITATION_SENT;
-
                     RefreshFriendInvitationMessage();
-
                     var (publicDHKey, privateDHKey) = model.GenerateDHKeys(g, p);
-                    byte[] encryptedPrivateDHKey = Security.AESEncrypt(privateDHKey, new byte[0], new byte[0]);
+                    byte[] encryptedPrivateDHKey = Security.AESEncrypt(privateDHKey, model.CredentialsHash, model.UserIV);
                     model.SaveEncryptedPrivateDHKey(invitationID, encryptedPrivateDHKey);
                     model.SendPublicDHKey(invitationID, publicDHKey);
                 }
@@ -115,6 +115,15 @@ namespace Client.ViewModels
 
             RefreshFriendInvitationMessage();
             OnPropertyChanged(nameof(InvitationUsername));
+        }
+
+        private void UpdateAsync() {
+            while (true) {
+                model.GetFriends();
+                model.GetNotifications();
+                OnPropertyChanged(nameof(Friends));
+                Thread.Sleep(1000);
+            }
         }
     }
 }

@@ -19,11 +19,13 @@ namespace Client.Models
         private readonly byte[] credentialsHash;
 
         private string invitationUsername;
-        private List<Friend> friendsList;
+        private List<FriendStatus> friends;
 
+        public byte[] CredentialsHash { get { return credentialsHash; } }
+        public byte[] UserIV { get { return userIV; } }
         public string Username { get { return username; } }
         public string InvitationUsername { get { return invitationUsername; } set { invitationUsername = value; } }
-        public List<Friend> FriendsList { get { return friendsList; } set { friendsList = value; } }
+        public List<FriendStatus> Friends { get { return friends; } set { friends = value; } }
 
         public ChatModel(ServerConnection connection, string username, byte[] userKey, byte[] userIV, byte[] credentialsHash) : base(connection) {
             this.username = username;
@@ -33,6 +35,7 @@ namespace Client.Models
             this.userPath = Path.Combine(appLocalDataFolderPath, username);
             this.invitationKeysFilePath = Path.Combine(userPath, invitationKeysFileName);
             this.encryptedUserKeyFilePath = Path.Combine(userPath, encryptedUserKeyFileName);
+            this.Friends = new List<FriendStatus>();
             Directory.CreateDirectory(userPath);
 
         }
@@ -40,12 +43,6 @@ namespace Client.Models
         public bool CheckUsernameText(string username) {
             if (!String.IsNullOrEmpty(username) && Regex.Match(username, @"^[\w]{3,}$").Success) return true;
             else return false;
-        }
-
-        public string GetFriendsJSON() {
-            var response = ServerCommands.GetFriendsCommand(ref connection);
-            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
-            return response.friendsJSON;
         }
 
         public void LogoutUser() {
@@ -87,6 +84,33 @@ namespace Client.Models
             invitationKeys.Add(invitationID, Security.ByteArrayToHexString(encryptedPrivateDHKey));
             string invitationKeysFileContentToSave = JsonConvert.SerializeObject(invitationKeys);
             File.WriteAllText(invitationKeysFilePath, invitationKeysFileContentToSave);
+        }
+        public void GetFriends() {
+            var response = ServerCommands.GetFriendsCommand(ref connection);
+            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
+            List<Friend> friendsNoUnreadMessage = JsonConvert.DeserializeObject<List<Friend>>(response.friendsJSON);
+            foreach (Friend friendNoUnreadMessage in friendsNoUnreadMessage) {
+                bool newFriend = true;
+                for (int i = 0; i < friends.Count; i++) {
+                    if (friendNoUnreadMessage.username == friends[i].Name) {
+                        newFriend = false;
+                        friends[i].Active = Convert.ToBoolean(friendNoUnreadMessage.active);
+                    }
+                }
+                if (newFriend) friends.Add(new FriendStatus(friendNoUnreadMessage.username, Convert.ToBoolean(friendNoUnreadMessage.active)));
+            }
+        }
+
+        public void GetNotifications() {
+            var response = ServerCommands.GetNotificationsCommand(ref connection);
+            if (response.error == (int)ErrorCodes.NO_NOTIFICATIONS) return;
+            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
+            List<Notification> newMessagesInfoList = JsonConvert.DeserializeObject<List<Notification>>(response.newMessagesInfoJSON);
+            foreach (Notification newMessageInfo in newMessagesInfoList) {
+                for (int i = 0; i < friends.Count; i++) {
+                    if (newMessageInfo.username == friends[i].Name) friends[i].NotificationsAmount = newMessageInfo.numberOfMessages;
+                }
+            }
         }
     }
 }

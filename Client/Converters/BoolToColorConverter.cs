@@ -6,17 +6,17 @@ using System.Globalization;
 
 namespace Client.Converters
 {
-    [ValueConversion(typeof(int), typeof(string))]
-    class IntToColorConverter : IValueConverter
+    [ValueConversion(typeof(bool), typeof(string))]
+    class BoolToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if ((int)value == 1) return "Green";
+            if ((bool)value == true) return "Green";
             return "Red";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            if ((string)value == "Green") return 1;
-            return 0;
+            if ((string)value == "Green") return true;
+            return false;
         }
     }
 }

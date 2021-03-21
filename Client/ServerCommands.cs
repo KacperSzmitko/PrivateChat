@@ -46,12 +46,18 @@ namespace Client
                         result += AddField("Username", fields[0]);
                         result += AddField("Data", fields[1]);
                         break;
+                    case 9:
+                        break;
+                    case 10:
+                        break;
                     case 11:
                         result += AddField("Username", fields[0]);
                         break;
                     case 12:
                         result += AddField("InvitationID", fields[0]);
                         result += AddField("PK", fields[1]);
+                        break;
+                    case 13:
                         break;
                     default: throw new ArgumentException("Invalid option!");
                 }
@@ -158,5 +164,18 @@ namespace Client
             return Int32.Parse(args[0]);
         }
 
+        public static (int error, string newMessagesInfoJSON) GetNotificationsCommand(ref ServerConnection connection) {
+            string command = CreateClientMessage((int)Options.NOTIFICATION);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
+            return (Int32.Parse(args[0]), args[1]);
+        }
+
+        public static (int error, string invitationsJSON) GetInvitationsCommand(ref ServerConnection connection) {
+            string command = CreateClientMessage((int)Options.SEND_INVITATION);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
+            return (Int32.Parse(args[0]), args[1]);
+        }
     }
 }
