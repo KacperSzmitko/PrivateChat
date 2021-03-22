@@ -83,6 +83,7 @@ namespace Client.ViewModels
                 return sendInvitationCommand;
             }
         }
+
         public ICommand AcceptInvitationCommand {
             get {
                 if (acceptInvitationCommand == null) {
@@ -137,7 +138,7 @@ namespace Client.ViewModels
                 }
                 if (userAlredyAFriend) lastInvitationStatus = InvitationStatus.USER_ALREADY_A_FRIEND;
                 else {
-                    var (g, p, invitationID) = model.SendInvitation(Username);
+                    var (g, p, invitationID) = model.SendInvitation(model.InvitationUsername);
                     lastInvitationStatus = InvitationStatus.INVITATION_SENT;
                     RefreshFriendInvitationMessage();
                     var (publicDHKey, privateDHKey) = model.GenerateDHKeys(g, p);

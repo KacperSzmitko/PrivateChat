@@ -90,6 +90,7 @@ namespace Client.Models
             string invitationKeysFileContentToSave = JsonConvert.SerializeObject(invitationKeys);
             File.WriteAllText(invitationKeysFilePath, invitationKeysFileContentToSave);
         }
+
         public void GetFriends() {
             var response = ServerCommands.GetFriendsCommand(ref connection);
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));

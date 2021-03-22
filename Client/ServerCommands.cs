@@ -152,27 +152,27 @@ namespace Client
         }
 
         public static (int error, string DHInvitationDataJSON) SendInvitationCommand(ref ServerConnection connection, string username) {
-            string command = CreateClientMessage((int)Options.ADD_FRIEND, username);
+            string command = CreateClientMessage((int)Options.SEND_FRIEND_INVITATION, username);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
             return (Int32.Parse(args[0]), args[1]);
         }
 
         public static int SendPublicDHKeyCommand(ref ServerConnection connection, string invitationID, string publicDHKey) {
-            string command = CreateClientMessage((int)Options.DH_EXCHANGE, invitationID, publicDHKey);
+            string command = CreateClientMessage((int)Options.SEND_DH_PK_INVITING, invitationID, publicDHKey);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             return Int32.Parse(args[0]);
         }
 
         public static (int error, string newMessagesInfoJSON) GetNotificationsCommand(ref ServerConnection connection) {
-            string command = CreateClientMessage((int)Options.NOTIFICATION);
+            string command = CreateClientMessage((int)Options.GET_NOTIFICATIONS);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
             return (Int32.Parse(args[0]), args[1]);
         }
 
         public static (int error, string invitationsJSON) GetInvitationsCommand(ref ServerConnection connection) {
-            string command = CreateClientMessage((int)Options.SEND_INVITATION);
+            string command = CreateClientMessage((int)Options.GET_FRIEND_INVITATIONS);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
             return (Int32.Parse(args[0]), args[1]);

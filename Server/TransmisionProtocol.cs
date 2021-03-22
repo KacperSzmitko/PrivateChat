@@ -35,7 +35,7 @@ namespace Server
                     {
                         AddFields(new[] { "Data" }, ref result, fields);
                     }
-                    else if (option == Options.ACCEPT_FRIEND)
+                    else if (option == Options.ACCPET_FRIEND_INVITATION)
                     {
                         AddFields(new[] { "ConversationID","IV"}, ref result, fields);
                     }
