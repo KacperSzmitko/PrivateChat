@@ -41,7 +41,7 @@ namespace Server
                     }
                     else if (option == Options.ADD_FRIEND)
                     {
-                        AddFields(new[] { "P","G" ,"InvitationId" }, ref result, fields);
+                        AddFields(new[] { "g","p" ,"InvitationId" }, ref result, fields);
                     }
 
                 }

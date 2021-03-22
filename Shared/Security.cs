@@ -53,12 +53,12 @@ namespace Shared
 
         public static string GetG(DHParameters parameters)
         {
-            return parameters.G.ToString();
+            return parameters.G.ToString(16);
         }
 
         public static string GetP(DHParameters parameters)
         {
-            return parameters.P.ToString();
+            return parameters.P.ToString(16);
         }
 
         public static AsymmetricCipherKeyPair GenerateKeys(DHParameters parameters)
@@ -74,7 +74,7 @@ namespace Shared
             var dhPublicKeyParameters = keyPair.Public as DHPublicKeyParameters;
             if (dhPublicKeyParameters != null)
             {
-                return dhPublicKeyParameters.Y.ToString();
+                return dhPublicKeyParameters.Y.ToString(16);
             }
             throw new NullReferenceException("The key pair provided is not a valid DH keypair.");
         }
@@ -84,7 +84,7 @@ namespace Shared
             var dhPrivateKeyParameters = keyPair.Private as DHPrivateKeyParameters;
             if (dhPrivateKeyParameters != null)
             {
-                return dhPrivateKeyParameters.X.ToString();
+                return dhPrivateKeyParameters.X.ToString(16);
             }
             throw new NullReferenceException("The key pair provided is not a valid DH keypair.");
         }
@@ -107,7 +107,7 @@ namespace Shared
 
         public static Org.BouncyCastle.Math.BigInteger ComputeSharedSecret(string A, AsymmetricKeyParameter bPrivateKey, DHParameters internalParameters)
         {
-            var importedKey = new DHPublicKeyParameters(new Org.BouncyCastle.Math.BigInteger(A), internalParameters);
+            var importedKey = new DHPublicKeyParameters(new Org.BouncyCastle.Math.BigInteger(A,16), internalParameters);
             var internalKeyAgree = AgreementUtilities.GetBasicAgreement("DH");
             internalKeyAgree.Init(bPrivateKey);
             return internalKeyAgree.CalculateAgreement(importedKey);
