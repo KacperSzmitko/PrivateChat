@@ -220,7 +220,7 @@ namespace Server
                 ei.invitationId = AddFriend(ei);
             }
 
-            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ADD_FRIEND,ei.p,ei.g,ei.invitationId.ToString());
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_FRIEND_INVITATION, ei.p,ei.g,ei.invitationId.ToString());
         }
 
         // Errors
@@ -281,7 +281,7 @@ namespace Server
                     conversationIv = Security.ByteArrayToHexString(Security.GenerateIV());
                     try
                     {
-                        conversationId = activeUsers[clientId].dbConnection.AddFriends(activeUsers[clientId].userId, invitations[invId].sender, invitations[invId].conversationIv);
+                        conversationId = activeUsers[clientId].dbConnection.AddFriends(activeUsers[clientId].userId, invitations[invId].sender, conversationIv);
                     if(conversationId == "") return TransmisionProtocol.CreateServerMessage(ErrorCodes.ADDING_FRIENDS_ERROR, Options.LOGIN);
 
 
@@ -298,7 +298,7 @@ namespace Server
                 }
             }
 
-            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ACCEPT_FRIEND,conversationId, conversationIv);
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ACCPET_FRIEND_INVITATION, conversationId, conversationIv);
         }
 
         // Errors

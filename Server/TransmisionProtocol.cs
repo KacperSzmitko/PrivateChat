@@ -30,8 +30,8 @@ namespace Server
                     {
                         AddFields(new[] { "ConversationKey","ConversationID", "Data" }, ref result, fields);
                     }
-                    else if (option == Options.GET_FRIENDS || option == Options.NEW_MESSAGES || option == Options.NOTIFICATION
-                           ||option == Options.SEND_INVITATION || option == Options.ACCEPTED_FRIEND)
+                    else if (option == Options.GET_FRIENDS || option == Options.GET_NEW_MESSAGES || option == Options.GET_NOTIFICATIONS
+                           || option == Options.GET_ACCEPTED_FRIENDS || option == Options.GET_FRIEND_INVITATIONS)
                     {
                         AddFields(new[] { "Data" }, ref result, fields);
                     }
@@ -39,7 +39,7 @@ namespace Server
                     {
                         AddFields(new[] { "ConversationID","IV"}, ref result, fields);
                     }
-                    else if (option == Options.ADD_FRIEND)
+                    else if (option == Options.SEND_FRIEND_INVITATION)
                     {
                         AddFields(new[] { "g","p" ,"InvitationId" }, ref result, fields);
                     }

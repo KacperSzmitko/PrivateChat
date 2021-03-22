@@ -37,7 +37,7 @@ namespace DbLibrary
         {
             string userAId = userAID.ToString();
             string userBId = GetUserId(usernameB).ToString();
-            string query = string.Format("INSERT INTO friends(user1_id,user2_id,iv_to_decrypt_converstion_key) VALUES({0},{1},{2})", userAId, userBId,iv);
+            string query = string.Format("INSERT INTO friends(user1_id,user2_id) VALUES({0},{1})", userAId, userBId);
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
             dataReader.Read();

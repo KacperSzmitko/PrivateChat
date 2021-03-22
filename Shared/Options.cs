@@ -17,7 +17,7 @@ namespace Shared
         GET_NEW_MESSAGES = 9,               //                                                              Error:<>$$Data:<JSONDataMessage>$$
         GET_NOTIFICATIONS = 10,             //                                                              Error:<>$$Data:<JSONData>$$ (user:numerOfMessages)
 
-        SEND_FRIEND_INVITATION = 11,        //  Username:<>$$                                               Error:<>$$Data:<JSONInvitationPK>$$
+        SEND_FRIEND_INVITATION = 11,        //  Username:<>$$                                               Error:<>$$p:<>$$g:<>$$InvitationId:<>$$
         SEND_DH_PK_INVITING = 12,           //  InvitationID:<>$$PK:<>$$                                    Error:<>$$
         GET_FRIEND_INVITATIONS = 13,        //                                                              Error:<>$$Data:<JSONInvitationPK>$$
         DECLINE_FRIEND_INVITATION = 14,     //  InvitationID:<>$$                                           Error:<>$$

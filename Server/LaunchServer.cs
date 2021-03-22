@@ -36,6 +36,8 @@ namespace Server
 
             Console.WriteLine(cp.AddFriend("SecondUserName:test2$$", id));
             Console.WriteLine(cp.DhExchange("InvitationID:0$$PK:656665$$", id));
+
+
             Console.WriteLine(cp.SendInvitation("", id1));
             Console.WriteLine(cp.AcceptFriend("InvitationID:0$$PKB:4$$", id1));
             Console.WriteLine(cp.SendConversationKey("ConversationID:1$$ConversationKey:ytyt$$", id1));
