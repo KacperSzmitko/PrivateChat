@@ -4,6 +4,7 @@ using Shared;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace Server
 {
@@ -11,8 +12,8 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            ServerConnection connection = new ServerConnection();
-            //FriendsAddTest();
+            //ServerConnection connection = new ServerConnection();
+            FriendsAddTest();
         }
 
         public static void CreateUser(string username, string pass)
@@ -35,6 +36,8 @@ namespace Server
 
             Console.WriteLine(cp.AddFriend("SecondUserName:test2$$", id));
             Console.WriteLine(cp.DhExchange("InvitationID:0$$PK:656665$$", id));
+
+
             Console.WriteLine(cp.SendInvitation("", id1));
             Console.WriteLine(cp.AcceptFriend("InvitationID:0$$PKB:4$$", id1));
             Console.WriteLine(cp.SendConversationKey("ConversationID:1$$ConversationKey:ytyt$$", id1));
@@ -65,10 +68,24 @@ namespace Server
 
         public static void DH()
         {
-            var par = Security.GenerateParameters();
+            var Tpar = Security.GenerateParameters();
+
+            // To są Twoje p i g, stringi zawierające 16-stkowo zapisaną liczbę
+            string p = Security.GetP(Tpar);
+            string g = Security.GetG(Tpar);
+
+            // Tworzysz nowe parametry podając 16 jako drugi argument konstruktora
+            var par = new Org.BouncyCastle.Crypto.Parameters.DHParameters(new Org.BouncyCastle.Math.BigInteger(p,16), new Org.BouncyCastle.Math.BigInteger(g,16));
+            
             var Akeys = Security.GenerateKeys(par);
             var Bkeys = Security.GenerateKeys(par);
+
+            // Chcąc odwołać się do np publicznego klucza (zapisanego szesnastkowo)
+            string x = Security.GetPublicKey(Akeys);
+
+            // Ta funkcja jakos PublicKey przyjmuje stringa reprezentującego liczbę 16-stkową, a funkcja GetPublic/PrivateKey to zwraca
             Console.WriteLine(Security.ComputeSharedSecret(Security.GetPublicKey(Akeys), Bkeys.Private, par).ToString(16));
+            
             Console.WriteLine(Security.ComputeSharedSecret(Security.GetPublicKey(Bkeys), Akeys.Private, par).ToString(16));
         }
     }

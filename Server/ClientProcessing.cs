@@ -220,7 +220,7 @@ namespace Server
                 ei.invitationId = AddFriend(ei);
             }
 
-            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ADD_FRIEND,ei.p,ei.g,ei.invitationId.ToString());
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_FRIEND_INVITATION, ei.p,ei.g,ei.invitationId.ToString());
         }
 
         // Errors
@@ -235,12 +235,12 @@ namespace Server
                 lock (invitations[invId])
                 {
                     invitations[invId].publicKeySender = pk;
-                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.DH_EXCHANGE);
+                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_DH_PK_INVITING);
                 }
             }
             catch
             {
-                return TransmisionProtocol.CreateServerMessage(ErrorCodes.DH_EXCHANGE_ERROR, Options.DH_EXCHANGE);
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.DH_EXCHANGE_ERROR, Options.SEND_DH_PK_INVITING);
             }
 
         }
@@ -259,10 +259,10 @@ namespace Server
             }
             catch
             {
-                return TransmisionProtocol.CreateServerMessage(ErrorCodes.DECLINE_FRIEND_ERROR, Options.DECLINE_FRIEND);
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.DECLINE_FRIEND_ERROR, Options.DECLINE_FRIEND_INVITATION);
             }
 
-            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.DECLINE_FRIEND);
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.DECLINE_FRIEND_INVITATION);
         }
 
         // TEST
@@ -281,7 +281,7 @@ namespace Server
                     conversationIv = Security.ByteArrayToHexString(Security.GenerateIV());
                     try
                     {
-                        conversationId = activeUsers[clientId].dbConnection.AddFriends(activeUsers[clientId].userId, invitations[invId].sender, invitations[invId].conversationIv);
+                        conversationId = activeUsers[clientId].dbConnection.AddFriends(activeUsers[clientId].userId, invitations[invId].sender, conversationIv);
                     if(conversationId == "") return TransmisionProtocol.CreateServerMessage(ErrorCodes.ADDING_FRIENDS_ERROR, Options.LOGIN);
 
 
@@ -298,7 +298,7 @@ namespace Server
                 }
             }
 
-            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ACCEPT_FRIEND,conversationId, conversationIv);
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ACCPET_FRIEND_INVITATION, conversationId, conversationIv);
         }
 
         // Errors
@@ -340,7 +340,7 @@ namespace Server
             }
             if (invs.Count > 0)
             {
-                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_INVITATION, JsonConvert.SerializeObject(invs));
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_FRIEND_INVITATIONS, JsonConvert.SerializeObject(invs));
             }
             else return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOTHING_TO_SEND, Options.LOGIN);
         }
@@ -359,7 +359,7 @@ namespace Server
                     {
                         invs.Add(invitations[i]);
                         invitations[i] = null;
-                        return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.ACCEPTED_FRIEND,JsonConvert.SerializeObject(invs));
+                        return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_ACCEPTED_FRIENDS,JsonConvert.SerializeObject(invs));
                     }
                 }
                 return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOTHING_TO_SEND, Options.LOGIN);
@@ -378,11 +378,11 @@ namespace Server
                 {
                     string notify = JsonConvert.SerializeObject(notifications[userId].Values);
                     notifications[userId].Clear();
-                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.NOTIFICATION,notify );
+                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_NOTIFICATIONS,notify );
                 }
                 catch
                 {
-                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_NOTIFICATIONS, Options.NOTIFICATION, "");
+                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_NOTIFICATIONS, Options.GET_NOTIFICATIONS, "");
                 }
 
             }
@@ -484,7 +484,7 @@ namespace Server
                 {
                     var messages = JsonConvert.SerializeObject(messagesToSend[id][activeConversationId]);
                     messagesToSend[id][activeConversationId].Clear();
-                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.NEW_MESSAGES,
+                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_NEW_MESSAGES,
                         messages);
                 }                
             }
