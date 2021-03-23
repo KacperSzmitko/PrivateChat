@@ -11,5 +11,6 @@ namespace Shared
         public int invitationId { get; set; }
         public string publicKeySender { get; set; }
         public string sender { get; set; }
+        
     }
 }

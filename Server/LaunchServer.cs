@@ -12,8 +12,9 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            //ServerConnection connection = new ServerConnection();
-            FriendsAddTest();
+            ServerConnection connection = new ServerConnection();
+            //FriendsAddTest();
+
         }
 
         public static void CreateUser(string username, string pass)
@@ -32,16 +33,18 @@ namespace Server
             Console.WriteLine(cp.Login("Username:test1$$Password:test1234$$", id));
             Console.WriteLine(cp.Login("Username:test2$$Password:test1234$$", id1));
 
-
+            string pk = BigInteger.Parse("1572974685565517564760848834612061204603051782958757453266089894").ToString("X");
+            string pri = BigInteger.Parse("2171516053468561523083790486470955343976023523132159054917711086").ToString("X");
+            string iv = BigInteger.Parse("48040271114089576525052332491161").ToString("X");
 
             Console.WriteLine(cp.AddFriend("SecondUserName:test2$$", id));
-            Console.WriteLine(cp.DhExchange("InvitationID:0$$PK:656665$$", id));
-
-
-            Console.WriteLine(cp.SendInvitation("", id1));
-            Console.WriteLine(cp.AcceptFriend("InvitationID:0$$PKB:4$$", id1));
+            Console.WriteLine(cp.DhExchange(String.Format("InvitationID:1$$PK:{0}$$PrivateK:{1}$$IV:{2}$$",pk,pri,iv), id));
+            Console.WriteLine(cp.SendInvitations("", id1));
+            Console.WriteLine(cp.AcceptFriend("InvitationID:1$$PKB:4$$", id1));
             Console.WriteLine(cp.SendConversationKey("ConversationID:1$$ConversationKey:ytyt$$", id1));
-            Console.WriteLine(cp.AcceptedFriend("", id));
+
+
+            Console.WriteLine(cp.SendAcceptedFriends("", id));
             Console.WriteLine(cp.SendConversationKey("ConversationID:1$$ConversationKey:ytyoit$$", id));
         }
 
@@ -74,6 +77,7 @@ namespace Server
             string p = Security.GetP(Tpar);
             string g = Security.GetG(Tpar);
 
+
             // Tworzysz nowe parametry podając 16 jako drugi argument konstruktora
             var par = new Org.BouncyCastle.Crypto.Parameters.DHParameters(new Org.BouncyCastle.Math.BigInteger(p,16), new Org.BouncyCastle.Math.BigInteger(g,16));
             
@@ -82,11 +86,14 @@ namespace Server
 
             // Chcąc odwołać się do np publicznego klucza (zapisanego szesnastkowo)
             string x = Security.GetPublicKey(Akeys);
+            string y = Security.GetPrivateKey(Bkeys);
+
 
             // Ta funkcja jakos PublicKey przyjmuje stringa reprezentującego liczbę 16-stkową, a funkcja GetPublic/PrivateKey to zwraca
-            Console.WriteLine(Security.ComputeSharedSecret(Security.GetPublicKey(Akeys), Bkeys.Private, par).ToString(16));
-            
-            Console.WriteLine(Security.ComputeSharedSecret(Security.GetPublicKey(Bkeys), Akeys.Private, par).ToString(16));
+            Console.WriteLine(Security.ComputeSharedSecret(Security.GetPublicKey(Akeys), Security.GetPrivateKey(Bkeys), p,g).ToString(16));
+
+            Console.WriteLine(Security.ComputeSharedSecret(Security.GetPublicKey(Bkeys), Security.GetPrivateKey(Akeys), p, g).ToString(16));
+
         }
     }
 }
