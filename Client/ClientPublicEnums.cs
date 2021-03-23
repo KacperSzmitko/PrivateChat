@@ -10,7 +10,8 @@ namespace Client
         WAITING_FOR_RESPONSE,
         INVITATION_SENT,
         USER_NOT_FOUND,
-        USER_ALREADY_A_FRIEND
+        USER_ALREADY_A_FRIEND,
+        SELF_INVITATION
     }
 
 }

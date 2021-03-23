@@ -52,10 +52,11 @@ namespace Client.Models
             else throw new Exception(GetErrorCodeName(error));
         }
 
-        public (string g, string p, string invitationID) SendInvitation(string username) {
+        public (bool selfInvitation, string g, string p, string invitationID) SendInvitation(string username) {
             var response = ServerCommands.SendInvitationCommand(ref connection, username);
+            if (response.error == (int)ErrorCodes.SELF_INVITE_ERROR) return (true, "", "", "");
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
-            return (response.g, response.p, response.invitationID);
+            return (false, response.g, response.p, response.invitationID);
         }
 
         public (string publicDHKey, byte[] privateDHKey) GenerateDHKeys(string p, string g) {

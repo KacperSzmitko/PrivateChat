@@ -52,6 +52,12 @@ namespace Client.ViewModels
                 else return "Collapsed";
             }
         }
+        public string SelfInvitationErrorVisibility {
+            get {
+                if (lastInvitationStatus == InvitationStatus.SELF_INVITATION) return "Visible";
+                else return "Collapsed";
+            }
+        }
         public string InvitationSentInfoVisibility {
             get {
                 if (lastInvitationStatus == InvitationStatus.INVITATION_SENT) return "Visible";
@@ -126,6 +132,7 @@ namespace Client.ViewModels
         private void RefreshFriendInvitationMessage() {
             OnPropertyChanged(nameof(UserNotFoundErrorVisibility));
             OnPropertyChanged(nameof(UserAlreadyAFriendErrorVisibility));
+            OnPropertyChanged(nameof(SelfInvitationErrorVisibility));
             OnPropertyChanged(nameof(InvitationSentInfoVisibility));
         }
 
@@ -142,13 +149,18 @@ namespace Client.ViewModels
                 }
                 if (userAlredyAFriend) lastInvitationStatus = InvitationStatus.USER_ALREADY_A_FRIEND;
                 else {
-                    (string g, string p, string invitationID) = model.SendInvitation(model.InvitationUsername);
-                    lastInvitationStatus = InvitationStatus.INVITATION_SENT;
-                    RefreshFriendInvitationMessage();
-                    (string publicDHKey, byte[] privateDHKey) = model.GenerateDHKeys(p, g);
-                    byte[] iv = Security.GenerateIV();
-                    byte[] encryptedPrivateDHKey = Security.AESEncrypt(privateDHKey, model.UserKey, iv);
-                    model.SendPublicDHKey(invitationID, publicDHKey, Security.ByteArrayToHexString(encryptedPrivateDHKey), Security.ByteArrayToHexString(iv));
+                    (bool selfInvitation, string g, string p, string invitationID) = model.SendInvitation(model.InvitationUsername);
+                    if (!selfInvitation) {
+                        lastInvitationStatus = InvitationStatus.INVITATION_SENT;
+                        RefreshFriendInvitationMessage();
+                        (string publicDHKey, byte[] privateDHKey) = model.GenerateDHKeys(p, g);
+                        byte[] iv = Security.GenerateIV();
+                        byte[] encryptedPrivateDHKey = Security.AESEncrypt(privateDHKey, model.UserKey, iv);
+                        model.SendPublicDHKey(invitationID, publicDHKey, Security.ByteArrayToHexString(encryptedPrivateDHKey), Security.ByteArrayToHexString(iv));
+                    }
+                    else {
+                        lastInvitationStatus = InvitationStatus.SELF_INVITATION;
+                    }
                 }
             }
 

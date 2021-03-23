@@ -62,6 +62,7 @@
                     </StackPanel>
                     <TextBlock Grid.Row="4" Margin="0 0 5 0" FontSize="14" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding UserNotFoundErrorVisibility}" d:Visibility="Hidden">Nie znaleziono</TextBlock>
                     <TextBlock Grid.Row="4" Margin="0 2 5 0" FontSize="10.5" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding UserAlreadyAFriendErrorVisibility}" d:Visibility="Hidden">Użytkownik jest już znajomym</TextBlock>
+                    <TextBlock Grid.Row="4" Margin="0 2 5 0" FontSize="10.5" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding SelfInvitationErrorVisibility}" d:Visibility="Hidden">Nie możesz zaprosić samego siebie</TextBlock>
                     <TextBlock Grid.Row="4" Margin="0 0 5 0" FontSize="14" HorizontalAlignment="Center" Visibility="{Binding InvitationSentInfoVisibility}" d:Visibility="Hidden">Wysłano zaproszenie</TextBlock>
                 </Grid>
             </Border>
