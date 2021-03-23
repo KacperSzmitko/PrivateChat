@@ -52,11 +52,12 @@ namespace Client.Models
             else throw new Exception(GetErrorCodeName(error));
         }
 
-        public (bool selfInvitation, string g, string p, string invitationID) SendInvitation(string username) {
+        public (InvitationStatus invitationStatus, string g, string p, string invitationID) SendInvitation(string username) {
             var response = ServerCommands.SendInvitationCommand(ref connection, username);
-            if (response.error == (int)ErrorCodes.SELF_INVITE_ERROR) return (true, "", "", "");
+            if (response.error == (int)ErrorCodes.SELF_INVITE_ERROR) return (InvitationStatus.SELF_INVITATION, "", "", "");
+            if (response.error == (int)ErrorCodes.INVITATION_ALREADY_EXIST) return (InvitationStatus.INVITATION_ALREADY_EXIST, "", "", "");
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
-            return (false, response.g, response.p, response.invitationID);
+            return (InvitationStatus.INVITATION_SENT, response.g, response.p, response.invitationID);
         }
 
         public (string publicDHKey, byte[] privateDHKey) GenerateDHKeys(string p, string g) {
@@ -66,7 +67,7 @@ namespace Client.Models
         }
 
         public byte[] GenerateConversationKey(string publicKeyA, string p, string g, byte[] privateKeyB) {
-            return Security.ComputeSharedSecret(publicKeyA, Security.ByteArrayToHexString(privateKeyB), p, g).ToByteArray();
+            return Security.ComputeSharedSecret(publicKeyA, Security.ByteArrayToHexString(privateKeyB), p, g);
         }
 
         public void SendPublicDHKey(string invitationID, string publicDHKey, string privateEncryptedDHKey, string privateEncryptedDHKeyIV) {

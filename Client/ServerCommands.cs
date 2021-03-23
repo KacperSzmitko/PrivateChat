@@ -69,7 +69,7 @@ namespace Client
                         break;
                     case 16:
                         result += AddField("ConversationID", fields[0]);
-                        result += AddField("ConversationKey", fields[0]);
+                        result += AddField("ConversationKey", fields[1]);
                         break;
                     case 17:
                         break;

@@ -268,6 +268,7 @@ namespace Server
             {
                 lock (invitations)
                 {
+                    activeUsers[clientId].dbConnection.DeleteInvitation(invId);
                     invitations.Remove(invId);
                 }
             }

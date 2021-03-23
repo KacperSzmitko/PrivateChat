@@ -105,14 +105,20 @@ namespace Shared
             throw new NullReferenceException("The key pair provided is not a valid DH keypair.");
         }
 
-        public static Org.BouncyCastle.Math.BigInteger ComputeSharedSecret(string A, string BPrivateKey, string p,string g)
+        public static byte[] ComputeSharedSecret(string A, string BPrivateKey, string p,string g)
         {
             DHParameters internalParameters = new DHParameters(new Org.BouncyCastle.Math.BigInteger(p, 16), new Org.BouncyCastle.Math.BigInteger(g, 16));
             AsymmetricKeyParameter bPrivateKey = new DHPrivateKeyParameters(new Org.BouncyCastle.Math.BigInteger(BPrivateKey, 16), internalParameters);
-            var importedKey = new DHPublicKeyParameters(new Org.BouncyCastle.Math.BigInteger(A,16), internalParameters);
+            var importedKey = new DHPublicKeyParameters(new Org.BouncyCastle.Math.BigInteger(A, 16), internalParameters);
             var internalKeyAgree = AgreementUtilities.GetBasicAgreement("DH");
             internalKeyAgree.Init(bPrivateKey);
-            return internalKeyAgree.CalculateAgreement(importedKey);
+            byte[] sharedSecret = internalKeyAgree.CalculateAgreement(importedKey).ToByteArray();
+            byte[] fixedSizeSharedSecret = new byte[64];
+            for (int i = 0; i < 64; i++) {
+                if (i >= sharedSecret.Length) fixedSizeSharedSecret[i] = 0xFF;
+                else fixedSizeSharedSecret[i] = sharedSecret[i];
+            }
+            return fixedSizeSharedSecret;
         }
 
         public static string ByteArrayToHexString(byte[] ba) {

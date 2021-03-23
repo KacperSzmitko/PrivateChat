@@ -52,6 +52,12 @@ namespace Client.ViewModels
                 else return "Collapsed";
             }
         }
+        public string InvitationAlredyExistErrorVisibility {
+            get {
+                if (lastInvitationStatus == InvitationStatus.INVITATION_ALREADY_EXIST) return "Visible";
+                else return "Collapsed";
+            }
+        }
         public string SelfInvitationErrorVisibility {
             get {
                 if (lastInvitationStatus == InvitationStatus.SELF_INVITATION) return "Visible";
@@ -132,6 +138,7 @@ namespace Client.ViewModels
         private void RefreshFriendInvitationMessage() {
             OnPropertyChanged(nameof(UserNotFoundErrorVisibility));
             OnPropertyChanged(nameof(UserAlreadyAFriendErrorVisibility));
+            OnPropertyChanged(nameof(InvitationAlredyExistErrorVisibility));
             OnPropertyChanged(nameof(SelfInvitationErrorVisibility));
             OnPropertyChanged(nameof(InvitationSentInfoVisibility));
         }
@@ -149,17 +156,16 @@ namespace Client.ViewModels
                 }
                 if (userAlredyAFriend) lastInvitationStatus = InvitationStatus.USER_ALREADY_A_FRIEND;
                 else {
-                    (bool selfInvitation, string g, string p, string invitationID) = model.SendInvitation(model.InvitationUsername);
-                    if (!selfInvitation) {
-                        lastInvitationStatus = InvitationStatus.INVITATION_SENT;
+                    (InvitationStatus invitationStatus, string g, string p, string invitationID) = model.SendInvitation(model.InvitationUsername);
+                    lastInvitationStatus = invitationStatus;
+                    if (lastInvitationStatus == InvitationStatus.INVITATION_SENT) {
                         RefreshFriendInvitationMessage();
                         (string publicDHKey, byte[] privateDHKey) = model.GenerateDHKeys(p, g);
                         byte[] iv = Security.GenerateIV();
                         byte[] encryptedPrivateDHKey = Security.AESEncrypt(privateDHKey, model.UserKey, iv);
-                        model.SendPublicDHKey(invitationID, publicDHKey, Security.ByteArrayToHexString(encryptedPrivateDHKey), Security.ByteArrayToHexString(iv));
-                    }
-                    else {
-                        lastInvitationStatus = InvitationStatus.SELF_INVITATION;
+                        string IVHexString = Security.ByteArrayToHexString(iv);
+                        string encryptedPrivateDHKeyHexString = Security.ByteArrayToHexString(encryptedPrivateDHKey);
+                        model.SendPublicDHKey(invitationID, publicDHKey, encryptedPrivateDHKeyHexString, IVHexString);
                     }
                 }
             }

@@ -90,9 +90,9 @@ namespace Server
 
 
             // Ta funkcja jakos PublicKey przyjmuje stringa reprezentującego liczbę 16-stkową, a funkcja GetPublic/PrivateKey to zwraca
-            Console.WriteLine(Security.ComputeSharedSecret(Security.GetPublicKey(Akeys), Security.GetPrivateKey(Bkeys), p,g).ToString(16));
+            Console.WriteLine(Security.ComputeSharedSecret(Security.GetPublicKey(Akeys), Security.GetPrivateKey(Bkeys), p,g).Length);
 
-            Console.WriteLine(Security.ComputeSharedSecret(Security.GetPublicKey(Bkeys), Security.GetPrivateKey(Akeys), p, g).ToString(16));
+            Console.WriteLine(Security.ComputeSharedSecret(Security.GetPublicKey(Bkeys), Security.GetPrivateKey(Akeys), p, g).Length);
 
         }
     }

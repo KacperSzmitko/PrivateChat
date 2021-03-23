@@ -11,7 +11,8 @@ namespace Client
         INVITATION_SENT,
         USER_NOT_FOUND,
         USER_ALREADY_A_FRIEND,
-        SELF_INVITATION
+        SELF_INVITATION,
+        INVITATION_ALREADY_EXIST
     }
 
 }
