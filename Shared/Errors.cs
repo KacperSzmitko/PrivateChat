@@ -4,6 +4,7 @@ namespace Shared
   public enum ErrorCodes
     {   // General
         NO_ERROR = 0,
+        DISCONNECT_ERROR = 21,
         // Login
         NOT_LOGGED_IN = 1,
         USER_NOT_FOUND = 2,
@@ -26,6 +27,5 @@ namespace Shared
         INVITATION_ALREADY_EXIST = 18,
         DB_DELETE_INVITATION_ERROR = 19,
         SELF_INVITE_ERROR = 20,
-        DISCONNECT_ERROR = 21,
     }
 }

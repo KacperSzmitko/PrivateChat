@@ -9,7 +9,6 @@ namespace Client.Models
         protected ServerConnection connection;
 
         protected const string appLocalDataFolderName = "private_chat";
-        protected const string invitationKeysFileName = "invitation_keys.json";
         protected const string encryptedUserKeyFileName = "encrypted_user_key.key";
 
         protected readonly string appLocalDataFolderPath;

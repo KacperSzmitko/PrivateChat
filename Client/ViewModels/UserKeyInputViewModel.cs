@@ -57,7 +57,7 @@ namespace Client.ViewModels
             get {
                 if (goChatCommand == null) {
                     goChatCommand = new RelayCommand(_ => {
-                        navigator.CurrentViewModel = new ChatViewModel(connection, navigator, model.Username, model.UserKey, model.UserIV, model.CredentialsHash);
+                        navigator.CurrentViewModel = new ChatViewModel(connection, navigator, model.Username, model.UserKey);
                     }, _ => {
                         if (userKeyIsGood) return true;
                         else return false;

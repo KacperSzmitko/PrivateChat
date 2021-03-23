@@ -565,7 +565,7 @@ namespace Server
                 lock (activeUsers[clientId])
                 {
                     activeUsers[clientId].dbConnection.CloseConnection();
-                    activeUsers[clientId].redis.redis.Close();
+                    //activeUsers[clientId].redis.redis.Close();
                     activeUsers[clientId] = null;
                 }
             }

@@ -202,7 +202,7 @@ namespace DbLibrary
         public bool InsertDHPublicReciverKey(int invitationId,string reciverPublicKey)
         {
             string query = String.Format
-            ("UPDATE invitations SET sender_public_dh_key = '{0}'" +
+            ("UPDATE invitations SET reciver_public_dh_key = '{0}'" +
             " WHERE invitation_id = {1}",
             reciverPublicKey,  invitationId);
             //Create Command

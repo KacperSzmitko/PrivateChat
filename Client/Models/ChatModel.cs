@@ -12,35 +12,27 @@ namespace Client.Models
     {
         private readonly string username;
         private readonly string userPath;
-        private readonly string invitationKeysFilePath;
         private readonly string encryptedUserKeyFilePath;
         private readonly byte[] userKey;
-        private readonly byte[] userIV;
-        private readonly byte[] credentialsHash;
 
         private string invitationUsername;
         private List<FriendStatus> friends;
         private List<Invitation> receivedInvitations;
 
-        public byte[] CredentialsHash { get { return credentialsHash; } }
-        public byte[] UserIV { get { return userIV; } }
+        public byte[] UserKey { get { return userKey; } }
         public string Username { get { return username; } }
         public string InvitationUsername { get { return invitationUsername; } set { invitationUsername = value; } }
         public List<FriendStatus> Friends { get { return friends; } set { friends = value; } }
         public List<Invitation> ReceivedInvitations { get { return receivedInvitations; } set { receivedInvitations = value; } }
 
-        public ChatModel(ServerConnection connection, string username, byte[] userKey, byte[] userIV, byte[] credentialsHash) : base(connection) {
+        public ChatModel(ServerConnection connection, string username, byte[] userKey) : base(connection) {
             this.username = username;
             this.userKey = userKey;
-            this.userIV = userIV;
-            this.credentialsHash = credentialsHash;
             this.userPath = Path.Combine(appLocalDataFolderPath, username);
-            this.invitationKeysFilePath = Path.Combine(userPath, invitationKeysFileName);
             this.encryptedUserKeyFilePath = Path.Combine(userPath, encryptedUserKeyFileName);
             this.friends = new List<FriendStatus>();
             this.receivedInvitations = new List<Invitation>();
             Directory.CreateDirectory(userPath);
-
         }
 
         public bool CheckUsernameText(string username) {
@@ -60,35 +52,27 @@ namespace Client.Models
             else throw new Exception(GetErrorCodeName(error));
         }
 
-        public (string g, string p, string invitationID) SendInvitation(string username) {
+        public (InvitationStatus invitationStatus, string g, string p, string invitationID) SendInvitation(string username) {
             var response = ServerCommands.SendInvitationCommand(ref connection, username);
+            if (response.error == (int)ErrorCodes.SELF_INVITE_ERROR) return (InvitationStatus.SELF_INVITATION, "", "", "");
+            if (response.error == (int)ErrorCodes.INVITATION_ALREADY_EXIST) return (InvitationStatus.INVITATION_ALREADY_EXIST, "", "", "");
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
-            Invitation DHInvitationData = JsonConvert.DeserializeObject<Invitation>(response.DHInvitationDataJSON);
-            return (DHInvitationData.g, DHInvitationData.p, DHInvitationData.invitationId.ToString());
+            return (InvitationStatus.INVITATION_SENT, response.g, response.p, response.invitationID);
         }
 
-        public void SendPublicDHKey(string invitationID, string publicDHKey) {
-            int error = ServerCommands.SendPublicDHKeyCommand(ref connection, invitationID, publicDHKey);
+        public (string publicDHKey, byte[] privateDHKey) GenerateDHKeys(string p, string g) {
+            var parameters = new DHParameters(new Org.BouncyCastle.Math.BigInteger(p, 16), new Org.BouncyCastle.Math.BigInteger(g, 16));
+            var DHkeys = Security.GenerateKeys(parameters);
+            return (Security.GetPublicKey(DHkeys), Security.GetPrivateKeyBytes(DHkeys));
+        }
+
+        public byte[] GenerateConversationKey(string publicKeyA, string p, string g, byte[] privateKeyB) {
+            return Security.ComputeSharedSecret(publicKeyA, Security.ByteArrayToHexString(privateKeyB), p, g);
+        }
+
+        public void SendPublicDHKey(string invitationID, string publicDHKey, string privateEncryptedDHKey, string privateEncryptedDHKeyIV) {
+            int error = ServerCommands.SendPublicDHKeyCommand(ref connection, invitationID, publicDHKey, privateEncryptedDHKey, privateEncryptedDHKeyIV);
             if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
-        }
-
-        public (string publicDHKey, byte[] privateDHKey) GenerateDHKeys(string g, string p) {
-            var parameters = new DHParameters(new Org.BouncyCastle.Math.BigInteger(p), new Org.BouncyCastle.Math.BigInteger(g));
-            var keys = Security.GenerateKeys(parameters);
-            return (Security.GetPublicKey(keys), Security.GetPrivateKeyBytes(keys));
-        }
-
-        public void SaveEncryptedPrivateDHKey(string invitationID, byte[] encryptedPrivateDHKey) {
-            Dictionary<string, string> invitationKeys;
-            if (!File.Exists(invitationKeysFilePath)) invitationKeys = new Dictionary<string, string>();
-            else {
-                string invitationKeysFileContent = File.ReadAllText(invitationKeysFilePath);
-                invitationKeys = JsonConvert.DeserializeObject<Dictionary<string, string>>(invitationKeysFileContent);
-            }
-            if (invitationKeys.ContainsKey(invitationID)) invitationKeys[invitationID] = Security.ByteArrayToHexString(encryptedPrivateDHKey);
-            else invitationKeys.Add(invitationID, Security.ByteArrayToHexString(encryptedPrivateDHKey));
-            string invitationKeysFileContentToSave = JsonConvert.SerializeObject(invitationKeys);
-            File.WriteAllText(invitationKeysFilePath, invitationKeysFileContentToSave);
         }
 
         public void GetFriends() {
@@ -124,6 +108,30 @@ namespace Client.Models
             if (response.error == (int)ErrorCodes.NOTHING_TO_SEND) return;
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             receivedInvitations = JsonConvert.DeserializeObject<List<Invitation>>(response.invitationsJSON);
+        }
+
+        public (string conversationID, byte[] conversationIV) AcceptFriendInvitation(string invitationID, string PKB) {
+            var response = ServerCommands.AcceptFriendInvitationCommand(ref connection, invitationID, PKB);
+            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
+            return (response.conversationID, Security.HexStringToByteArray(response.conversationIV));
+        }
+
+        public void DeclineFriendInvitation(string invitationID) {
+            var error = ServerCommands.DeclineFriendInvitationCommand(ref connection, invitationID);
+            if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
+        }
+
+        public void SendEncryptedConversationKey(string conversationID, byte[] encryptedConversationKey) {
+            string encryptedConversationKeyHexString = Security.ByteArrayToHexString(encryptedConversationKey);
+            int error = ServerCommands.SendEncryptedConversationKeyCommand(ref connection, conversationID, encryptedConversationKeyHexString);
+            if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
+        }
+
+        public List<ExtendedInvitation> GetAcceptedInvitations() {
+            var response = ServerCommands.GetAcceptedInvitationsCommand(ref connection);
+            if (response.error == (int)ErrorCodes.NOTHING_TO_SEND) return null;
+            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
+            return JsonConvert.DeserializeObject<List<ExtendedInvitation>>(response.ExtendedInvitationJSON);
         }
     }
 }

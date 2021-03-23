@@ -64,7 +64,7 @@ namespace Client.ViewModels
                             byte[] credentialsHash = model.CreateCredentialsHash(userIV);
                             byte[] userKey = model.VerifyAndGetUserKey(credentialsHash, userIV, userKeyHash);
                             if (userKey == null) navigator.CurrentViewModel = new UserKeyInputViewModel(connection, navigator, model.Username, userKeyHash, userIV, credentialsHash);
-                            else navigator.CurrentViewModel = new ChatViewModel(connection, navigator, model.Username, userKey, userIV, credentialsHash);
+                            else navigator.CurrentViewModel = new ChatViewModel(connection, navigator, model.Username, userKey);
                         }
                         else {
                             loginError = true;
