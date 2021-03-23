@@ -54,7 +54,9 @@ namespace Client
                         break;
                     case 12:
                         result += AddField("InvitationID", fields[0]);
-                        result += AddField("PK", fields[1]);
+                        result += AddField("PublicK", fields[1]);
+                        result += AddField("PrivateK", fields[2]);
+                        result += AddField("IV", fields[3]);
                         break;
                     case 13:
                         break;
@@ -171,8 +173,8 @@ namespace Client
             return (Int32.Parse(args[0]), args[1], args[2], args[3]);
         }
 
-        public static int SendPublicDHKeyCommand(ref ServerConnection connection, string invitationID, string publicDHKey) {
-            string command = CreateClientMessage((int)Options.SEND_DH_PK_INVITING, invitationID, publicDHKey);
+        public static int SendPublicDHKeyCommand(ref ServerConnection connection, string invitationID, string publicDHKey, string privateEncryptedDHKey, string privateEncryptedDHKeyIV) {
+            string command = CreateClientMessage((int)Options.SEND_DH_PK_INVITING, invitationID, publicDHKey, privateEncryptedDHKey, privateEncryptedDHKeyIV);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             return Int32.Parse(args[0]);
         }

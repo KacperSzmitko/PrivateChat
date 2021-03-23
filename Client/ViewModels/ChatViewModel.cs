@@ -115,8 +115,8 @@ namespace Client.ViewModels
             }
         }
 
-        public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey, byte[] userIV, byte[] credentialsHash) : base(connection, navigator) {
-            this.model = new ChatModel(connection, username, userKey, userIV, credentialsHash);
+        public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey) : base(connection, navigator) {
+            this.model = new ChatModel(connection, username, userKey);
             this.lastInvitationStatus = InvitationStatus.NO_INVITATION;
             this.lastRecivedInvitation = null;
             updateThread = new Thread(UpdateAsync);
@@ -142,13 +142,13 @@ namespace Client.ViewModels
                 }
                 if (userAlredyAFriend) lastInvitationStatus = InvitationStatus.USER_ALREADY_A_FRIEND;
                 else {
-                    var (g, p, invitationID) = model.SendInvitation(model.InvitationUsername);
+                    (string g, string p, string invitationID) = model.SendInvitation(model.InvitationUsername);
                     lastInvitationStatus = InvitationStatus.INVITATION_SENT;
                     RefreshFriendInvitationMessage();
-                    var (publicDHKey, privateDHKey) = model.GenerateDHKeys(g, p);
-                    byte[] encryptedPrivateDHKey = Security.AESEncrypt(privateDHKey, model.CredentialsHash, model.UserIV);
-                    model.SaveEncryptedPrivateDHKey(invitationID, encryptedPrivateDHKey);
-                    model.SendPublicDHKey(invitationID, publicDHKey);
+                    (string publicDHKey, byte[] privateDHKey) = model.GenerateDHKeys(p, g);
+                    byte[] iv = Security.GenerateIV();
+                    byte[] encryptedPrivateDHKey = Security.AESEncrypt(privateDHKey, model.UserKey, iv);
+                    model.SendPublicDHKey(invitationID, publicDHKey, Security.ByteArrayToHexString(encryptedPrivateDHKey), Security.ByteArrayToHexString(iv));
                 }
             }
 
@@ -173,7 +173,8 @@ namespace Client.ViewModels
             OnPropertyChanged(nameof(InvitationsBoxVisibility));
             OnPropertyChanged(nameof(LastInvitationUsername));
 
-            (byte[] conversationKey, string publicDHKey) = model.GenerateConversationKeyAndPublicDHKey(invitingPublicDHKey, p, g);
+            (string publicDHKey, byte[] privateDHKey) = model.GenerateDHKeys(p, g);
+            byte[] conversationKey = model.GenerateConversationKey(invitingPublicDHKey, p, g, privateDHKey);
             (string conversationID, byte[] conversationIV) = model.AcceptFriendInvitation(invitationID, publicDHKey);
             byte[] encryptedConversationKey = Security.AESEncrypt(conversationKey, model.UserKey, conversationIV); //Using userKey to encrypt conversationKey
             model.SendEncryptedConversationKey(conversationID, encryptedConversationKey);
@@ -197,10 +198,17 @@ namespace Client.ViewModels
             OnPropertyChanged(nameof(LastInvitationUsername));
         }
 
-        private void ManageAcceptedFriendsAsync(List<ExtendedInvitation> acceptedInvitations) {
-            foreach (ExtendedInvitation inv in acceptedInvitations) {
-                byte[] encryptedPrivateDHKey = model.GetEncryptedPrivateDHKey(inv.invitationId.ToString());
-                byte[] privateDHKey = Security.AESDecrypt(encryptedPrivateDHKey, model.CredentialsHash, model.UserIV);
+        private void ManageAcceptedFriends(List<ExtendedInvitation> acceptedInvitations) {
+            if (acceptedInvitations != null && acceptedInvitations.Count > 0) {
+                foreach (ExtendedInvitation inv in acceptedInvitations) {
+                    byte[] encryptedPrivateDHKey = Security.HexStringToByteArray(inv.encryptedSenderPrivateKey);
+                    byte[] IVToDecyptPrivateDHKey = Security.HexStringToByteArray(inv.ivToDecryptSenderPrivateKey);
+                    byte[] conversationIV = Security.HexStringToByteArray(inv.conversationIv);
+                    byte[] privateDHKey = Security.AESDecrypt(encryptedPrivateDHKey, model.UserKey, IVToDecyptPrivateDHKey);
+                    byte[] conversationKey = model.GenerateConversationKey(inv.publicKeyReciver, inv.p, inv.g, privateDHKey);
+                    byte[] encryptedConversationKey = Security.AESEncrypt(conversationKey, model.UserKey, conversationIV); //Using userKey to encrypt conversationKey
+                    model.SendEncryptedConversationKey(inv.conversationId, encryptedConversationKey);
+                }
             }
         }
 
@@ -211,10 +219,8 @@ namespace Client.ViewModels
                 model.GetInvitations();
                 if (model.ReceivedInvitations.Count > 0) lastRecivedInvitation = model.ReceivedInvitations[^1]; //^1 - last item in the list
                 else lastRecivedInvitation = null;
-                List<ExtendedInvitation> acceptedInvitations = model.GetAcceptedInvitations();
-                if (acceptedInvitations != null) {
+                ManageAcceptedFriends(model.GetAcceptedInvitations());
 
-                }
                 OnPropertyChanged(nameof(Friends));
                 OnPropertyChanged(nameof(InvitationsBoxVisibility));
                 OnPropertyChanged(nameof(LastInvitationUsername));

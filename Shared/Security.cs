@@ -116,7 +116,7 @@ namespace Shared
         }
 
         public static string ByteArrayToHexString(byte[] ba) {
-            return BitConverter.ToString(ba).Replace("-", "");
+            return BitConverter.ToString(ba).Replace("-", "").ToLower();
         }
 
         public static byte[] HexStringToByteArray(string hex) {
