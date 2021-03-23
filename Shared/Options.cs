@@ -21,7 +21,7 @@ namespace Shared
         SEND_DH_PK_INVITING = 12,           //  InvitationID:<>$$PK:<>$$                                    Error:<>$$
         GET_FRIEND_INVITATIONS = 13,        //                                                              Error:<>$$Data:<JSONInvitationPK>$$
         DECLINE_FRIEND_INVITATION = 14,     //  InvitationID:<>$$                                           Error:<>$$
-        ACCPET_FRIEND_INVITATION = 15,      //  InvitationID:<>$$PKB:<>$$                                   Error:<>$$ConversationID:<>$$
+        ACCPET_FRIEND_INVITATION = 15,      //  InvitationID:<>$$PKB:<>$$                                   Error:<>$$ConversationID:<>$$ConversationIV:<>$$
         SEND_CONVERSATION_KEY = 16,         //  ConversationID:<>$$ConversationKey:<>$$                     Error:<>$$ 
         GET_ACCEPTED_FRIENDS = 17,          //                                                              Error:<>$$Data:<JSONExtendedInvatation>$$
     }

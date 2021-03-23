@@ -15,6 +15,8 @@ namespace Client.ViewModels
         private ChatModel model;
 
         private Thread sendInvitationThread;
+        private Thread acceptFriendThread;
+        private Thread declineFriendThread;
         private Thread updateThread;
 
         private RelayCommand sendInvitationCommand;
@@ -88,7 +90,8 @@ namespace Client.ViewModels
             get {
                 if (acceptInvitationCommand == null) {
                     acceptInvitationCommand = new RelayCommand(_ => {
-                        //TODO
+                        acceptFriendThread = new Thread(AcceptFriendAsync);
+                        acceptFriendThread.Start();
                     }, _ => {
                         if (lastRecivedInvitation != null) return true;
                         else return false;
@@ -101,7 +104,8 @@ namespace Client.ViewModels
             get {
                 if (declineInvitationCommand == null) {
                     declineInvitationCommand = new RelayCommand(_ => {
-                        //TODO
+                        declineFriendThread = new Thread(DeclineFriendAsync);
+                        declineFriendThread.Start();
                     }, _ => {
                         if (lastRecivedInvitation != null) return true;
                         else return false;
@@ -150,13 +154,54 @@ namespace Client.ViewModels
 
             if (lastInvitationStatus != InvitationStatus.INVITATION_SENT) RefreshFriendInvitationMessage();
 
-            Thread.Sleep(10000);
+            Thread.Sleep(5000);
 
             model.InvitationUsername = "";
             lastInvitationStatus = InvitationStatus.NO_INVITATION;
 
             RefreshFriendInvitationMessage();
             OnPropertyChanged(nameof(InvitationUsername));
+        }
+
+        private void AcceptFriendAsync() {
+            string invitingPublicDHKey = lastRecivedInvitation.publicKeySender;
+            string p = lastRecivedInvitation.p;
+            string g = lastRecivedInvitation.g;
+            string invitationID = lastRecivedInvitation.invitationId.ToString();
+            model.ReceivedInvitations.RemoveAt(model.ReceivedInvitations.Count - 1);
+            lastRecivedInvitation = null;
+            OnPropertyChanged(nameof(InvitationsBoxVisibility));
+            OnPropertyChanged(nameof(LastInvitationUsername));
+
+            (byte[] conversationKey, string publicDHKey) = model.GenerateConversationKeyAndPublicDHKey(invitingPublicDHKey, p, g);
+            (string conversationID, byte[] conversationIV) = model.AcceptFriendInvitation(invitationID, publicDHKey);
+            byte[] encryptedConversationKey = Security.AESEncrypt(conversationKey, model.UserKey, conversationIV); //Using userKey to encrypt conversationKey
+            model.SendEncryptedConversationKey(conversationID, encryptedConversationKey);
+
+            if (model.ReceivedInvitations.Count > 0) lastRecivedInvitation = model.ReceivedInvitations[^1];
+            OnPropertyChanged(nameof(InvitationsBoxVisibility));
+            OnPropertyChanged(nameof(LastInvitationUsername));
+        }
+
+        private void DeclineFriendAsync() {
+            string invitationID = lastRecivedInvitation.invitationId.ToString();
+            model.ReceivedInvitations.RemoveAt(model.ReceivedInvitations.Count - 1);
+            lastRecivedInvitation = null;
+            OnPropertyChanged(nameof(InvitationsBoxVisibility));
+            OnPropertyChanged(nameof(LastInvitationUsername));
+
+            model.DeclineFriendInvitation(invitationID);
+
+            if (model.ReceivedInvitations.Count > 0) lastRecivedInvitation = model.ReceivedInvitations[^1];
+            OnPropertyChanged(nameof(InvitationsBoxVisibility));
+            OnPropertyChanged(nameof(LastInvitationUsername));
+        }
+
+        private void ManageAcceptedFriendsAsync(List<ExtendedInvitation> acceptedInvitations) {
+            foreach (ExtendedInvitation inv in acceptedInvitations) {
+                byte[] encryptedPrivateDHKey = model.GetEncryptedPrivateDHKey(inv.invitationId.ToString());
+                byte[] privateDHKey = Security.AESDecrypt(encryptedPrivateDHKey, model.CredentialsHash, model.UserIV);
+            }
         }
 
         private void UpdateAsync() {
@@ -166,6 +211,10 @@ namespace Client.ViewModels
                 model.GetInvitations();
                 if (model.ReceivedInvitations.Count > 0) lastRecivedInvitation = model.ReceivedInvitations[^1]; //^1 - last item in the list
                 else lastRecivedInvitation = null;
+                List<ExtendedInvitation> acceptedInvitations = model.GetAcceptedInvitations();
+                if (acceptedInvitations != null) {
+
+                }
                 OnPropertyChanged(nameof(Friends));
                 OnPropertyChanged(nameof(InvitationsBoxVisibility));
                 OnPropertyChanged(nameof(LastInvitationUsername));

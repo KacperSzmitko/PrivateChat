@@ -5,8 +5,7 @@ using System.Text;
 
 namespace Client
 {
-    public static class ServerCommands
-    {
+    public static class ServerCommands {
 
         private static readonly object comunicateLock = new object(); //Only one thread can use client-server communcation methods at the same time
 
@@ -59,6 +58,20 @@ namespace Client
                         break;
                     case 13:
                         break;
+                    case 14:
+                        result += AddField("InvitationID", fields[0]);
+                        break;
+                    case 15:
+                        result += AddField("InvitationID", fields[0]);
+                        result += AddField("PKB", fields[1]);
+                        break;
+                    case 16:
+                        result += AddField("ConversationID", fields[0]);
+                        result += AddField("ConversationKey", fields[0]);
+                        break;
+                    case 17:
+                        break;
+
                     default: throw new ArgumentException("Invalid option!");
                 }
             }
@@ -151,11 +164,11 @@ namespace Client
             return (Int32.Parse(args[0]), args[1]);
         }
 
-        public static (int error, string DHInvitationDataJSON) SendInvitationCommand(ref ServerConnection connection, string username) {
+        public static (int error, string p, string g, string invitationID) SendInvitationCommand(ref ServerConnection connection, string username) {
             string command = CreateClientMessage((int)Options.SEND_FRIEND_INVITATION, username);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
-            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
-            return (Int32.Parse(args[0]), args[1]);
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "", "", "");
+            return (Int32.Parse(args[0]), args[1], args[2], args[3]);
         }
 
         public static int SendPublicDHKeyCommand(ref ServerConnection connection, string invitationID, string publicDHKey) {
@@ -173,6 +186,32 @@ namespace Client
 
         public static (int error, string invitationsJSON) GetInvitationsCommand(ref ServerConnection connection) {
             string command = CreateClientMessage((int)Options.GET_FRIEND_INVITATIONS);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
+            return (Int32.Parse(args[0]), args[1]);
+        }
+
+        public static (int error, string conversationID, string conversationIV) AcceptFriendInvitationCommand(ref ServerConnection connection, string invitationID, string PKB) {
+            string command = CreateClientMessage((int)Options.ACCPET_FRIEND_INVITATION, invitationID, PKB);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "", "");
+            return (Int32.Parse(args[0]), args[1], args[2]);
+        }
+
+        public static int DeclineFriendInvitationCommand(ref ServerConnection connection, string invitationID) {
+            string command = CreateClientMessage((int)Options.DECLINE_FRIEND_INVITATION, invitationID);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            return Int32.Parse(args[0]);
+        }
+
+        public static int SendEncryptedConversationKeyCommand(ref ServerConnection connection, string conversationID, string encryptedConversationKey) {
+            string command = CreateClientMessage((int)Options.SEND_CONVERSATION_KEY, conversationID, encryptedConversationKey);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            return Int32.Parse(args[0]);
+        }
+
+        public static (int error, string ExtendedInvitationJSON) GetAcceptedInvitationsCommand(ref ServerConnection connection) {
+            string command = CreateClientMessage((int)Options.GET_ACCEPTED_FRIENDS);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
             return (Int32.Parse(args[0]), args[1]);
