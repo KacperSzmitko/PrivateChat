@@ -47,7 +47,7 @@ namespace Shared
         public static DHParameters GenerateParameters()
         {
             var generator = new DHParametersGenerator();
-            generator.Init(256,10, new SecureRandom());
+            generator.Init(256, 10, new SecureRandom());
             return generator.GenerateParameters();
         }
 
@@ -140,7 +140,7 @@ namespace Shared
         }
 
         public static byte[] GenerateIV() {
-            byte[] iv = new byte[8];
+            byte[] iv = new byte[16];
             using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider()) {
                 rng.GetBytes(iv);
             }
