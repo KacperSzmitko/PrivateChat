@@ -87,7 +87,7 @@ namespace DbLibrary
 
         public Redis()
         {
-            //redis = ConnectionMultiplexer.Connect("192.168.0.9:6381");
+            redis = ConnectionMultiplexer.Connect("10.8.0.1:6379,password=5fUwXohpL6rh5xvK");
 
         }
     }
