@@ -2,11 +2,7 @@
 using Newtonsoft.Json;
 using Shared;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 
 namespace Server
 {
@@ -27,7 +23,7 @@ namespace Server
         public List<Functions> functions { get; set; }
         public List<User> activeUsers { get; set; }
 
-        public List<ExtendedInvitation> invitations { get; set; }
+        public Dictionary<int,ExtendedInvitation> invitations { get; set; }
 
         //D(recvUserId:Dict(convId:List<message>))
         public Dictionary<int,Dictionary<int,List<Message>>> messagesToSend { get; set; }
@@ -37,6 +33,7 @@ namespace Server
         // userId:convId
         public Dictionary<int,int> activeConversations { get; set; }
 
+        public DbMethods dbMethods { get; set; }
 
         /// <summary>
         /// Function that takes message from client procces it and return server response
@@ -62,6 +59,17 @@ namespace Server
         {
             lock (activeUsers[clientId])
                 activeUsers[clientId].logged = false;
+            lock (invitations)
+            {
+                int[] a = new int[invitations.Count];
+                invitations.Keys.CopyTo(a, 0);
+                foreach (var key in a)
+                {
+                    if (invitations[key].reciver == activeUsers[clientId].name)
+                        invitations[key].sended = false;
+
+                }
+            }
             return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.LOGOUT);
         }
 
@@ -181,7 +189,6 @@ namespace Server
 
 
 
-        // Check if invatatnion doesnt already exist
         public string AddFriend(string msg, int clientId)
         {
             lock(activeUsers[clientId])
@@ -190,7 +197,7 @@ namespace Server
             }
             string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
             string userName = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
-            
+            if (userName == activeUsers[clientId].name) return TransmisionProtocol.CreateServerMessage(ErrorCodes.SELF_INVITE_ERROR, Options.LOGIN);
             ExtendedInvitation ei = new ExtendedInvitation();
 
             // Check if we arent already friends
@@ -203,7 +210,7 @@ namespace Server
 
             lock(invitations)
             {
-                foreach(var i in invitations)
+                foreach(var i in invitations.Values)
                 {
                     if((i.sender == userName && i.reciver == activeUsers[clientId].name) || ((i.reciver == userName && i.sender == activeUsers[clientId].name)))
                         return TransmisionProtocol.CreateServerMessage(ErrorCodes.INVITATION_ALREADY_EXIST, Options.SEND_FRIEND_INVITATION);
@@ -214,12 +221,12 @@ namespace Server
             ei.g = Security.GetG(param); 
             ei.p = Security.GetP(param);
             ei.reciver = userName;
-
-            lock(invitations)
+            ei.invitationId = activeUsers[clientId].dbConnection.CreateNewInvitation(ei.sender, ei.reciver, ei.p, ei.g);
+            
+            lock (invitations)
             {
-                ei.invitationId = AddFriend(ei);
-            }
-
+                AddFriend(ei,ei.invitationId);
+            }         
             return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_FRIEND_INVITATION, ei.p,ei.g,ei.invitationId.ToString());
         }
 
@@ -228,14 +235,21 @@ namespace Server
         {
             string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
             int invId = Int32.Parse(fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1]);
-            string pk = fields[1].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+            string publicKeySender = fields[1].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+            string encryptedSenderPrivateKey = fields[2].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+            string ivToDecryptSenderPrivateKey = fields[3].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
 
             try
             {
                 lock (invitations[invId])
                 {
-                    invitations[invId].publicKeySender = pk;
+                    invitations[invId].publicKeySender = publicKeySender;
+                    invitations[invId].encryptedSenderPrivateKey = encryptedSenderPrivateKey;
+                    invitations[invId].ivToDecryptSenderPrivateKey = ivToDecryptSenderPrivateKey;
+                    if (activeUsers[clientId].dbConnection.InsertDHKeysToInvitation(invitations[invId].invitationId, invitations[invId].publicKeySender, 
+                        invitations[invId].encryptedSenderPrivateKey, invitations[invId].ivToDecryptSenderPrivateKey))
                     return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_DH_PK_INVITING);
+                    else return TransmisionProtocol.CreateServerMessage(ErrorCodes.DH_EXCHANGE_ERROR, Options.SEND_DH_PK_INVITING);
                 }
             }
             catch
@@ -254,7 +268,7 @@ namespace Server
             {
                 lock (invitations)
                 {
-                    invitations[invId] = null;
+                    invitations.Remove(invId);
                 }
             }
             catch
@@ -282,17 +296,20 @@ namespace Server
                     try
                     {
                         conversationId = activeUsers[clientId].dbConnection.AddFriends(activeUsers[clientId].userId, invitations[invId].sender, conversationIv);
-                    if(conversationId == "") return TransmisionProtocol.CreateServerMessage(ErrorCodes.ADDING_FRIENDS_ERROR, Options.LOGIN);
+                        if(conversationId == "") return TransmisionProtocol.CreateServerMessage(ErrorCodes.ADDING_FRIENDS_ERROR, Options.ACCPET_FRIEND_INVITATION);
+                        if (activeUsers[clientId].dbConnection.InsertDHPublicReciverKey(invId, reciverPk))
+                        {
+                            invitations[invId].publicKeyReciver = reciverPk;
+                            invitations[invId].accepted = true;
+                            invitations[invId].conversationId = conversationId;
+                            invitations[invId].conversationIv = conversationIv;
+                        }
+                        else return TransmisionProtocol.CreateServerMessage(ErrorCodes.ADDING_FRIENDS_ERROR, Options.ACCPET_FRIEND_INVITATION);
 
-
-                        invitations[invId].publicKeyReciver = reciverPk;
-                        invitations[invId].accepted = true;
-                        invitations[invId].conversationId = conversationId;
-                        invitations[invId].conversationIv = conversationIv;
                     }
                     catch
                     {
-                        return TransmisionProtocol.CreateServerMessage(ErrorCodes.WRONG_INVATATION_ID, Options.LOGIN);
+                        return TransmisionProtocol.CreateServerMessage(ErrorCodes.WRONG_INVATATION_ID, Options.ACCPET_FRIEND_INVITATION);
                     }
                     
                 }
@@ -317,7 +334,7 @@ namespace Server
         }
 
 
-        public string SendInvitation(string msg, int clientId)
+        public string SendInvitations(string msg, int clientId)
         {
             string username;
             lock(activeUsers[clientId])
@@ -326,10 +343,11 @@ namespace Server
                 username = activeUsers[clientId].name;
             }
             List<Invitation> invs = new List<Invitation>();
-
+            int[] keys = new int[invitations.Count];
+            invitations.Keys.CopyTo(keys, 0);
             lock(invitations)
             {
-                for(int i=0;i<invitations.Count; i++)
+                foreach(var i in keys)
                 {
                     if(invitations[i].reciver == username && !invitations[i].sended)
                     {
@@ -345,24 +363,31 @@ namespace Server
             else return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOTHING_TO_SEND, Options.LOGIN);
         }
 
-        public string AcceptedFriend(string msg, int clientId)
+        public string SendAcceptedFriends(string msg, int clientId)
         {
             string username;
-            if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOTHING_TO_SEND, Options.LOGIN);
+            if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.GET_ACCEPTED_FRIENDS);
             username = activeUsers[clientId].name;
             List<ExtendedInvitation> invs = new List<ExtendedInvitation>();
+
+            int[] t = new int[invitations.Count];
+            invitations.Keys.CopyTo(t, 0);
             lock(invitations)
             {
-                for(int i=0;i<invitations.Count;i++)
+                foreach(int i in t)
                 {
-                    if(invitations[i] != null && invitations[i].sender == username && invitations[i].accepted)
+                    if(invitations[i].sender == username && invitations[i].accepted)
                     {
                         invs.Add(invitations[i]);
-                        invitations[i] = null;
-                        return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_ACCEPTED_FRIENDS,JsonConvert.SerializeObject(invs));
+                        if (activeUsers[clientId].dbConnection.DeleteInvitation(invitations[i].invitationId))
+                            invitations.Remove(i);
+                        else return TransmisionProtocol.CreateServerMessage(ErrorCodes.DB_DELETE_INVITATION_ERROR, Options.GET_ACCEPTED_FRIENDS);
                     }
                 }
-                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOTHING_TO_SEND, Options.LOGIN);
+                if(invs.Count > 0)
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_ACCEPTED_FRIENDS, JsonConvert.SerializeObject(invs));
+
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOTHING_TO_SEND, Options.GET_ACCEPTED_FRIENDS);
             }
         }
 
@@ -518,8 +543,9 @@ namespace Server
             return activeUsers.Count - 1;
         }
 
-        public int AddFriend(ExtendedInvitation ei)
+        public void AddFriend(ExtendedInvitation ei,int index)
         {
+            /*
             for (int i = 0; i < invitations.Count; i++)
             {
                 if (activeUsers[i] == null)
@@ -528,9 +554,10 @@ namespace Server
                     return i;
                 }
             }
-           invitations.Add(ei);
-            return invitations.Count - 1;
+            */
+            invitations[index] = ei;
         }
+
         public bool DeleteActiveUser(int clientId)
         {
             try {
@@ -566,14 +593,15 @@ namespace Server
             functions.Add(new Functions(Notification));
             functions.Add(new Functions(AddFriend));
             functions.Add(new Functions(DhExchange));
-            functions.Add(new Functions(SendInvitation));
+            functions.Add(new Functions(SendInvitations));
             functions.Add(new Functions(DeclineFriend));
             functions.Add(new Functions(AcceptFriend));
             functions.Add(new Functions(SendConversationKey));
-            functions.Add(new Functions(AcceptedFriend));
+            functions.Add(new Functions(SendAcceptedFriends));
 
+            dbMethods = new DbMethods();
             activeUsers = new List<User>();
-            invitations = new List<ExtendedInvitation>();
+            invitations = dbMethods.GetInvitations();
             messagesToSend = new Dictionary<int, Dictionary<int, List<Message>>>();
             notifications = new Dictionary<int, Dictionary<int, Notification>>();
             activeConversations = new Dictionary<int, int>();

@@ -15,10 +15,10 @@ namespace Shared
         ACTIVATE_CONVERSATION = 7,          //  ConversationID:<>$$                                         Error:<>$$
         SEND_MESSAGE = 8,                   //  ConversationID:<>$$Data:<JSON>$$                            Error:<>$$
         GET_NEW_MESSAGES = 9,               //                                                              Error:<>$$Data:<JSONDataMessage>$$
-        GET_NOTIFICATIONS = 10,             //                                                              Error:<>$$Data:<JSONData>$$ (user:numerOfMessages)
+        GET_NOTIFICATIONS = 10,             //                                                              Error:<>$$Data:<JSONNotification>$$ 
 
         SEND_FRIEND_INVITATION = 11,        //  Username:<>$$                                               Error:<>$$p:<>$$g:<>$$InvitationId:<>$$
-        SEND_DH_PK_INVITING = 12,           //  InvitationID:<>$$PK:<>$$                                    Error:<>$$
+        SEND_DH_PK_INVITING = 12,           //  InvitationID:<>$$PublicK:<>$$PrivateK:<>$$IV:<>$$           Error:<>$$
         GET_FRIEND_INVITATIONS = 13,        //                                                              Error:<>$$Data:<JSONInvitationPK>$$
         DECLINE_FRIEND_INVITATION = 14,     //  InvitationID:<>$$                                           Error:<>$$
         ACCPET_FRIEND_INVITATION = 15,      //  InvitationID:<>$$PKB:<>$$                                   Error:<>$$ConversationID:<>$$ConversationIV:<>$$

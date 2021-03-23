@@ -37,11 +37,11 @@ namespace Server
                     }
                     else if (option == Options.ACCPET_FRIEND_INVITATION)
                     {
-                        AddFields(new[] { "ConversationID","IV"}, ref result, fields);
+                        AddFields(new[] { "ConversationID", "ConversationIV" }, ref result, fields);
                     }
                     else if (option == Options.SEND_FRIEND_INVITATION)
                     {
-                        AddFields(new[] { "g","p" ,"InvitationId" }, ref result, fields);
+                        AddFields(new[] { "p","g" ,"InvitationId" }, ref result, fields);
                     }
 
                 }
