@@ -14,7 +14,6 @@ namespace Server
         {
             ServerConnection connection = new ServerConnection();
             //FriendsAddTest();
-
         }
 
         public static void CreateUser(string username, string pass)
