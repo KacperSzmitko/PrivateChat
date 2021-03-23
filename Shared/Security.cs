@@ -113,8 +113,8 @@ namespace Shared
             var internalKeyAgree = AgreementUtilities.GetBasicAgreement("DH");
             internalKeyAgree.Init(bPrivateKey);
             byte[] sharedSecret = internalKeyAgree.CalculateAgreement(importedKey).ToByteArray();
-            byte[] fixedSizeSharedSecret = new byte[64];
-            for (int i = 0; i < 64; i++) {
+            byte[] fixedSizeSharedSecret = new byte[32];
+            for (int i = 0; i < 32; i++) {
                 if (i >= sharedSecret.Length) fixedSizeSharedSecret[i] = 0xFF;
                 else fixedSizeSharedSecret[i] = sharedSecret[i];
             }
