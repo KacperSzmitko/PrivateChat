@@ -90,7 +90,7 @@ namespace Client.Models
                         friends[i].Active = Convert.ToBoolean(friendNoUnreadMessage.active);
                     }
                 }
-                if (newFriend) friends.Add(new FriendItem(friendNoUnreadMessage.username, Convert.ToBoolean(friendNoUnreadMessage.active), friendNoUnreadMessage.conversationID.ToString()));
+                if (newFriend) friends.Add(new FriendItem(friendNoUnreadMessage.username, Convert.ToBoolean(friendNoUnreadMessage.active), friendNoUnreadMessage.conversationId.ToString()));
             }
         }
 

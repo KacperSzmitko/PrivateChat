@@ -112,7 +112,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Disabled" FontSize="14" d:Text="Testowy tekst 123"/>
-                    <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="&#8250;" Command="{Binding SendMessageCommand}/>
+                    <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="&#8250;" Command="{Binding SendMessageCommand}"/>
                 </Grid>
             </Grid>
         </Grid>
