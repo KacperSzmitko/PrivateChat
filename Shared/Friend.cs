@@ -8,5 +8,6 @@ namespace Shared
     {
         public string username { get; set; }
         public int active { get; set; }
+        public int conversationId { get; set; }
     }
 }
