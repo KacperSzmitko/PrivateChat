@@ -4,7 +4,6 @@ namespace Shared
   public enum ErrorCodes
     {   // General
         NO_ERROR = 0,
-        DISCONNECT_ERROR = 7,
         // Login
         NOT_LOGGED_IN = 1,
         USER_NOT_FOUND = 2,

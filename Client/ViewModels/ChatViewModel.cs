@@ -22,6 +22,7 @@ namespace Client.ViewModels
         private RelayCommand sendInvitationCommand;
         private RelayCommand acceptInvitationCommand;
         private RelayCommand declineInvitationCommand;
+        private RelayCommand sendMessageCommand;
 
         private InvitationStatus lastInvitationStatus;
         private Invitation lastRecivedInvitation;
@@ -38,8 +39,9 @@ namespace Client.ViewModels
             }
         }
 
-        public ObservableCollection<FriendStatus> Friends { get { return new ObservableCollection<FriendStatus>(model.Friends); } }
-        
+        public ObservableCollection<FriendItem> Friends { get { return new ObservableCollection<FriendItem>(model.Friends); } }
+        public ObservableCollection<MessageItem> Messages { get { return new ObservableCollection<MessageItem>(model.Messages); } }
+
         public string UserNotFoundErrorVisibility {
             get {
                 if (lastInvitationStatus == InvitationStatus.USER_NOT_FOUND) return "Visible";
@@ -83,6 +85,12 @@ namespace Client.ViewModels
             }
         }
 
+        public FriendItem SelectedFriend {
+            set {
+                //TODO
+            }
+        }
+
         public ICommand SendInvitationCommand {
             get {
                 if (sendInvitationCommand == null) {
@@ -97,7 +105,6 @@ namespace Client.ViewModels
                 return sendInvitationCommand;
             }
         }
-
         public ICommand AcceptInvitationCommand {
             get {
                 if (acceptInvitationCommand == null) {
@@ -126,6 +133,19 @@ namespace Client.ViewModels
                 return declineInvitationCommand;
             }
         }
+        public ICommand SendMessageCommand {
+            get {
+                if (sendMessageCommand == null) {
+                    sendMessageCommand = new RelayCommand(_ => {
+                        //TODO
+                    }, _ => {
+                        //TODO
+                        return true;
+                    });
+                }
+            }
+        }
+
 
         public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey) : base(connection, navigator) {
             this.model = new ChatModel(connection, username, userKey);
@@ -151,7 +171,7 @@ namespace Client.ViewModels
             if (!userExists) lastInvitationStatus = InvitationStatus.USER_NOT_FOUND;
             else {
                 bool userAlredyAFriend = false;
-                foreach (FriendStatus f in model.Friends) {
+                foreach (FriendItem f in model.Friends) {
                     if (f.Name == model.InvitationUsername) userAlredyAFriend = true;
                 }
                 if (userAlredyAFriend) lastInvitationStatus = InvitationStatus.USER_ALREADY_A_FRIEND;
