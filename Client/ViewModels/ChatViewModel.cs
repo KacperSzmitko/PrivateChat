@@ -143,6 +143,7 @@ namespace Client.ViewModels
                         return true;
                     });
                 }
+                return sendMessageCommand;
             }
         }
 
