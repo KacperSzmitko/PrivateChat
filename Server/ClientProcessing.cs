@@ -169,7 +169,7 @@ namespace Server
         }
 
         // Tested TODO Make errors
-        public string GetConversation(string msg, int clientId)
+        public string SendConversation(string msg, int clientId)
         {
             string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
             string secondUserName = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
@@ -182,7 +182,8 @@ namespace Server
                 int conversationId = activeUsers[clientId].dbConnection.GetConversationId(username, secondUserName);
                 string conversation = activeUsers[clientId].redis.GetConversation(conversationId);
                 string conversationKey = activeUsers[clientId].dbConnection.GetConversationKey(conversationId, username);
-                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.GET_CONVERSATION,conversationKey,conversationId.ToString(),conversation);
+                string conversationIv = activeUsers[clientId].dbConnection.GetConversationIv(conversationId);
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.GET_CONVERSATION,conversationKey,conversationId.ToString(), conversationIv,conversation);
             }
 
         }
@@ -587,7 +588,7 @@ namespace Server
             functions.Add(new Functions(CheckUserName));
             functions.Add(new Functions(Disconnect));
             functions.Add(new Functions(GetFriends));
-            functions.Add(new Functions(GetConversation));
+            functions.Add(new Functions(SendConversation));
             functions.Add(new Functions(ActivateConversation));
             functions.Add(new Functions(SendMessage));
             functions.Add(new Functions(NewMessages));
