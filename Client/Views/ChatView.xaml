@@ -71,7 +71,7 @@
                     <TextBlock Grid.Row="4" Margin="0 0 5 0" FontSize="14" HorizontalAlignment="Center" Visibility="{Binding InvitationSentInfoVisibility}" d:Visibility="Hidden">Wysłano zaproszenie</TextBlock>
                 </Grid>
             </Border>
-            <Grid Grid.Column="1">
+            <Grid Grid.Column="1" Visibility="{Binding ChatBoxVisibility}" d:Visibility="Visible">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="15*"/>
                     <RowDefinition Height="*"/>
