@@ -18,14 +18,14 @@ namespace Client.Models
         private string invitationUsername;
         private List<FriendItem> friends;
         private List<Invitation> receivedInvitations;
-        private Dictionary<string, List<MessageItem>> messagesDict;
+        private Dictionary<string, List<MessageItem>> conversations;
 
         public byte[] UserKey { get { return userKey; } }
         public string Username { get { return username; } }
         public string InvitationUsername { get { return invitationUsername; } set { invitationUsername = value; } }
         public List<FriendItem> Friends { get { return friends; } set { friends = value; } }
         public List<Invitation> ReceivedInvitations { get { return receivedInvitations; } set { receivedInvitations = value; } }
-        public Dictionary<string, List<MessageItem>> MessagesDict { get { return messagesDict; } set { messagesDict = value; } }
+        public Dictionary<string, List<MessageItem>> Conversations { get { return conversations; } set { conversations = value; } }
 
         public ChatModel(ServerConnection connection, string username, byte[] userKey) : base(connection) {
             this.username = username;
@@ -34,7 +34,7 @@ namespace Client.Models
             this.encryptedUserKeyFilePath = Path.Combine(userPath, encryptedUserKeyFileName);
             this.friends = new List<FriendItem>();
             this.receivedInvitations = new List<Invitation>();
-            this.messagesDict = new Dictionary<string, List<MessageItem>>();
+            this.conversations = new Dictionary<string, List<MessageItem>>();
             Directory.CreateDirectory(userPath);
         }
 
@@ -135,6 +135,11 @@ namespace Client.Models
             if (response.error == (int)ErrorCodes.NOTHING_TO_SEND) return null;
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             return JsonConvert.DeserializeObject<List<ExtendedInvitation>>(response.ExtendedInvitationJSON);
+        }
+
+        public string GetConversation(string username) {
+            //TODO
+            throw new NotImplementedException();
         }
 
         public void ActivateConversation(string conversationID) {

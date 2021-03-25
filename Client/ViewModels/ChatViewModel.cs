@@ -44,7 +44,7 @@ namespace Client.ViewModels
         }
 
         public ObservableCollection<FriendItem> Friends { get { return new ObservableCollection<FriendItem>(model.Friends); } }
-        public ObservableCollection<MessageItem> Messages { get { return new ObservableCollection<MessageItem>(model.MessagesDict[selectedFriend.Name]); } }
+        public ObservableCollection<MessageItem> Conversation { get { return new ObservableCollection<MessageItem>(model.Conversations[selectedFriend.Name]); } }
 
         public string UserNotFoundErrorVisibility {
             get {
@@ -82,7 +82,7 @@ namespace Client.ViewModels
                 else return "Collapsed";
             }
         }
-        public string ChatBoxVisibility {
+        public string ConversationBoxVisibility {
             get {
                 if (selectedFriend != null && activeConversation) return "Visible";
                 else return "Collapsed";
@@ -254,11 +254,12 @@ namespace Client.ViewModels
         }
 
         private void LoadConversationAsync() {
+            string conversationID = model.GetConversation(selectedFriend.Name);
             model.ActivateConversation(selectedFriend.Name);
             model.GetMessages();
             activeConversation = true;
-            OnPropertyChanged(nameof(ChatBoxVisibility));
-            OnPropertyChanged(nameof(Messages));
+            OnPropertyChanged(nameof(ConversationBoxVisibility));
+            OnPropertyChanged(nameof(Conversation));
         }
 
         private void UpdateAsync() {
@@ -274,7 +275,7 @@ namespace Client.ViewModels
                 OnPropertyChanged(nameof(Friends));
                 OnPropertyChanged(nameof(InvitationsBoxVisibility));
                 OnPropertyChanged(nameof(LastInvitationUsername));
-                if (activeConversation) OnPropertyChanged(nameof(Messages));
+                if (activeConversation) OnPropertyChanged(nameof(Conversation));
 
                 Thread.Sleep(500);
             }
