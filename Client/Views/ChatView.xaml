@@ -77,7 +77,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <ScrollViewer Grid.Row="0">
-                    <ItemsControl ItemsSource="{Binding Conversation}" d:DataContext="{StaticResource testViewModel}">
+                    <ItemsControl ItemsSource="{Binding Messages}" d:DataContext="{StaticResource testViewModel}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Grid>

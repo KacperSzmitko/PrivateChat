@@ -7,7 +7,7 @@ namespace Client
 {
     class TestViewModel
     {
-        public ObservableCollection<MessageItem> Conversation {
+        public ObservableCollection<MessageItem> Messages {
             get {
                 return new ObservableCollection<MessageItem>() { 
                     new MessageItem("test1", "Moja wiadomość testowa", "24.03.2021", "15:36", true), 

@@ -44,7 +44,7 @@ namespace Client.ViewModels
         }
 
         public ObservableCollection<FriendItem> Friends { get { return new ObservableCollection<FriendItem>(model.Friends); } }
-        public ObservableCollection<MessageItem> Conversation { get { return new ObservableCollection<MessageItem>(model.Conversations[selectedFriend.Name]); } }
+        public ObservableCollection<MessageItem> Messages { get { return new ObservableCollection<MessageItem>(model.Conversations[selectedFriend.Name].Messages); } }
 
         public string UserNotFoundErrorVisibility {
             get {
@@ -254,12 +254,11 @@ namespace Client.ViewModels
         }
 
         private void LoadConversationAsync() {
-            string conversationID = model.GetConversation(selectedFriend.Name);
+            model.GetConversation(selectedFriend.Name);
             model.ActivateConversation(selectedFriend.Name);
-            model.GetMessages();
             activeConversation = true;
             OnPropertyChanged(nameof(ConversationBoxVisibility));
-            OnPropertyChanged(nameof(Conversation));
+            OnPropertyChanged(nameof(Messages));
         }
 
         private void UpdateAsync() {
@@ -270,12 +269,12 @@ namespace Client.ViewModels
                 if (model.ReceivedInvitations.Count > 0) lastRecivedInvitation = model.ReceivedInvitations[^1]; //^1 - last item in the list
                 else lastRecivedInvitation = null;
                 ManageAcceptedFriends(model.GetAcceptedInvitations());
-                if (activeConversation) model.GetMessages();
+                if (activeConversation) model.GetMessages(selectedFriend.Name);
 
                 OnPropertyChanged(nameof(Friends));
                 OnPropertyChanged(nameof(InvitationsBoxVisibility));
                 OnPropertyChanged(nameof(LastInvitationUsername));
-                if (activeConversation) OnPropertyChanged(nameof(Conversation));
+                if (activeConversation) OnPropertyChanged(nameof(Messages));
 
                 Thread.Sleep(500);
             }
