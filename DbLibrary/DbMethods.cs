@@ -401,6 +401,29 @@ namespace DbLibrary
             return "";
         }
 
+        public string GetConversationIv(int conversationID)
+        {
+            string conversationId = conversationID.ToString();
+            string query = string.Format("SELECT iv_to_decrypt_converstion_key FROM conversations WHERE conversation_id = '{0}'", conversationId);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+
+            try
+            {
+                return dataReader.GetString("iv_to_decrypt_converstion_key");
+            }
+            catch
+            {
+                return "";
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+            return "";
+        }
+
         public int GetUserId(string username)
         {
             string query = "SELECT user_id FROM users " + String.Format("WHERE username = '{0}'", username);

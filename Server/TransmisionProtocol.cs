@@ -28,7 +28,7 @@ namespace Server
                     }
                     else if (option == Options.GET_CONVERSATION)
                     {
-                        AddFields(new[] { "ConversationKey","ConversationID", "Data" }, ref result, fields);
+                        AddFields(new[] { "ConversationKey","ConversationID","ConversationIv", "Data" }, ref result, fields);
                     }
                     else if (option == Options.GET_FRIENDS || option == Options.GET_NEW_MESSAGES || option == Options.GET_NOTIFICATIONS
                            || option == Options.GET_ACCEPTED_FRIENDS || option == Options.GET_FRIEND_INVITATIONS)
