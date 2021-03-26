@@ -130,7 +130,8 @@ namespace Client.ViewModels
                 if (value != null && value != selectedFriend) {
                     selectedFriend = value;
                     if (loadConversationThread != null) loadConversationThread.Join();
-                    loadConversationThread = new Thread(() => LoadConversationAsync(selectedFriend.Name));
+                    string friendUsernameCopy = selectedFriend.Name;
+                    loadConversationThread = new Thread(() => LoadConversationAsync(friendUsernameCopy));
                     loadConversationThread.Start();
                 }
             }
@@ -140,7 +141,8 @@ namespace Client.ViewModels
             get {
                 if (sendInvitationCommand == null) {
                     sendInvitationCommand = new RelayCommand(_ => {
-                        sendInvitationThread = new Thread(() => SendInvitationAndGenerateDHKeysAsync(invitationUsername));
+                        string invitationUsernameCopy = invitationUsername;
+                        sendInvitationThread = new Thread(() => SendInvitationAndGenerateDHKeysAsync(invitationUsernameCopy));
                         sendInvitationThread.Start();
                         invitationUsername = "";
                         OnPropertyChanged(nameof(InvitationUsername));
@@ -187,9 +189,11 @@ namespace Client.ViewModels
             get {
                 if (sendMessageCommand == null) {
                     sendMessageCommand = new RelayCommand(_ => {
-                        sendMessageThread = new Thread(() => SendMessageAsync(messageToSendText, selectedFriend.Name));
+                        string messageToSendTextCopy = messageToSendText;
+                        string friendUsername = selectedFriend.Name;
+                        sendMessageThread = new Thread(() => SendMessageAsync(messageToSendTextCopy, friendUsername));
                         sendMessageThread.Start();
-                        invitationUsername = "";
+                        messageToSendText = "";
                         OnPropertyChanged(nameof(MessageToSendText));
                     }, _ => {
                         if (messageToSendText.Length > 0) return true;
@@ -290,6 +294,7 @@ namespace Client.ViewModels
             OnPropertyChanged(nameof(InvitationsBoxVisibility));
             OnPropertyChanged(nameof(LastInvitationUsername));
         }
+
         private void ManageAcceptedFriends(List<ExtendedInvitation> acceptedInvitations) {
             if (acceptedInvitations != null && acceptedInvitations.Count > 0) {
                 foreach (ExtendedInvitation inv in acceptedInvitations) {

@@ -86,7 +86,6 @@ namespace Client.Models
                 for (int i = 0; i < friends.Count; i++) {
                     if (dirtyFriend.username == friends[i].Name) {
                         newFriend = false;
-                        friends[1].Active = Convert.ToBoolean(dirtyFriend.active);
                         friends[i].Active = Convert.ToBoolean(dirtyFriend.active);
                     }
                 }
@@ -182,7 +181,7 @@ namespace Client.Models
 
         public void GetMessages(string friendUsername) {
             var response = ServerCommands.GetNewMessagesCommand(ref connection);
-            if (response.error == (int)ErrorCodes.NOTHING_TO_SEND) return;
+            if (response.error == (int)ErrorCodes.NO_MESSAGES) return;
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             List<Message> dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.newMessegesJSON);
             byte[] conversationKey = conversations[friendUsername].ConversationKey;
