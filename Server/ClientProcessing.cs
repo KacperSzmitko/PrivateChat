@@ -454,21 +454,31 @@ namespace Server
             message = JsonConvert.SerializeObject(messageObject);
             activeUsers[clientId].redis.AddMessage(conversationId, message);
 
-
+            bool isActive = false;
             lock (messagesToSend)
             {
-
-                if (messagesToSend.ContainsKey(userId))
+                foreach(var aUser in activeUsers)
                 {
-                    messagesToSend[userId][conversationId].Add(JsonConvert.DeserializeObject<Message>(message));
-                }
-                else
-                {
-                    messagesToSend.Add(userId, new Dictionary<int, List<Message>>()
+                    if(aUser.userId == userId)
                     {
-                        [conversationId] =
-                        new List<Message> { JsonConvert.DeserializeObject<Message>(message) }
-                    });
+                        isActive = true;
+                        break;
+                    }
+                }
+                if (isActive)
+                {
+                    if (messagesToSend.ContainsKey(userId))
+                    {
+                        messagesToSend[userId][conversationId].Add(JsonConvert.DeserializeObject<Message>(message));
+                    }
+                    else
+                    {
+                        messagesToSend.Add(userId, new Dictionary<int, List<Message>>()
+                        {
+                            [conversationId] =
+                            new List<Message> { JsonConvert.DeserializeObject<Message>(message) }
+                        });
+                    }
                 }
 
             }
