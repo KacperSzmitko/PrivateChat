@@ -12,7 +12,9 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            ServerConnection connection = new ServerConnection();
+            //ServerConnection connection = new ServerConnection();
+            Redis r = new Redis();
+            r.GetConversation(1);
         }
 
         public static void CreateUser(string username, string pass)
