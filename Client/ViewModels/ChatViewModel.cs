@@ -36,8 +36,18 @@ namespace Client.ViewModels
 
         public string Username { get { return model.Username; } }
 
-        public ObservableCollection<FriendItem> Friends { get { return new ObservableCollection<FriendItem>(model.Friends); } }
-        public ObservableCollection<MessageItem> Messages { get { return new ObservableCollection<MessageItem>(model.Conversations[selectedFriend.Name].Messages); } }
+        public ObservableCollection<FriendItem> Friends { 
+            get { 
+                return new ObservableCollection<FriendItem>(model.Friends); 
+            } 
+        }
+
+        public ObservableCollection<MessageItem> Messages { 
+            get {
+                if (selectedFriend != null) return new ObservableCollection<MessageItem>(model.Conversations[selectedFriend.Name].Messages);
+                else return null;
+            } 
+        }
 
         public string UserNotFoundErrorVisibility {
             get {
@@ -117,10 +127,12 @@ namespace Client.ViewModels
 
         public FriendItem SelectedFriend {
             set {
-                selectedFriend = value;
-                if (loadConversationThread != null) loadConversationThread.Join();
-                loadConversationThread = new Thread(() => LoadConversationAsync(selectedFriend.Name));
-                loadConversationThread.Start();
+                if (value != null && value != selectedFriend) {
+                    selectedFriend = value;
+                    if (loadConversationThread != null) loadConversationThread.Join();
+                    loadConversationThread = new Thread(() => LoadConversationAsync(selectedFriend.Name));
+                    loadConversationThread.Start();
+                }
             }
         }
 
@@ -193,6 +205,8 @@ namespace Client.ViewModels
             this.lastInvitationStatus = InvitationStatus.NO_INVITATION;
             this.lastRecivedInvitation = null;
             this.selectedFriend = null;
+            this.invitationUsername = "";
+            this.messageToSendText = "";
             this.activeConversation = false;
             updateThread = new Thread(UpdateAsync);
             updateThread.Start();

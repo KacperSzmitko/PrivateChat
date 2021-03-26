@@ -40,7 +40,7 @@
                         </StackPanel>
                     </StackPanel>
                     <TextBlock Grid.Row="1" Margin="0 0 5 0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18">Znajomi</TextBlock>
-                    <ListBox Grid.Row="2" Margin="0 0 5 0" ItemsSource="{Binding Friends}" SelectedItem="{Binding SelectedFriend}">
+                    <ListBox Grid.Row="2" Margin="0 0 5 0" ItemsSource="{Binding Friends}" SelectedItem="{Binding SelectedFriend, Mode=OneWayToSource}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -96,7 +96,7 @@
                                         </Grid.RowDefinitions>
                                         <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Padding="10" CornerRadius="10" Background="LightGray">
                                             <!-- Message text -->
-                                            <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" FontSize="14" Text="{Binding MessageText}"/>
+                                            <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" FontSize="14" Text="{Binding MessageText, UpdateSourceTrigger=PropertyChanged}"/>
                                         </Border>
                                         <TextBlock Grid.Column="0" Grid.Row="1" Padding="5 0 0 0" TextAlignment="Left" FontSize="12" Text="{Binding Username}"/>
                                         <TextBlock Grid.Column="1" Grid.Row="1" Margin="5 0 0 0" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding DateTime, Converter={StaticResource dateTimeToTimeStringConverter}}" ToolTip="{Binding DateTime, Converter={StaticResource dateTimeToDateStringConverter}}"/>
