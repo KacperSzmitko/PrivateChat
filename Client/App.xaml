@@ -37,6 +37,8 @@
         <converters:IntToVisibilityConverter x:Key="intToVisibilityConverter"/>
         <converters:BoolToIntConverter x:Key="boolToIntConverter"/>
         <converters:BoolToSideConverter x:Key="boolToSideConverter"/>
+        <converters:DateTimeToDateStringConverter x:Key="dateTimeToDateStringConverter"/>
+        <converters:DateTimeToTimeStringConverter x:Key="dateTimeToTimeStringConverter"/>
 
     </Application.Resources>
 </Application>

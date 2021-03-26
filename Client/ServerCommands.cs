@@ -42,7 +42,7 @@ namespace Client
                         result += AddField("ConversationID", fields[0]);
                         break;
                     case 8:
-                        result += AddField("Username", fields[0]);
+                        result += AddField("ConversationID", fields[0]);
                         result += AddField("Data", fields[1]);
                         break;
                     case 9:
@@ -219,17 +219,30 @@ namespace Client
             return (Int32.Parse(args[0]), args[1]);
         }
 
+        public static (int error, string conversationID, string conversationKey, string conversationIV, string messagesJSON) GetConversationCommand(ref ServerConnection connection, string username) {
+            string command = CreateClientMessage((int)Options.GET_CONVERSATION, username);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "", "", "", "");
+            return (Int32.Parse(args[0]), args[1], args[2], args[3], args[4]);
+        }
+
         public static int ActivateConversationCommand(ref ServerConnection connection, string conversationID) {
             string command = CreateClientMessage((int)Options.ACTIVATE_CONVERSATION, conversationID);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             return Int32.Parse(args[0]);
         }
 
-        public static (int error, string NewMessegesJSON) GetNewMessagesCommand(ref ServerConnection connection) {
+        public static (int error, string newMessegesJSON) GetNewMessagesCommand(ref ServerConnection connection) {
             string command = CreateClientMessage((int)Options.GET_NEW_MESSAGES);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
             return (Int32.Parse(args[0]), args[1]);
+        }
+
+        public static int SendMessageCommand(ref ServerConnection connection, string conversationID, string messageJSON) {
+            string command = CreateClientMessage((int)Options.SEND_MESSAGE, conversationID, messageJSON);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            return Int32.Parse(args[0]);
         }
     }
 }

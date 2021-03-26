@@ -99,7 +99,7 @@
                                             <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" FontSize="14" Text="{Binding MessageText}"/>
                                         </Border>
                                         <TextBlock Grid.Column="0" Grid.Row="1" Padding="5 0 0 0" TextAlignment="Left" FontSize="12" Text="{Binding Username}"/>
-                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5 0 0 0" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding Time}" ToolTip="{Binding Date}"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5 0 0 0" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding DateTime, Converter={StaticResource dateTimeToTimeStringConverter}}" ToolTip="{Binding DateTime, Converter={StaticResource dateTimeToDateStringConverter}}"/>
                                     </Grid>
                                 </Grid>
                             </DataTemplate>
@@ -111,7 +111,7 @@
                         <ColumnDefinition Width="6*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Disabled" FontSize="14" d:Text="Testowy tekst 123"/>
+                    <TextBox Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Disabled" FontSize="14" Text="{Binding MessageToSendText}" d:Text="Testowy tekst 12345 żółć"/>
                     <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="&#8250;" Command="{Binding SendMessageCommand}"/>
                 </Grid>
             </Grid>

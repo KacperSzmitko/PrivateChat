@@ -183,7 +183,7 @@ namespace Server
                 string conversation = activeUsers[clientId].redis.GetConversation(conversationId);
                 string conversationKey = activeUsers[clientId].dbConnection.GetConversationKey(conversationId, username);
                 string conversationIv = activeUsers[clientId].dbConnection.GetConversationIv(conversationId);
-                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.GET_CONVERSATION,conversationKey,conversationId.ToString(), conversationIv,conversation);
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.GET_CONVERSATION, conversationId.ToString(), conversationKey, conversationIv, conversation);
             }
 
         }
