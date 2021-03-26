@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Client
+﻿namespace Client
 {
-    public class FriendStatus
+    public class FriendItem
     {
         public string Name { get; set; }
         public bool Active { get; set; }
         public int NotificationsAmount { get; set; }
 
-        public FriendStatus(string name, bool active, int notificationsAmount = 0) {
+        public FriendItem(string name, bool active, int notificationsAmount = 0) {
             Name = name;
             Active = active;
             NotificationsAmount = notificationsAmount;

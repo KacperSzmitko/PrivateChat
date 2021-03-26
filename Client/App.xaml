@@ -35,6 +35,8 @@
         <converters:BoolToColorConverter x:Key="boolToColorConverter"/>
         <converters:BoolToVisibilityConverter x:Key="boolToVisibilityConverter"/>
         <converters:IntToVisibilityConverter x:Key="intToVisibilityConverter"/>
+        <converters:BoolToIntConverter x:Key="boolToIntConverter"/>
+        <converters:BoolToSideConverter x:Key="boolToSideConverter"/>
 
     </Application.Resources>
 </Application>

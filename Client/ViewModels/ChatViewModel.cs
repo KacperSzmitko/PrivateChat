@@ -17,14 +17,19 @@ namespace Client.ViewModels
         private Thread sendInvitationThread;
         private Thread acceptFriendThread;
         private Thread declineFriendThread;
+        private Thread loadConversationThread;
         private Thread updateThread;
 
         private RelayCommand sendInvitationCommand;
         private RelayCommand acceptInvitationCommand;
         private RelayCommand declineInvitationCommand;
+        private RelayCommand sendMessageCommand;
 
         private InvitationStatus lastInvitationStatus;
         private Invitation lastRecivedInvitation;
+        private FriendItem selectedFriend;
+
+        private bool activeConversation;
 
         public string Username { get { return model.Username; } }
 
@@ -38,8 +43,9 @@ namespace Client.ViewModels
             }
         }
 
-        public ObservableCollection<FriendStatus> Friends { get { return new ObservableCollection<FriendStatus>(model.Friends); } }
-        
+        public ObservableCollection<FriendItem> Friends { get { return new ObservableCollection<FriendItem>(model.Friends); } }
+        public ObservableCollection<MessageItem> Messages { get { return new ObservableCollection<MessageItem>(model.Conversations[selectedFriend.Name].Messages); } }
+
         public string UserNotFoundErrorVisibility {
             get {
                 if (lastInvitationStatus == InvitationStatus.USER_NOT_FOUND) return "Visible";
@@ -76,10 +82,26 @@ namespace Client.ViewModels
                 else return "Collapsed";
             }
         }
+        public string ConversationBoxVisibility {
+            get {
+                if (selectedFriend != null && activeConversation) return "Visible";
+                else return "Collapsed";
+            }
+        }
+
         public string LastInvitationUsername {
             get {
                 if (lastRecivedInvitation != null) return lastRecivedInvitation.sender;
                 else return "";
+            }
+        }
+
+        public FriendItem SelectedFriend {
+            set {
+                selectedFriend = value;
+                if (loadConversationThread != null) loadConversationThread.Join();
+                loadConversationThread = new Thread(LoadConversationAsync);
+                loadConversationThread.Start();
             }
         }
 
@@ -97,7 +119,6 @@ namespace Client.ViewModels
                 return sendInvitationCommand;
             }
         }
-
         public ICommand AcceptInvitationCommand {
             get {
                 if (acceptInvitationCommand == null) {
@@ -126,11 +147,27 @@ namespace Client.ViewModels
                 return declineInvitationCommand;
             }
         }
+        public ICommand SendMessageCommand {
+            get {
+                if (sendMessageCommand == null) {
+                    sendMessageCommand = new RelayCommand(_ => {
+                        //TODO
+                    }, _ => {
+                        //TODO
+                        return true;
+                    });
+                }
+                return sendMessageCommand;
+            }
+        }
+
 
         public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey) : base(connection, navigator) {
             this.model = new ChatModel(connection, username, userKey);
             this.lastInvitationStatus = InvitationStatus.NO_INVITATION;
             this.lastRecivedInvitation = null;
+            this.selectedFriend = null;
+            this.activeConversation = false;
             updateThread = new Thread(UpdateAsync);
             updateThread.Start();
         }
@@ -151,7 +188,7 @@ namespace Client.ViewModels
             if (!userExists) lastInvitationStatus = InvitationStatus.USER_NOT_FOUND;
             else {
                 bool userAlredyAFriend = false;
-                foreach (FriendStatus f in model.Friends) {
+                foreach (FriendItem f in model.Friends) {
                     if (f.Name == model.InvitationUsername) userAlredyAFriend = true;
                 }
                 if (userAlredyAFriend) lastInvitationStatus = InvitationStatus.USER_ALREADY_A_FRIEND;
@@ -172,7 +209,7 @@ namespace Client.ViewModels
 
             if (lastInvitationStatus != InvitationStatus.INVITATION_SENT) RefreshFriendInvitationMessage();
 
-            Thread.Sleep(5000);
+            Thread.Sleep(3000);
 
             model.InvitationUsername = "";
             lastInvitationStatus = InvitationStatus.NO_INVITATION;
@@ -216,6 +253,33 @@ namespace Client.ViewModels
             OnPropertyChanged(nameof(LastInvitationUsername));
         }
 
+        private void LoadConversationAsync() {
+            model.GetConversation(selectedFriend.Name);
+            model.ActivateConversation(selectedFriend.Name);
+            activeConversation = true;
+            OnPropertyChanged(nameof(ConversationBoxVisibility));
+            OnPropertyChanged(nameof(Messages));
+        }
+
+        private void UpdateAsync() {
+            while (true) {
+                model.GetFriends();
+                model.GetNotifications();
+                model.GetInvitations();
+                if (model.ReceivedInvitations.Count > 0) lastRecivedInvitation = model.ReceivedInvitations[^1]; //^1 - last item in the list
+                else lastRecivedInvitation = null;
+                ManageAcceptedFriends(model.GetAcceptedInvitations());
+                if (activeConversation) model.GetMessages(selectedFriend.Name);
+
+                OnPropertyChanged(nameof(Friends));
+                OnPropertyChanged(nameof(InvitationsBoxVisibility));
+                OnPropertyChanged(nameof(LastInvitationUsername));
+                if (activeConversation) OnPropertyChanged(nameof(Messages));
+
+                Thread.Sleep(500);
+            }
+        }
+
         private void ManageAcceptedFriends(List<ExtendedInvitation> acceptedInvitations) {
             if (acceptedInvitations != null && acceptedInvitations.Count > 0) {
                 foreach (ExtendedInvitation inv in acceptedInvitations) {
@@ -227,22 +291,6 @@ namespace Client.ViewModels
                     byte[] encryptedConversationKey = Security.AESEncrypt(conversationKey, model.UserKey, conversationIV); //Using userKey to encrypt conversationKey
                     model.SendEncryptedConversationKey(inv.conversationId, encryptedConversationKey);
                 }
-            }
-        }
-
-        private void UpdateAsync() {
-            while (true) {
-                model.GetFriends();
-                model.GetNotifications();
-                model.GetInvitations();
-                if (model.ReceivedInvitations.Count > 0) lastRecivedInvitation = model.ReceivedInvitations[^1]; //^1 - last item in the list
-                else lastRecivedInvitation = null;
-                ManageAcceptedFriends(model.GetAcceptedInvitations());
-
-                OnPropertyChanged(nameof(Friends));
-                OnPropertyChanged(nameof(InvitationsBoxVisibility));
-                OnPropertyChanged(nameof(LastInvitationUsername));
-                Thread.Sleep(1000);
             }
         }
     }

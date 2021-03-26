@@ -5,6 +5,7 @@ namespace Shared
     {   // General
         NO_ERROR = 0,
         DISCONNECT_ERROR = 21,
+
         // Login
         NOT_LOGGED_IN = 1,
         USER_NOT_FOUND = 2,

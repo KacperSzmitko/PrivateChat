@@ -218,5 +218,18 @@ namespace Client
             if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
             return (Int32.Parse(args[0]), args[1]);
         }
+
+        public static int ActivateConversationCommand(ref ServerConnection connection, string conversationID) {
+            string command = CreateClientMessage((int)Options.ACTIVATE_CONVERSATION, conversationID);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            return Int32.Parse(args[0]);
+        }
+
+        public static (int error, string NewMessegesJSON) GetNewMessagesCommand(ref ServerConnection connection) {
+            string command = CreateClientMessage((int)Options.GET_NEW_MESSAGES);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
+            return (Int32.Parse(args[0]), args[1]);
+        }
     }
 }

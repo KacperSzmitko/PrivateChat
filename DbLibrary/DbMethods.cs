@@ -298,10 +298,6 @@ namespace DbLibrary
                     dataReader = cmd.ExecuteReader();
                 }
                 dataReader.Close();
-                for(int i=0;i<friends.Count;i++)
-                {
-                    friends[i].conversationId = GetConversationId(username, friends[i].username);
-                }
                 return JsonConvert.SerializeObject(friends);
             }
             catch

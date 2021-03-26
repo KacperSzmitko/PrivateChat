@@ -16,22 +16,25 @@ namespace Client.Models
         private readonly byte[] userKey;
 
         private string invitationUsername;
-        private List<FriendStatus> friends;
+        private List<FriendItem> friends;
         private List<Invitation> receivedInvitations;
+        private Dictionary<string, Conversation> conversations;
 
         public byte[] UserKey { get { return userKey; } }
         public string Username { get { return username; } }
         public string InvitationUsername { get { return invitationUsername; } set { invitationUsername = value; } }
-        public List<FriendStatus> Friends { get { return friends; } set { friends = value; } }
+        public List<FriendItem> Friends { get { return friends; } set { friends = value; } }
         public List<Invitation> ReceivedInvitations { get { return receivedInvitations; } set { receivedInvitations = value; } }
+        public Dictionary<string, Conversation> Conversations { get { return conversations; } set { conversations = value; } }
 
         public ChatModel(ServerConnection connection, string username, byte[] userKey) : base(connection) {
             this.username = username;
             this.userKey = userKey;
             this.userPath = Path.Combine(appLocalDataFolderPath, username);
             this.encryptedUserKeyFilePath = Path.Combine(userPath, encryptedUserKeyFileName);
-            this.friends = new List<FriendStatus>();
+            this.friends = new List<FriendItem>();
             this.receivedInvitations = new List<Invitation>();
+            this.conversations = new Dictionary<string, Conversation>();
             Directory.CreateDirectory(userPath);
         }
 
@@ -84,10 +87,11 @@ namespace Client.Models
                 for (int i = 0; i < friends.Count; i++) {
                     if (friendNoUnreadMessage.username == friends[i].Name) {
                         newFriend = false;
+                        friends[1].Active = Convert.ToBoolean(friendNoUnreadMessage.active);
                         friends[i].Active = Convert.ToBoolean(friendNoUnreadMessage.active);
                     }
                 }
-                if (newFriend) friends.Add(new FriendStatus(friendNoUnreadMessage.username, Convert.ToBoolean(friendNoUnreadMessage.active)));
+                if (newFriend) friends.Add(new FriendItem(friendNoUnreadMessage.username, Convert.ToBoolean(friendNoUnreadMessage.active)));
             }
         }
 
@@ -132,6 +136,23 @@ namespace Client.Models
             if (response.error == (int)ErrorCodes.NOTHING_TO_SEND) return null;
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             return JsonConvert.DeserializeObject<List<ExtendedInvitation>>(response.ExtendedInvitationJSON);
+        }
+
+        public void GetConversation(string username) {
+            //TODO
+            
+        }
+
+        public void ActivateConversation(string username) {
+            int error = ServerCommands.ActivateConversationCommand(ref connection, conversations[username].ConversationID);
+            if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
+        }
+
+        public void GetMessages(string username) {
+            var response = ServerCommands.GetNewMessagesCommand(ref connection);
+            if (response.error == (int)ErrorCodes.NOTHING_TO_SEND) return;
+            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
+            //TODO
         }
     }
 }
