@@ -12,7 +12,9 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            ServerConnection connection = new ServerConnection();
+            //ServerConnection connection = new ServerConnection();
+            Redis r = new Redis();
+            r.GetConversation(1);
         }
 
         public static void CreateUser(string username, string pass)
@@ -21,6 +23,7 @@ namespace Server
             int id = cp.AddActiveUser();
             cp.CreateUser(String.Format("Username:{0}$$Password:{1}$$UserIV:{0}$$",username,pass),id);
         }
+
 
 
         public static void FriendsAddTest()

@@ -43,7 +43,7 @@ namespace Server
         public string ProccesClient(string message, int clientId)
         {
             string[] fields = message.Split("$$", StringSplitOptions.RemoveEmptyEntries);
-            int option = Int32.Parse(fields[0].Split(':', StringSplitOptions.RemoveEmptyEntries)[1]);
+            int option = int.Parse(fields[0].Split(':', StringSplitOptions.RemoveEmptyEntries)[1]);
 
             //Remove option
             var list = new List<string>(fields);
@@ -65,7 +65,7 @@ namespace Server
                 invitations.Keys.CopyTo(a, 0);
                 foreach (var key in a)
                 {
-                    if (invitations[key].reciver == activeUsers[clientId].name)
+                    if (invitations[key].reciver == activeUsers[clientId].userName)
                         invitations[key].sended = false;
 
                 }
@@ -93,14 +93,14 @@ namespace Server
                     {
                         if (u != null)
                         {
-                            if (u.name == username && u.logged)
+                            if (u.userName == username && u.logged)
                             {
                                 return TransmisionProtocol.CreateServerMessage(ErrorCodes.USER_ALREADY_LOGGED_IN, Options.LOGIN);
                             }
                         }
                     }
                     activeUsers[clientId].logged = true;
-                    activeUsers[clientId].name = username;
+                    activeUsers[clientId].userName = username;
                     activeUsers[clientId].userId = dbConnection.GetUserId(username);
 
                 }
@@ -159,10 +159,10 @@ namespace Server
             { 
                 if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
                 dbConnection = activeUsers[clientId].dbConnection;
-                username = activeUsers[clientId].name;
+                username = activeUsers[clientId].userName;
                 foreach(User user in activeUsers)
                 {
-                    activeUsersNames.Add(user.name);
+                    activeUsersNames.Add(user.userName);
                 }
             }
             return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.GET_FRIENDS,dbConnection.GetFriends(username,activeUsersNames));
@@ -178,7 +178,7 @@ namespace Server
             lock(activeUsers[clientId])
             {
                 if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
-                string username = activeUsers[clientId].name;
+                string username = activeUsers[clientId].userName;
                 int conversationId = activeUsers[clientId].dbConnection.GetConversationId(username, secondUserName);
                 string conversation = activeUsers[clientId].redis.GetConversation(conversationId);
                 string conversationKey = activeUsers[clientId].dbConnection.GetConversationKey(conversationId, username);
@@ -198,22 +198,22 @@ namespace Server
             }
             string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
             string userName = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
-            if (userName == activeUsers[clientId].name) return TransmisionProtocol.CreateServerMessage(ErrorCodes.SELF_INVITE_ERROR, Options.LOGIN);
+            if (userName == activeUsers[clientId].userName) return TransmisionProtocol.CreateServerMessage(ErrorCodes.SELF_INVITE_ERROR, Options.LOGIN);
             ExtendedInvitation ei = new ExtendedInvitation();
 
             // Check if we arent already friends
             lock (activeUsers[clientId])
             {
-                if (activeUsers[clientId].dbConnection.CheckFriends(activeUsers[clientId].name, userName)) return TransmisionProtocol.CreateServerMessage(
+                if (activeUsers[clientId].dbConnection.CheckFriends(activeUsers[clientId].userName, userName)) return TransmisionProtocol.CreateServerMessage(
                       ErrorCodes.ALREADY_FRIENDS, Options.LOGIN);
-                ei.sender = activeUsers[clientId].name;
+                ei.sender = activeUsers[clientId].userName;
             }
 
             lock(invitations)
             {
                 foreach(var i in invitations.Values)
                 {
-                    if((i.sender == userName && i.reciver == activeUsers[clientId].name) || ((i.reciver == userName && i.sender == activeUsers[clientId].name)))
+                    if((i.sender == userName && i.reciver == activeUsers[clientId].userName) || ((i.reciver == userName && i.sender == activeUsers[clientId].userName)))
                         return TransmisionProtocol.CreateServerMessage(ErrorCodes.INVITATION_ALREADY_EXIST, Options.SEND_FRIEND_INVITATION);
                 }
             }
@@ -343,7 +343,7 @@ namespace Server
             lock(activeUsers[clientId])
             {
                 if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
-                username = activeUsers[clientId].name;
+                username = activeUsers[clientId].userName;
             }
             List<Invitation> invs = new List<Invitation>();
             int[] keys = new int[invitations.Count];
@@ -370,7 +370,7 @@ namespace Server
         {
             string username;
             if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.GET_ACCEPTED_FRIENDS);
-            username = activeUsers[clientId].name;
+            username = activeUsers[clientId].userName;
             List<ExtendedInvitation> invs = new List<ExtendedInvitation>();
 
             int[] t = new int[invitations.Count];
@@ -445,10 +445,10 @@ namespace Server
         public string SendMessage(string msg, int clientId)
         {
             string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
-            string username = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+            int conversationId = int.Parse(fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1]);
             string message = fields[1].Split(":", 2,StringSplitOptions.RemoveEmptyEntries)[1];
-            int id = activeUsers[clientId].dbConnection.GetUserId(username);
-            int conversationId = activeUsers[clientId].dbConnection.GetConversationId(username, activeUsers[clientId].name);
+            int userId = activeUsers[clientId].userId;
+
 
             Message messageObject = JsonConvert.DeserializeObject<Message>(message);
             messageObject.date = DateTime.Now;
@@ -459,13 +459,13 @@ namespace Server
             lock (messagesToSend)
             {
 
-                if (messagesToSend.ContainsKey(id))
+                if (messagesToSend.ContainsKey(userId))
                 {
-                    messagesToSend[id][conversationId].Add(JsonConvert.DeserializeObject<Message>(message));
+                    messagesToSend[userId][conversationId].Add(JsonConvert.DeserializeObject<Message>(message));
                 }
                 else
                 {
-                    messagesToSend.Add(id, new Dictionary<int, List<Message>>()
+                    messagesToSend.Add(userId, new Dictionary<int, List<Message>>()
                     {
                         [conversationId] =
                         new List<Message> { JsonConvert.DeserializeObject<Message>(message) }
@@ -475,24 +475,24 @@ namespace Server
             }
             lock (activeConversations)
             {
-                if (!activeConversations.ContainsKey(id))
+                if (!activeConversations.ContainsKey(userId))
                 {
-                    activeConversations[id] = -1;
+                    activeConversations[userId] = -1;
                 }
-                if (!(conversationId == activeConversations[id]))
+                if (!(conversationId == activeConversations[userId]))
                 {
                     lock (notifications)
                     {
-                        if (notifications.ContainsKey(id))
+                        if (notifications.ContainsKey(userId))
                         {
-                            notifications[id][conversationId].numberOfMessages += 1;
+                            notifications[userId][conversationId].numberOfMessages += 1;
                         }
                         else
                         {
-                            notifications.Add(id, new Dictionary<int, Notification>()
+                            notifications.Add(userId, new Dictionary<int, Notification>()
                             {
                                 [conversationId] =
-                                new Notification { numberOfMessages = 1, username = username }
+                                new Notification { numberOfMessages = 1, username = activeUsers[clientId].userName}
                             });
                         }
                     }
