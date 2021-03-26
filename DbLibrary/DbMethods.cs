@@ -34,6 +34,31 @@ namespace DbLibrary
 
         }
 
+        public int GetSecondUserId(int conversationId,int userId)
+        {
+            string query = string.Format("SELECT user1_id,user2_id FROM conversations WHERE  conversation_id = {0}", conversationId);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+
+            // Check if conversation already exist
+            try
+            {
+                dataReader.Read();
+                int secondUserId = dataReader.GetInt32("user1_id");
+                if (secondUserId != userId) return secondUserId;
+                return dataReader.GetInt32("user2_id");
+            }
+            catch
+            {
+                return 0;
+                ;
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+
+        }
         public string AddFriends(int userAID, string usernameB, string iv)
         {
             string userAId = userAID.ToString();

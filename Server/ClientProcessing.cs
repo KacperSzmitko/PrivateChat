@@ -446,7 +446,7 @@ namespace Server
             string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
             int conversationId = int.Parse(fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1]);
             string message = fields[1].Split(":", 2,StringSplitOptions.RemoveEmptyEntries)[1];
-            int userId = activeUsers[clientId].userId;
+            int userId = activeUsers[clientId].dbConnection.GetSecondUserId(conversationId, activeUsers[clientId].userId);
 
 
             Message messageObject = JsonConvert.DeserializeObject<Message>(message);
