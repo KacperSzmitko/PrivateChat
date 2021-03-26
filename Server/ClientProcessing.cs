@@ -448,6 +448,10 @@ namespace Server
             string message = fields[1].Split(":", 2,StringSplitOptions.RemoveEmptyEntries)[1];
             int id = activeUsers[clientId].dbConnection.GetUserId(username);
             int conversationId = activeUsers[clientId].dbConnection.GetConversationId(username, activeUsers[clientId].name);
+
+            Message messageObject = JsonConvert.DeserializeObject<Message>(message);
+            messageObject.date = DateTime.Now;
+            message = JsonConvert.SerializeObject(messageObject);
             activeUsers[clientId].redis.AddMessage(conversationId, message);
 
 

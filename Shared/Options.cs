@@ -14,7 +14,7 @@ namespace Shared
 
         // Conversation process
         ACTIVATE_CONVERSATION = 7,          //  ConversationID:<>$$                                         Error:<>$$
-        SEND_MESSAGE = 8,                   //  ConversationID:<>$$Data:<JSON>$$                            Error:<>$$
+        SEND_MESSAGE = 8,                   //  ConversationID:<>$$Data:<Message>$$                         Error:<>$$
         GET_NEW_MESSAGES = 9,               //                                                              Error:<>$$Data:<JSONDataMessage>$$
         GET_NOTIFICATIONS = 10,             //                                                              Error:<>$$Data:<JSONNotification>$$ 
 
