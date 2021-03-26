@@ -42,8 +42,7 @@ namespace DbLibrary
             }
             catch
             {
-
-                return "";
+                return "[{}]";
             }
             foreach (var message in conversation)
             {

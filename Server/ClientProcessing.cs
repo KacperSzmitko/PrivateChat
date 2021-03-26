@@ -305,7 +305,6 @@ namespace Server
                             invitations[invId].accepted = true;
                             invitations[invId].conversationId = conversationId;
                             invitations[invId].conversationIv = conversationIv;
-                            activeUsers[clientId].redis.AddMessage(int.Parse(conversationId), "");
                         }
                         else return TransmisionProtocol.CreateServerMessage(ErrorCodes.ADDING_FRIENDS_ERROR, Options.ACCPET_FRIEND_INVITATION);
 
