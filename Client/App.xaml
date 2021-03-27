@@ -12,6 +12,32 @@
              >
 
     <Application.Resources>
+
+        <Style TargetType="Border">
+            <Setter Property="Background" Value="#0F1E2E"/>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#DADDE7"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#28507B"/>
+            <Setter Property="BorderBrush" Value="#28507B"/>
+            <Setter Property="Foreground"  Value="#DADDE7"/>
+        </Style>
+        <Style TargetType="PasswordBox">
+            <Setter Property="Background" Value="#28507B"/>
+            <Setter Property="BorderBrush" Value="#28507B"/>
+            <Setter Property="Foreground"  Value="#DADDE7"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#2F4475"/>
+            <Setter Property="BorderBrush" Value="#2F4475"/>
+        </Style>
+        <Style TargetType="ListBox">
+            <Setter Property="Background" Value="#2F4475"/>
+            <Setter Property="BorderBrush" Value="#2F4475"/>
+        </Style>
+
         <DataTemplate DataType="{x:Type viewmodels:MainViewModel}">
             <local:MainWindow/>
         </DataTemplate>
@@ -39,6 +65,7 @@
         <converters:BoolToSideConverter x:Key="boolToSideConverter"/>
         <converters:DateTimeToDateStringConverter x:Key="dateTimeToDateStringConverter"/>
         <converters:DateTimeToTimeStringConverter x:Key="dateTimeToTimeStringConverter"/>
-
+        
     </Application.Resources>
+    
 </Application>

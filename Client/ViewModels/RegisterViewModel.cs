@@ -63,7 +63,7 @@ namespace Client.ViewModels
 
         public string UsernameBoxColor {
             get {
-                if (String.IsNullOrEmpty(Username)) return "White";
+                if (String.IsNullOrEmpty(Username)) return "#28507B";
                 else if (!goodUsername || !usernameAvailable) return "Salmon";
                 else return "LightGreen";
             }
@@ -71,7 +71,7 @@ namespace Client.ViewModels
 
         public string Pass1BoxColor {
             get {
-                if (String.IsNullOrEmpty(Pass1)) return "White";
+                if (String.IsNullOrEmpty(Pass1)) return "#28507B";
                 else if (!goodPass1) return "Salmon";
                 else return "LightGreen";
             }
@@ -79,7 +79,7 @@ namespace Client.ViewModels
 
         public string Pass2BoxColor {
             get {
-                if (String.IsNullOrEmpty(Pass2)) return "White";
+                if (String.IsNullOrEmpty(Pass2)) return "#28507B";
                 else if (!goodPass2) return "Salmon";
                 else return "LightGreen";
             }

@@ -25,16 +25,16 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Padding="2" FontWeight="Bold" FontSize="22" Text="Login"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Padding="2" FontSize="22" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Background="{Binding UsernameBoxColor}"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Padding="2" FontSize="22" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Background="{Binding UsernameBoxColor}" d:Background="#28507B"/>
                 <TextBlock Grid.Row="1" Grid.Column="1" Padding="2" FontSize="14" Text="Minimum 3 zwykłe znaki" Visibility="{Binding UsernameInfoVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
                 <TextBlock Grid.Row="1" Grid.Column="1" Padding="2" FontSize="14" Text="Nazwa zajęta" Visibility="{Binding UsernameInfoAvailabilityVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Margin="0 10 0 0" Padding="2" FontWeight="Bold" FontSize="22" Text="Hasło"/>
-                <PasswordBox Grid.Row="2" Grid.Column="1" Margin="0 10 0 0" Padding="2" FontSize="22" PasswordChanged="PasswordBox1_PasswordChanged" Background="{Binding Pass1BoxColor}"/>
+                <PasswordBox Grid.Row="2" Grid.Column="1" Margin="0 10 0 0" Padding="2" FontSize="22" PasswordChanged="PasswordBox1_PasswordChanged" Background="{Binding Pass1BoxColor}" d:Background="#28507B"/>
                 <TextBlock Grid.Row="3" Grid.Column="1" Padding="2" FontSize="14" Text="Minimum 8 znaków" Visibility="{Binding Pass1InfoVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
 
                 <TextBlock  Grid.Row="4" Grid.Column="0" Margin="0 10 0 0" Padding="2" FontWeight="Bold" FontSize="22" Text="Powtórz hasło"/>
-                <PasswordBox  Grid.Row="4" Grid.Column="1" Margin="0 10 0 0" Padding="2" FontSize="22" PasswordChanged="PasswordBox2_PasswordChanged" Background="{Binding Pass2BoxColor}"/>
+                <PasswordBox  Grid.Row="4" Grid.Column="1" Margin="0 10 0 0" Padding="2" FontSize="22" PasswordChanged="PasswordBox2_PasswordChanged" Background="{Binding Pass2BoxColor}" d:Background="#28507B"/>
                 <TextBlock Grid.Row="5" Grid.Column="1" Padding="2" FontSize="14" Text="Hasła muszą być identyczne" Visibility="{Binding Pass2InfoVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
                 
             </Grid>
