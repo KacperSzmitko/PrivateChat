@@ -93,9 +93,9 @@ namespace Client.Models
             }
         }
 
-        public void GetNotifications() {
+        public bool GetNotifications() {
             var response = ServerCommands.GetNotificationsCommand(ref connection);
-            if (response.error == (int)ErrorCodes.NO_NOTIFICATIONS) return;
+            if (response.error == (int)ErrorCodes.NO_NOTIFICATIONS) return false;
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             List<Notification> notificationsList = JsonConvert.DeserializeObject<List<Notification>>(response.newMessagesInfoJSON);
             foreach (Notification notification in notificationsList) {
@@ -103,13 +103,15 @@ namespace Client.Models
                     if (notification.username == friends[i].Name) friends[i].NotificationsAmount = notification.numberOfMessages;
                 }
             }
+            return true;
         }
 
-        public void GetInvitations() {
+        public bool GetInvitations() {
             var response = ServerCommands.GetInvitationsCommand(ref connection);
-            if (response.error == (int)ErrorCodes.NOTHING_TO_SEND) return;
+            if (response.error == (int)ErrorCodes.NOTHING_TO_SEND) return false;
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             receivedInvitations = JsonConvert.DeserializeObject<List<Invitation>>(response.invitationsJSON);
+            return true;
         }
 
         public (string conversationID, byte[] conversationIV) AcceptFriendInvitation(string invitationID, string PKB) {
@@ -150,10 +152,10 @@ namespace Client.Models
             return messages;
         }
 
-        public string CreateEncryptedMessageToSendJSON(string friendUsernamem, string messageToSendText) {
+        public string CreateEncryptedMessageToSendJSON(string friendUsername, string messageToSendText) {
             byte[] messageTextBytes = Encoding.Unicode.GetBytes(messageToSendText);
             byte[] iv = Security.GenerateIV();
-            byte[] encryptedMessageTextBytes = Security.AESEncrypt(messageTextBytes, conversations[friendUsernamem].ConversationKey, iv);
+            byte[] encryptedMessageTextBytes = Security.AESEncrypt(messageTextBytes, conversations[friendUsername].ConversationKey, iv);
             string ivHexString = Security.ByteArrayToHexString(iv);
             string encryptedMessageTextHexString = Security.ByteArrayToHexString(encryptedMessageTextBytes);
             Message messageToSend = new Message();
@@ -164,13 +166,18 @@ namespace Client.Models
             return JsonConvert.SerializeObject(messageToSend);
         }
 
+        public void AddUserMessageToConversation(string friendUsername, string messageToSendText) {
+            conversations[friendUsername].Messages.Add(new MessageItem(username, messageToSendText, DateTime.Now, true));
+        }
+
         public void GetConversation(string friendUsername) {
             var response = ServerCommands.GetConversationCommand(ref connection, friendUsername);
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             byte[] encryptedConversationKey = Security.HexStringToByteArray(response.conversationKey);
             byte[] conversationIV = Security.HexStringToByteArray(response.conversationIV);
             byte[] conversationKey = Security.AESDecrypt(encryptedConversationKey, userKey, conversationIV);
-            List<Message> dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.messagesJSON);
+            List<Message> dirtyMessages = new List<Message>();
+            if (response.messagesJSON != null && response.messagesJSON != "" && response.messagesJSON != "[{}]") dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.messagesJSON);
             conversations[friendUsername] = new Conversation(response.conversationID, conversationKey, conversationIV, DecryptMessages(dirtyMessages, conversationKey));
         }
 
@@ -179,18 +186,25 @@ namespace Client.Models
             if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
         }
 
-        public void GetMessages(string friendUsername) {
+        public bool GetMessages(string friendUsername) {
             var response = ServerCommands.GetNewMessagesCommand(ref connection);
-            if (response.error == (int)ErrorCodes.NO_MESSAGES) return;
+            if (response.error == (int)ErrorCodes.NO_MESSAGES) return false;
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             List<Message> dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.newMessegesJSON);
             byte[] conversationKey = conversations[friendUsername].ConversationKey;
             conversations[friendUsername].Messages.AddRange(DecryptMessages(dirtyMessages, conversationKey));
+            return true;
         }
 
         public void SendMessage(string friendUsername, string messageJSON) {
             int error = ServerCommands.SendMessageCommand(ref connection, conversations[friendUsername].ConversationID, messageJSON);
             if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
+        }
+
+        public void RemoveNotification(string friendUsername) {
+            for (int i = 0; i < friends.Count; i++) {
+                if (friends[i].Name == friendUsername) friends[i].NotificationsAmount = 0;
+            }
         }
     }
 }

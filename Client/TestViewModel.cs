@@ -7,6 +7,16 @@ namespace Client
 {
     class TestViewModel
     {
+        public ObservableCollection<FriendItem> Friends {
+            get {
+                return new ObservableCollection<FriendItem>() {
+                    new FriendItem("test2", true, 0),
+                    new FriendItem("test3", true, 1),
+                    new FriendItem("test3", false, 7)
+                };
+            }
+        }
+
         public ObservableCollection<MessageItem> Messages {
             get {
                 return new ObservableCollection<MessageItem>() { 
