@@ -100,7 +100,11 @@
                                             <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" FontSize="14" Text="{Binding MessageText}"/>
                                         </Border>
                                         <TextBlock Grid.Column="0" Grid.Row="1" Padding="5 0 0 0" TextAlignment="Left" FontSize="12" Text="{Binding Username}"/>
-                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5 0 0 0" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding DateTime, Converter={StaticResource dateTimeToTimeStringConverter}}" ToolTip="{Binding DateTime, Converter={StaticResource dateTimeToDateStringConverter}}"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5 0 0 0" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding DateTime, Converter={StaticResource dateTimeToTimeStringConverter}}">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip Background="#2F4475" BorderBrush="#2F4475" Content="{Binding DateTime, Converter={StaticResource dateTimeToDateStringConverter}}"/>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
                                     </Grid>
                                 </Grid>
                             </DataTemplate>
