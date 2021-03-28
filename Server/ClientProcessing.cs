@@ -505,7 +505,14 @@ namespace Server
                     {
                         if (notifications.ContainsKey(userId) && notifications[userId].ContainsKey(conversationId))
                         {
-                            notifications[userId][conversationId].numberOfMessages += 1;
+                            if (notifications[userId].ContainsKey(conversationId))
+                            {
+                                notifications[userId][conversationId].numberOfMessages += 1;
+                            }
+                            else
+                            {
+                                notifications[userId].Add(conversationId, new Notification { numberOfMessages = 1, username = activeUsers[clientId].userName });
+                            }
                         }
                         else
                         {
