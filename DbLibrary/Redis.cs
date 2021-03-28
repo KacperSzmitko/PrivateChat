@@ -84,6 +84,14 @@ namespace DbLibrary
             
         }
 
+        public void DeleteConversations(List<int> conversationsIds)
+        {
+            db = redis.GetDatabase(0);
+            foreach(int key in conversationsIds)
+            {
+                db.KeyDelete(new RedisKey(key.ToString()));
+            }
+        }
 
         public Redis()
         {

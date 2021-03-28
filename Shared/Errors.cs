@@ -28,5 +28,6 @@ namespace Shared
         INVITATION_ALREADY_EXIST = 18,
         DB_DELETE_INVITATION_ERROR = 19,
         SELF_INVITE_ERROR = 20,
+        DELETING_ACCOUNT_ERROR = 21,
     }
 }

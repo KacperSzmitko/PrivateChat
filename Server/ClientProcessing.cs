@@ -536,7 +536,16 @@ namespace Server
 
         }
 
+        public string DeleteAccount(string msg, int clientId)
+        {
+            if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.DELETE_ACCOUNT);
+            List<int> userConversationsIds = activeUsers[clientId].dbConnection.GetAllUserConversations(activeUsers[clientId].userId);
+            activeUsers[clientId].redis.DeleteConversations(userConversationsIds);
+            if (!activeUsers[clientId].dbConnection.DeleteUser(activeUsers[clientId].userId)) return TransmisionProtocol.CreateServerMessage(ErrorCodes.DELETING_ACCOUNT_ERROR, Options.DELETE_ACCOUNT);
+            if(!DeleteActiveUser(clientId)) return TransmisionProtocol.CreateServerMessage(ErrorCodes.DELETING_ACCOUNT_ERROR, Options.DELETE_ACCOUNT);
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.DELETE_ACCOUNT);
 
+        }
 
 
 
@@ -561,16 +570,6 @@ namespace Server
 
         public void AddFriend(ExtendedInvitation ei,int index)
         {
-            /*
-            for (int i = 0; i < invitations.Count; i++)
-            {
-                if (activeUsers[i] == null)
-                {
-                    invitations[i] = ei;
-                    return i;
-                }
-            }
-            */
             invitations[index] = ei;
         }
 
@@ -580,8 +579,9 @@ namespace Server
                 lock (activeUsers[clientId])
                 {
                     activeUsers[clientId].dbConnection.CloseConnection();
-                    //activeUsers[clientId].redis.redis.Close();
-                    activeUsers[clientId] = null;
+                    activeUsers[clientId].redis.redis.Close();
+                    activeConversations.Remove(activeUsers[clientId].userId);
+                    activeUsers[clientId] = null;                
                 }
             }
             catch
@@ -614,6 +614,7 @@ namespace Server
             functions.Add(new Functions(AcceptFriend));
             functions.Add(new Functions(SendConversationKey));
             functions.Add(new Functions(SendAcceptedFriends));
+            functions.Add(new Functions(DeleteAccount));
 
             dbMethods = new DbMethods();
             activeUsers = new List<User>();

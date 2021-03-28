@@ -475,9 +475,8 @@ namespace DbLibrary
         {
             string query = String.Format("SELECT invitation_id i FROM invitations JOIN users u ON u.user_id = i.sender JOIN users u2 ON u2.user_id = i.reciver WHERE u.username = {0} AND u2.username = {1}"
                 , senderUserName, reciverUserName);
-            //Create Command
+
             MySqlCommand cmd = new MySqlCommand(query, connection);
-            //Create a data reader and Execute the command
             MySqlDataReader dataReader = cmd.ExecuteReader();
 
             try
@@ -491,6 +490,41 @@ namespace DbLibrary
             {
                 throw new Exception("Nie ma takiego uzytkownika!");
             }
+        }
+
+        public List<int> GetAllUserConversations(int userId)
+        {
+            List<int> res = new List<int>();
+            string query = String.Format("SELECT conversation_id FROM conversations WHERE user1_id = {0} OR user2_id = {0}", userId);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+
+            while(dataReader.Read())
+            {
+                res.Add(dataReader.GetInt32(0));
+            }
+            return res;
+        }
+
+        public bool DeleteUser(int userId)
+        {
+            string query = String.Format("DELETE FROM users WHERE user_id = {0}", userId);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            try
+            {
+                dataReader.Read();
+                dataReader.Close();
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+            return true;
         }
 
         public void CloseConnection()
