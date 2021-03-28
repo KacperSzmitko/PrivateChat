@@ -162,7 +162,10 @@ namespace Server
                 username = activeUsers[clientId].userName;
                 foreach(User user in activeUsers)
                 {
-                    activeUsersNames.Add(user.userName);
+                    if (user != null)
+                    {
+                        activeUsersNames.Add(user.userName);
+                    }
                 }
             }
             return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.GET_FRIENDS,dbConnection.GetFriends(username,activeUsersNames));
