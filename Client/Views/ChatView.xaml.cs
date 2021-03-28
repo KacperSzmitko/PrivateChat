@@ -18,5 +18,9 @@ namespace Client.Views
         public ChatView() {
             InitializeComponent();
         }
+
+        private void ScrollViewer_Scroll(object sender, System.Windows.Controls.Primitives.ScrollEventArgs e) {
+
+        }
     }
 }

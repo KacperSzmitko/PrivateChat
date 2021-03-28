@@ -8,7 +8,7 @@
         Height="680" Width="600"
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="CenterScreen"        
         >
 
     <ContentControl Content="{Binding CurrentViewModel}"/>

@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              Height="680" Width="600"
-             Background="White"
              >
 
     <Border Padding="110 0 110 0">

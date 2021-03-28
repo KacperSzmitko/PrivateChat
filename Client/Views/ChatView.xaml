@@ -4,6 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:behaviors="clr-namespace:Client.Behaviors"
              mc:Ignorable="d" 
              Height="680" Width="600"
              Background="White"
@@ -40,21 +41,21 @@
                         </StackPanel>
                     </StackPanel>
                     <TextBlock Grid.Row="1" Margin="0 0 5 0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18">Znajomi</TextBlock>
-                    <ListBox Grid.Row="2" Margin="0 0 5 0" ItemsSource="{Binding Friends}" SelectedItem="{Binding SelectedFriend, Mode=OneWayToSource}">
+                    <ListBox Grid.Row="2" Margin="0 0 5 0" ItemsSource="{Binding Friends}" SelectedItem="{Binding SelectedFriend, Mode=OneWayToSource}" d:DataContext="{StaticResource testViewModel}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="20"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="20"/>
-                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="15"/>
+                                        <ColumnDefinition Width="112"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="10"/>
                                     </Grid.ColumnDefinitions>
                                     
-                                    <TextBlock Grid.Column="0" FontSize="14" Text="&#x25CF;" Foreground="{Binding Active, Converter={StaticResource boolToColorConverter}}"/>
-                                    <TextBlock Grid.Column="1" FontSize="14" Text="{Binding Name}"/>
-                                    <TextBlock Grid.Column="2" FontSize="14" Text="&#x25CF;" Foreground="Blue" Visibility="{Binding NotificationsAmount, Converter={StaticResource intToVisibilityConverter}}"/>
-                                    <TextBlock Grid.Column="3" FontSize="14" Text="{Binding NotificationsAmount}" Foreground="Blue" Visibility="{Binding NotificationsAmount, Converter={StaticResource intToVisibilityConverter}}"/>
+                                    <TextBlock Grid.Column="0" FontSize="14" TextAlignment="Center" Text="&#x25CF;" Foreground="{Binding Active, Converter={StaticResource boolToColorConverter}}"/>
+                                    <TextBlock Grid.Column="1" FontSize="14" TextAlignment="Left" Text="{Binding Name}"/>
+                                    <TextBlock Grid.Column="2" FontSize="14" TextAlignment="Center" Text="&#x25CF;" Foreground="#66b3ff" Visibility="{Binding NotificationsAmount, Converter={StaticResource intToVisibilityConverter}}"/>
+                                    <TextBlock Grid.Column="3" FontSize="14" TextAlignment="Center" Text="{Binding NotificationsAmount}" Foreground="#66b3ff" Visibility="{Binding NotificationsAmount, Converter={StaticResource intToVisibilityConverter}}"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -76,7 +77,7 @@
                     <RowDefinition Height="15*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <ScrollViewer Grid.Row="0">
+                <ScrollViewer Grid.Row="0" behaviors:AutoScrollBehavior.AutoScroll="True">
                     <ItemsControl ItemsSource="{Binding Messages}" d:DataContext="{StaticResource testViewModel}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -94,12 +95,16 @@
                                             <RowDefinition Height="*"/>
                                             <RowDefinition Height="14"/>
                                         </Grid.RowDefinitions>
-                                        <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Padding="10" CornerRadius="10" Background="LightGray">
+                                        <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Padding="10" CornerRadius="10" Background="#28507B">
                                             <!-- Message text -->
                                             <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" FontSize="14" Text="{Binding MessageText}"/>
                                         </Border>
                                         <TextBlock Grid.Column="0" Grid.Row="1" Padding="5 0 0 0" TextAlignment="Left" FontSize="12" Text="{Binding Username}"/>
-                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5 0 0 0" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding DateTime, Converter={StaticResource dateTimeToTimeStringConverter}}" ToolTip="{Binding DateTime, Converter={StaticResource dateTimeToDateStringConverter}}"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5 0 0 0" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding DateTime, Converter={StaticResource dateTimeToTimeStringConverter}}">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip Background="#2F4475" BorderBrush="#2F4475" Content="{Binding DateTime, Converter={StaticResource dateTimeToDateStringConverter}}"/>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
                                     </Grid>
                                 </Grid>
                             </DataTemplate>

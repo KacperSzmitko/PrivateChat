@@ -10,12 +10,12 @@ namespace Client.Converters
     class BoolToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if ((bool)value == true) return "Green";
-            return "Red";
+            if ((bool)value == true) return "#00ff00";
+            return "Crimson";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            if ((string)value == "Green") return true;
+            if ((string)value == "#00ff00") return true;
             return false;
         }
     }

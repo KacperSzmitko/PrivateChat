@@ -12,6 +12,8 @@ namespace Client.ViewModels
 {
     public class ChatViewModel : BaseViewModel
     {
+        private const int baseRefreshRate = 200;
+
         private ChatModel model;
 
         private Thread sendInvitationThread;
@@ -191,7 +193,7 @@ namespace Client.ViewModels
                     sendMessageCommand = new RelayCommand(_ => {
                         string messageToSendTextCopy = messageToSendText;
                         string friendUsername = selectedFriend.Name;
-                        sendMessageThread = new Thread(() => SendMessageAsync(messageToSendTextCopy, friendUsername));
+                        sendMessageThread = new Thread(() => SendMessageAsync(friendUsername, messageToSendTextCopy));
                         sendMessageThread.Start();
                         messageToSendText = "";
                         OnPropertyChanged(nameof(MessageToSendText));
@@ -310,37 +312,45 @@ namespace Client.ViewModels
         }
 
         private void LoadConversationAsync(string friendUsernameCopy) {
-            if (!model.Conversations.ContainsKey(selectedFriend.Name)) model.GetConversation(selectedFriend.Name);
-            model.ActivateConversation(selectedFriend.Name);
+            if (!model.Conversations.ContainsKey(friendUsernameCopy)) model.GetConversation(friendUsernameCopy);
+            model.ActivateConversation(friendUsernameCopy);
             activeConversation = true;
+            model.RemoveNotification(friendUsernameCopy);
+            OnPropertyChanged(nameof(Friends));
             OnPropertyChanged(nameof(ConversationBoxVisibility));
             OnPropertyChanged(nameof(Messages));
         }
 
-        private void SendMessageAsync(string messageToSendTextCopy, string friendUsernameCopy) {
+        private void SendMessageAsync(string friendUsernameCopy, string messageToSendTextCopy) {
+            model.AddUserMessageToConversation(friendUsernameCopy, messageToSendTextCopy);
+            OnPropertyChanged(nameof(Messages));
             string encryptedMessageToSendJSON = model.CreateEncryptedMessageToSendJSON(friendUsernameCopy, messageToSendTextCopy);
             model.SendMessage(friendUsernameCopy, encryptedMessageToSendJSON);
         }
 
         private void UpdateAsync() {
+            int i = 1;
             while (true) {
-                model.GetFriends();
-                model.GetNotifications();
-                model.GetInvitations();
-                if (model.ReceivedInvitations.Count > 0) lastRecivedInvitation = model.ReceivedInvitations[^1]; //^1 - last item in the list
-                else lastRecivedInvitation = null;
-                ManageAcceptedFriends(model.GetAcceptedInvitations());
-                if (activeConversation) model.GetMessages(selectedFriend.Name);
+                if (i == 5) {
+                    model.GetFriends();
+                    OnPropertyChanged(nameof(Friends));
+                    if (model.GetNotifications()) OnPropertyChanged(nameof(Friends));
+                    if (model.GetInvitations()) {
+                        OnPropertyChanged(nameof(InvitationsBoxVisibility));
+                        OnPropertyChanged(nameof(LastInvitationUsername));
+                    }
+                    if (model.ReceivedInvitations.Count > 0) lastRecivedInvitation = model.ReceivedInvitations[^1]; //^1 - last item in the list
+                    else lastRecivedInvitation = null;
+                    ManageAcceptedFriends(model.GetAcceptedInvitations());
+                }
+                if (activeConversation) {
+                    if (model.GetMessages(selectedFriend.Name)) OnPropertyChanged(nameof(Messages));
+                }
 
-                OnPropertyChanged(nameof(Friends));
-                OnPropertyChanged(nameof(InvitationsBoxVisibility));
-                OnPropertyChanged(nameof(LastInvitationUsername));
-                if (activeConversation) OnPropertyChanged(nameof(Messages));
-
-                Thread.Sleep(500);
+                Thread.Sleep(baseRefreshRate);
+                i++;
+                if (i > 5) i = 1;
             }
         }
-
-        
     }
 }
