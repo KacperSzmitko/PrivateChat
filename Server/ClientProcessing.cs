@@ -35,6 +35,8 @@ namespace Server
 
         public DbMethods dbMethods { get; set; }
 
+        // userId: convsIds
+        public Dictionary<int, List<int>> sendedConversationIds;
         /// <summary>
         /// Function that takes message from client procces it and return server response
         /// </summary>
@@ -102,6 +104,7 @@ namespace Server
                     activeUsers[clientId].logged = true;
                     activeUsers[clientId].userName = username;
                     activeUsers[clientId].userId = dbConnection.GetUserId(username);
+                    sendedConversationIds[activeUsers[clientId].userId] = new List<int>();
 
                 }
                 return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.LOGIN,dbConnection.GetFromUser("iv_to_decrypt_user_key",username),dbConnection.GetFromUser("user_key_hash", username));
@@ -186,6 +189,7 @@ namespace Server
                 string conversation = activeUsers[clientId].redis.GetConversation(conversationId);
                 string conversationKey = activeUsers[clientId].dbConnection.GetConversationKey(conversationId, username);
                 string conversationIv = activeUsers[clientId].dbConnection.GetConversationIv(conversationId);
+                sendedConversationIds[activeUsers[clientId].userId].Add(conversationId);
                 return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.GET_CONVERSATION, conversationId.ToString(), conversationKey, conversationIv, conversation);
             }
 
@@ -462,25 +466,29 @@ namespace Server
             {
                 foreach(var aUser in activeUsers)
                 {
-                    if(aUser.userId == userId)
+                    if(aUser != null && aUser.userId == userId)
                     {
                         isActive = true;
                         break;
                     }
                 }
+                // Second user is active
                 if (isActive)
                 {
-                    if (messagesToSend.ContainsKey(userId))
+                    if (sendedConversationIds[userId].Contains(conversationId))
                     {
-                        messagesToSend[userId][conversationId].Add(JsonConvert.DeserializeObject<Message>(message));
-                    }
-                    else
-                    {
-                        messagesToSend.Add(userId, new Dictionary<int, List<Message>>()
+                        if (messagesToSend.ContainsKey(userId))
                         {
-                            [conversationId] =
-                            new List<Message> { JsonConvert.DeserializeObject<Message>(message) }
-                        });
+                            messagesToSend[userId][conversationId].Add(JsonConvert.DeserializeObject<Message>(message));
+                        }
+                        else
+                        {
+                            messagesToSend.Add(userId, new Dictionary<int, List<Message>>()
+                            {
+                                [conversationId] =
+                                new List<Message> { JsonConvert.DeserializeObject<Message>(message) }
+                            });
+                        }
                     }
                 }
 
@@ -581,6 +589,10 @@ namespace Server
             try {
                 lock (activeUsers[clientId])
                 {
+                    lock(sendedConversationIds)
+                    {
+                        sendedConversationIds.Remove(activeUsers[clientId].userId);
+                    }
                     activeUsers[clientId].dbConnection.CloseConnection();
                     activeUsers[clientId].redis.redis.Close();
                     activeConversations.Remove(activeUsers[clientId].userId);
@@ -625,6 +637,7 @@ namespace Server
             messagesToSend = new Dictionary<int, Dictionary<int, List<Message>>>();
             notifications = new Dictionary<int, Dictionary<int, Notification>>();
             activeConversations = new Dictionary<int, int>();
+            sendedConversationIds = new Dictionary<int, List<int>>();
         }
 
 

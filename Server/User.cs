@@ -8,7 +8,6 @@ namespace Server
     public class User
     {
         public string userName { get; set; }
-        public Dictionary<List<int>,int> conversationsIds { get; set; }
         public DbMethods dbConnection { get; set; }
         public Redis redis { get; set; }
         public bool logged { get; set; }
