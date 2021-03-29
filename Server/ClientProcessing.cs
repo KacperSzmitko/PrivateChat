@@ -88,8 +88,7 @@ namespace Server
             catch { return TransmisionProtocol.CreateServerMessage(ErrorCodes.USER_NOT_FOUND, Options.LOGIN); }
 
             
-            //if (Security.VerifyPassword(passwordHash, password))
-            if(true)
+            if (Security.VerifyPassword(passwordHash, password))
             {
                 lock (activeUsers)
                 {
