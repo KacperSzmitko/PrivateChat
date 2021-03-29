@@ -27,6 +27,8 @@ namespace Server
 
         public static void FriendsAddTest(string username1,string username2,int invId)
         {
+
+            /*
             ClientProcessing cp = new ClientProcessing();
             int id = cp.AddActiveUser();
             int id1 = cp.AddActiveUser();
@@ -36,9 +38,9 @@ namespace Server
             cp.Login(String.Format("Username:{0}$$Password:test1234$$", username1), id);
             cp.Login(String.Format("Username:{0}$$Password:test1234$$", username2), id1);
 
-            string pk = "";
-            string pri = "";
-            string iv = "";
+            string pk = 
+            string pri = 
+            string iv = 
 
 
             Console.WriteLine(cp.AddFriend(String.Format("SecondUserName:{0}$$",username2), id));
@@ -46,9 +48,9 @@ namespace Server
             Console.WriteLine(cp.DhExchange(String.Format("InvitationID:{3}$$PK:{0}$$PrivateK:{1}$$IV:{2}$$",pk,pri,iv,invId), id));
             Console.WriteLine(cp.SendInvitations("", id1));
 
-            string pkB = "";
-            string priB = "";
-            string ivB = "";
+            string pkB = 
+            string priB = 
+            string ivB = 
 
             string convKey = "";
 
@@ -58,6 +60,7 @@ namespace Server
 
             Console.WriteLine(cp.SendAcceptedFriends("", id));
             Console.WriteLine(cp.SendConversationKey(String.Format("ConversationID:{0}$$ConversationKey:{1}$$",invId,convKey), id));
+            */
         }
 
         public static void MessageTest()
