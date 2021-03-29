@@ -158,10 +158,10 @@ namespace Shared
             using (Aes aes = Aes.Create()) {
                 aes.KeySize = 256;
                 aes.BlockSize = 128;
-                aes.Padding = PaddingMode.Zeros;
+                aes.Padding = PaddingMode.PKCS7;
                 aes.Key = encryptingKey;
                 aes.IV = iv;
-                using (var encryptor = aes.CreateEncryptor(aes.Key, aes.IV)) {
+                using (var encryptor = aes.CreateEncryptor()) {
                     return AESPerformCryptography(bytesToEncrypt, encryptor);
                 }
             }
@@ -171,10 +171,10 @@ namespace Shared
             using (Aes aes = Aes.Create()) {
                 aes.KeySize = 256;
                 aes.BlockSize = 128;
-                aes.Padding = PaddingMode.Zeros;
+                aes.Padding = PaddingMode.PKCS7;
                 aes.Key = decryptingKey;
                 aes.IV = iv;
-                using (var decryptor = aes.CreateDecryptor(aes.Key, aes.IV)) {
+                using (var decryptor = aes.CreateDecryptor()) {
                     return AESPerformCryptography(bytesToDecrypt, decryptor);
                 }
             }
@@ -184,9 +184,8 @@ namespace Shared
             using (MemoryStream ms = new MemoryStream()) {
                 using (CryptoStream cryptoStream = new CryptoStream(ms, cryptoTransform, CryptoStreamMode.Write)) {
                     cryptoStream.Write(data, 0, data.Length);
-                    cryptoStream.FlushFinalBlock();
-                    return ms.ToArray();
                 }
+                return ms.ToArray();
             }
         }
 

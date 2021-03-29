@@ -37,30 +37,32 @@ namespace Server
             NetworkStream stream = client.GetStream();
             int clientId = menager.AddActiveUser();
             byte[] message;
-
+            Decoder decoder = Encoding.ASCII.GetDecoder();
             while (true)
             {
-                
+                try {
                     //Read message
                     string sendMessage = "";
                     byte[] buffer = new byte[2048];
                     StringBuilder messageData = new StringBuilder();
                     int bytes = -1;
+                    do {
 
-                    bytes = await stream.ReadAsync(buffer, 0, buffer.Length);
 
-                    //Decode message
-                    Decoder decoder = Encoding.ASCII.GetDecoder();
-                    char[] chars = new char[decoder.GetCharCount(buffer, 0, bytes)];
-                    decoder.GetChars(buffer, 0, bytes, chars, 0);
-                    messageData.Append(chars);
+                        bytes = await stream.ReadAsync(buffer, 0, buffer.Length);
+
+                        //Decode message
+                        char[] chars = new char[decoder.GetCharCount(buffer, 0, bytes)];
+                        decoder.GetChars(buffer, 0, bytes, chars, 0);
+                        messageData.Append(chars);
+
+                    } while (stream.DataAvailable);
 
                     //Prepare response
                     sendMessage = menager.ProccesClient(messageData.ToString(), clientId);
 
                     //Disconnection
-                    if (sendMessage == "")
-                    {
+                    if (sendMessage == "") {
                         message = Encoding.ASCII.GetBytes("Response:0$$");
                         stream.Write(message);
                         Thread.Sleep(1000);
@@ -70,7 +72,11 @@ namespace Server
                     message = Encoding.ASCII.GetBytes(sendMessage);
                     //Send response
                     stream.Write(message);
-                
+                }
+                catch (Exception e) {
+                    Console.WriteLine(e.Message);
+                    break;
+                }
 
             }
         }

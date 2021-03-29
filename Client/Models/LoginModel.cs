@@ -35,7 +35,7 @@ namespace Client.Models
             string encryptedUserKeyHexString = File.ReadAllText(encryptedUserKeyFilePath);
 
             //If encryptedUserKey length is wrong - return null
-            if (encryptedUserKeyHexString.Length != 64) return null;
+            if (encryptedUserKeyHexString.Length < 64) return null;
             byte[] encryptedUserKey = Security.HexStringToByteArray(encryptedUserKeyHexString);
             byte[] userKeyFromFile = Security.AESDecrypt(encryptedUserKey, decryptingKey, userIV);
 

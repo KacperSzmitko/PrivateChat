@@ -242,8 +242,8 @@ namespace Client.ViewModels
                 if (userAlredyAFriend) lastInvitationStatus = InvitationStatus.USER_ALREADY_A_FRIEND;
                 else {
                     (InvitationStatus invitationStatus, string g, string p, string invitationID) = model.SendInvitation(invitationUsernameCopy);
-                    Log.LogText("1sender g: " + g);
                     Log.LogText("1sender p: " + p);
+                    Log.LogText("1sender g: " + g);
                     Log.LogText("1sender invitationID: " + invitationID);
                     lastInvitationStatus = invitationStatus;
                     if (lastInvitationStatus == InvitationStatus.INVITATION_SENT) {
@@ -277,7 +277,7 @@ namespace Client.ViewModels
             string p = lastRecivedInvitation.p;
             Log.LogText("1reciver p: " + p);
             string g = lastRecivedInvitation.g;
-            Log.LogText("1reciver p: " + g);
+            Log.LogText("1reciver g: " + g);
             string invitationID = lastRecivedInvitation.invitationId.ToString();
             Log.LogText("1reciver invitationID: " + invitationID);
             model.ReceivedInvitations.RemoveAt(model.ReceivedInvitations.Count - 1);

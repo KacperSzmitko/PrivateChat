@@ -5,6 +5,7 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text;
 
 namespace Server
 {
@@ -13,7 +14,22 @@ namespace Server
         public static void Main(string[] args)
         {
             ServerConnection connection = new ServerConnection();
+            /*
+            string eUserKey = "435f2f2346851f3aa3b7209ef12c078a5bd45af55e2739a78f9c7156b18648c5";
+            byte[] eUserKeyBytes = Security.HexStringToByteArray(eUserKey);
+            string userIV = "085e8f1ec44621499500d72df800cb10";
+            byte[] userIVBytes = Security.HexStringToByteArray(userIV);
+            byte[] hashKey = Security.CreateSHA256Hash(Encoding.ASCII.GetBytes("test1" + "$$" + "test1234" + "$$" + userIV));
+            byte[] userKey = Security.AESDecrypt(eUserKeyBytes, hashKey, userIVBytes);
 
+            string eKey = "a12b992eec3ab0e2baca20b702f1e7efd8f812ccb1fa9a4ea9100186b0fe370e463fb719e77a840e31ce863aea0eb016";
+            byte[] eKeyBytes = Security.HexStringToByteArray(eKey);
+            string iv = "4f2b89b1ae2333e6d21b613c0ce15919";
+            byte[] ivBytes = Security.HexStringToByteArray(iv);
+            byte[] key = Security.AESDecrypt(eKeyBytes, userKey, ivBytes);
+            string keyHexString = Security.ByteArrayToHexString(key);
+            Console.WriteLine(keyHexString);
+            */
         }
 
         public static void CreateUser(string username, string pass)
