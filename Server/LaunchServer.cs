@@ -24,27 +24,39 @@ namespace Server
 
 
 
-        public static void FriendsAddTest()
+        public static void FriendsAddTest(string username1,string username2,int invId)
         {
             ClientProcessing cp = new ClientProcessing();
             int id = cp.AddActiveUser();
             int id1 = cp.AddActiveUser();
-            Console.WriteLine(cp.Login("Username:test1$$Password:test1234$$", id));
-            Console.WriteLine(cp.Login("Username:test2$$Password:test1234$$", id1));
+            cp.CreateUser(String.Format("Username:{0}$$Password:test1234$$UserIV:1123$$UserKeyHash:1233444", username1), id);
+            cp.CreateUser(String.Format("Username:{0}$$Password:test1234$$UserIV:1123$$UserKeyHash:1233444", username2), id1);
 
-            string pk = BigInteger.Parse("1572974685565517564760848834612061204603051782958757453266089894").ToString("X");
-            string pri = BigInteger.Parse("2171516053468561523083790486470955343976023523132159054917711086").ToString("X");
-            string iv = BigInteger.Parse("48040271114089576525052332491161").ToString("X");
+            cp.Login(String.Format("Username:{0}$$Password:test1234$$", username1), id);
+            cp.Login(String.Format("Username:{0}$$Password:test1234$$", username2), id1);
 
-            Console.WriteLine(cp.AddFriend("SecondUserName:test2$$", id));
-            Console.WriteLine(cp.DhExchange(String.Format("InvitationID:1$$PK:{0}$$PrivateK:{1}$$IV:{2}$$",pk,pri,iv), id));
+            string pk = 
+            string pri = 
+            string iv = 
+
+
+            Console.WriteLine(cp.AddFriend(String.Format("SecondUserName:{0}$$",username2), id));
+
+            Console.WriteLine(cp.DhExchange(String.Format("InvitationID:{3}$$PK:{0}$$PrivateK:{1}$$IV:{2}$$",pk,pri,iv,invId), id));
             Console.WriteLine(cp.SendInvitations("", id1));
-            Console.WriteLine(cp.AcceptFriend("InvitationID:1$$PKB:4$$", id1));
-            Console.WriteLine(cp.SendConversationKey("ConversationID:1$$ConversationKey:ytyt$$", id1));
+
+            string pkB = 
+            string priB = 
+            string ivB = 
+
+            string convKey = "";
+
+            Console.WriteLine(cp.AcceptFriend(String.Format("InvitationID:{0}$$PKB:{1}$$",invId, pkB), id1));
+            Console.WriteLine(cp.SendConversationKey(String.Format("ConversationID:{0}$$ConversationKey:{1}$$",invId,convKey), id1));
 
 
             Console.WriteLine(cp.SendAcceptedFriends("", id));
-            Console.WriteLine(cp.SendConversationKey("ConversationID:1$$ConversationKey:ytyoit$$", id));
+            Console.WriteLine(cp.SendConversationKey(String.Format("ConversationID:{0}$$ConversationKey:{1}$$",invId,convKey), id));
         }
 
         public static void MessageTest()
