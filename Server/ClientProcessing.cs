@@ -229,6 +229,8 @@ namespace Server
             var param = Security.GenerateParameters();
             ei.g = Security.GetG(param); 
             ei.p = Security.GetP(param);
+            Console.WriteLine("P: " + ei.p);
+            Console.WriteLine("G: " + ei.g);
             ei.reciver = userName;
             ei.invitationId = activeUsers[clientId].dbConnection.CreateNewInvitation(ei.sender, ei.reciver, ei.p, ei.g);
             
@@ -247,6 +249,10 @@ namespace Server
             string publicKeySender = fields[1].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
             string encryptedSenderPrivateKey = fields[2].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
             string ivToDecryptSenderPrivateKey = fields[3].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+
+            Console.WriteLine("Sender Public Key: " + publicKeySender);
+            Console.WriteLine("Sender Encrypted Private Key: " + encryptedSenderPrivateKey);
+            Console.WriteLine("Sender IV to decrypt Private Key: " + ivToDecryptSenderPrivateKey);
 
             try
             {
@@ -296,6 +302,8 @@ namespace Server
             int invId = Int32.Parse(fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1]);
             string reciverPk = fields[1].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
 
+            Console.WriteLine("Reciver Public Key: " + reciverPk);
+
             string conversationId = "";
             var conversationIv = "";
             lock (activeUsers[clientId])
@@ -335,7 +343,7 @@ namespace Server
             string conversationId = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
             string conversationKey = fields[1].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
 
- 
+            Console.WriteLine("Conversation Key: " + conversationKey);
             lock(activeUsers[clientId])
             {
                 activeUsers[clientId].dbConnection.SetUserConversationKey(activeUsers[clientId].userId, conversationKey, int.Parse(conversationId));
