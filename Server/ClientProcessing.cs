@@ -479,7 +479,14 @@ namespace Server
                     {
                         if (messagesToSend.ContainsKey(userId))
                         {
-                            messagesToSend[userId][conversationId].Add(JsonConvert.DeserializeObject<Message>(message));
+                            if (messagesToSend[userId].ContainsKey(conversationId))
+                            {
+                                messagesToSend[userId][conversationId].Add(JsonConvert.DeserializeObject<Message>(message));
+                            }
+                            else
+                            {
+                                messagesToSend[userId].Add(conversationId, new List<Message>() { JsonConvert.DeserializeObject<Message>(message) });
+                            }
                         }
                         else
                         {
