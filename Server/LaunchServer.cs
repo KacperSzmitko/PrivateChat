@@ -26,6 +26,8 @@ namespace Server
 
         public static void FriendsAddTest(string username1,string username2,int invId)
         {
+
+            /*
             ClientProcessing cp = new ClientProcessing();
             int id = cp.AddActiveUser();
             int id1 = cp.AddActiveUser();
@@ -57,6 +59,7 @@ namespace Server
 
             Console.WriteLine(cp.SendAcceptedFriends("", id));
             Console.WriteLine(cp.SendConversationKey(String.Format("ConversationID:{0}$$ConversationKey:{1}$$",invId,convKey), id));
+            */
         }
 
         public static void MessageTest()
