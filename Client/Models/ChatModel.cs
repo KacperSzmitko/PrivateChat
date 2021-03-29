@@ -100,7 +100,7 @@ namespace Client.Models
             List<Notification> notificationsList = JsonConvert.DeserializeObject<List<Notification>>(response.newMessagesInfoJSON);
             foreach (Notification notification in notificationsList) {
                 for (int i = 0; i < friends.Count; i++) {
-                    if (notification.username == friends[i].Name) friends[i].NotificationsAmount = notification.numberOfMessages;
+                    if (notification.username == friends[i].Name) friends[i].NotificationsAmount += notification.numberOfMessages;
                 }
             }
             return true;

@@ -47,7 +47,10 @@ namespace Client.ViewModels
                         userKeyIsGood = model.IsUserKeyGood();
                         OnPropertyChanged(nameof(UserKeyOkMessageVisibility));
                         OnPropertyChanged(nameof(UserKeyNotOkMessageVisibility));
-                    }, _ => true);
+                    }, _ => {
+                        if (userKeyIsGood) return true;
+                        else return false;
+                    });
                 }
                 return checkUserKeyCommand;
             }
@@ -58,10 +61,7 @@ namespace Client.ViewModels
                 if (goChatCommand == null) {
                     goChatCommand = new RelayCommand(_ => {
                         navigator.CurrentViewModel = new ChatViewModel(connection, navigator, model.Username, model.UserKey);
-                    }, _ => {
-                        if (userKeyIsGood) return true;
-                        else return false;
-                    });
+                    }, _ => true);
                 }
                 return goChatCommand;
             }
