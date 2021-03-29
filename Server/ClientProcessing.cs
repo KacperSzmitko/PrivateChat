@@ -503,7 +503,7 @@ namespace Server
                 {
                     lock (notifications)
                     {
-                        if (notifications.ContainsKey(userId) && notifications[userId].ContainsKey(conversationId))
+                        if (notifications.ContainsKey(userId))
                         {
                             if (notifications[userId].ContainsKey(conversationId))
                             {

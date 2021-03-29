@@ -64,24 +64,24 @@ namespace Client.ViewModels
         public string UsernameBoxColor {
             get {
                 if (String.IsNullOrEmpty(Username)) return "#28507B";
-                else if (!goodUsername || !usernameAvailable) return "Salmon";
-                else return "LightGreen";
+                else if (!goodUsername || !usernameAvailable) return "#B30000";
+                else return "#009900";
             }
         }
 
         public string Pass1BoxColor {
             get {
                 if (String.IsNullOrEmpty(Pass1)) return "#28507B";
-                else if (!goodPass1) return "Salmon";
-                else return "LightGreen";
+                else if (!goodPass1) return "#B30000";
+                else return "#009900";
             }
         }
 
         public string Pass2BoxColor {
             get {
                 if (String.IsNullOrEmpty(Pass2)) return "#28507B";
-                else if (!goodPass2) return "Salmon";
-                else return "LightGreen";
+                else if (!goodPass2) return "#B30000";
+                else return "#009900";
             }
         }
 
