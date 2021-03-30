@@ -42,7 +42,7 @@ namespace Client.Models
             else return false;
         }
 
-        public void LogoutUser() {
+        public void Logout() {
             int error = ServerCommands.LogoutCommand(ref connection);
             if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
         }

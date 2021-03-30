@@ -73,6 +73,8 @@ namespace Client
                         break;
                     case 17:
                         break;
+                    case 18:
+                        break;
 
                     default: throw new ArgumentException("Invalid option!");
                 }
@@ -241,6 +243,12 @@ namespace Client
 
         public static int SendMessageCommand(ref ServerConnection connection, string conversationID, string messageJSON) {
             string command = CreateClientMessage((int)Options.SEND_MESSAGE, conversationID, messageJSON);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            return Int32.Parse(args[0]);
+        }
+
+        public static int DeleteAccountCommand(ref ServerConnection connection) {
+            string command = CreateClientMessage((int)Options.DELETE_ACCOUNT);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             return Int32.Parse(args[0]);
         }

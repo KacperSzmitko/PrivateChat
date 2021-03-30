@@ -27,6 +27,7 @@ namespace Client.ViewModels
         private RelayCommand acceptInvitationCommand;
         private RelayCommand declineInvitationCommand;
         private RelayCommand sendMessageCommand;
+        private RelayCommand logoutCommand;
 
         private InvitationStatus lastInvitationStatus;
         private Invitation lastRecivedInvitation;
@@ -35,6 +36,7 @@ namespace Client.ViewModels
         private string invitationUsername;
         private string messageToSendText;
         private bool activeConversation;
+        private bool keepUpdating;
 
         public string Username { get { return model.Username; } }
 
@@ -206,6 +208,25 @@ namespace Client.ViewModels
             }
         }
 
+        public ICommand LogoutCommand {
+            get {
+                if (logoutCommand == null) {
+                    logoutCommand = new RelayCommand(_ => {
+                        keepUpdating = false;
+                        if (sendInvitationThread != null && sendInvitationThread.IsAlive) sendInvitationThread.Join();
+                        if (acceptFriendThread != null && acceptFriendThread.IsAlive) acceptFriendThread.Join();
+                        if (declineFriendThread != null && declineFriendThread.IsAlive) declineFriendThread.Join();
+                        if (loadConversationThread != null && loadConversationThread.IsAlive) loadConversationThread.Join();
+                        if (sendInvitationThread != null && sendInvitationThread.IsAlive) sendInvitationThread.Join();
+                        if (updateThread != null && updateThread.IsAlive) updateThread.Join();
+                        model.Logout();
+                        navigator.CurrentViewModel = new LoginViewModel(connection, navigator);
+                    }, _ => true);
+                }
+                return logoutCommand;
+            }
+        }
+
         public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey) : base(connection, navigator) {
             Log.SetLogFileName("log_" + username + ".log");
 
@@ -216,6 +237,7 @@ namespace Client.ViewModels
             this.invitationUsername = "";
             this.messageToSendText = "";
             this.activeConversation = false;
+            this.keepUpdating = true;
             updateThread = new Thread(UpdateAsync);
             updateThread.Start();
         }
@@ -355,7 +377,7 @@ namespace Client.ViewModels
 
         private void UpdateAsync() {
             int i = 1;
-            while (true) {
+            while (keepUpdating) {
                 if (i == 5) {
                     model.GetFriends();
                     OnPropertyChanged(nameof(Friends));
