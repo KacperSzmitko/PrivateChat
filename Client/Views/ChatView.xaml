@@ -7,7 +7,6 @@
              xmlns:behaviors="clr-namespace:Client.Behaviors"
              mc:Ignorable="d" 
              Height="680" Width="600"
-             Background="White"
              >
     <UserControl.Resources>
         <local:TestViewModel x:Key="testViewModel"/>
