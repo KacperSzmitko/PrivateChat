@@ -113,23 +113,25 @@ namespace DbLibrary
 
         public string GetFromUser(string fieldName, string username)
         {
-                string query = String.Format("SELECT {0} FROM users WHERE username = '{1}'",fieldName, username);
-                //Create Command
-                MySqlCommand cmd = new MySqlCommand(query, connection);
-                //Create a data reader and Execute the command
-                MySqlDataReader dataReader = cmd.ExecuteReader();
+            string query = String.Format("SELECT {0} FROM users WHERE username = '{1}'",fieldName, username);
+            //Create Command
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            //Create a data reader and Execute the command
+            MySqlDataReader dataReader = cmd.ExecuteReader();
 
-                try
-                {
-                    dataReader.Read();
-                    string password = dataReader.GetString(0);
-                    dataReader.Close();
-                    return password;
-                }
-                catch
-                {
-                    throw new Exception("Nie ma takiego uzytkownika!");
-                }
+            try
+            {
+                dataReader.Read();
+                string password = dataReader.GetString(0);
+                return password;
+            }
+            catch
+            {
+                throw new Exception("Nie ma takiego uzytkownika!");
+            }
+            finally {
+                dataReader.Close();
+            }
         }
 
         public Dictionary<int,ExtendedInvitation> GetInvitations()

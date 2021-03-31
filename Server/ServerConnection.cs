@@ -40,7 +40,7 @@ namespace Server
             Decoder decoder = Encoding.ASCII.GetDecoder();
             while (true)
             {
-                try {
+                //try {
                     //Read message
                     string sendMessage = "";
                     byte[] buffer = new byte[2048];
@@ -68,11 +68,11 @@ namespace Server
                     message = Encoding.ASCII.GetBytes(sendMessage);
                     //Send response
                     stream.Write(message);
-                }
-                catch (Exception e) {
-                    Console.WriteLine(e.Message);
-                    break;
-                }
+                //}
+                //catch (Exception e) {
+                    //Console.WriteLine(e.Message);
+                    //break;
+                //}
 
             }
         }
