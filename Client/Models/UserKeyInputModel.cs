@@ -16,7 +16,7 @@ namespace Client.Models
 
         public byte[] UserIV { get { return userIV; } }
         public byte[] CredentialsHash { get { return credentialsHash; } }
-        public byte[] UserKey { get { return UserKey; } }
+        public byte[] UserKey { get { return userKey; } }
         public string Username { get { return username; } }
 
         public string UserKeyHexStringFromInput { get { return userKeyHexStringFromInput; } set { userKeyHexStringFromInput = value; } }

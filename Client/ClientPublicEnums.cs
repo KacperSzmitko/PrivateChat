@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Client
 {
-    public enum InvitationStatus
+    public enum InvitationStatuses
     {
         NO_INVITATION,
         WAITING_FOR_RESPONSE,
@@ -13,6 +13,14 @@ namespace Client
         USER_ALREADY_A_FRIEND,
         SELF_INVITATION,
         INVITATION_ALREADY_EXIST
+    }
+
+    public enum MessageStatuses
+    {
+        NOT_LAST_MESSAGE,
+        MESSAGE_SENT,
+        MESSAGE_RECEIVED_SERVER,
+        MESSAGE_RECEIVED_FRIEND
     }
 
 }

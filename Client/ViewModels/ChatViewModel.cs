@@ -27,14 +27,17 @@ namespace Client.ViewModels
         private RelayCommand acceptInvitationCommand;
         private RelayCommand declineInvitationCommand;
         private RelayCommand sendMessageCommand;
+        private RelayCommand logoutCommand;
+        private RelayCommand deleteAccountCommand;
 
-        private InvitationStatus lastInvitationStatus;
+        private InvitationStatuses lastInvitationStatus;
         private Invitation lastRecivedInvitation;
         private FriendItem selectedFriend;
 
         private string invitationUsername;
         private string messageToSendText;
         private bool activeConversation;
+        private bool keepUpdating;
 
         public string Username { get { return model.Username; } }
 
@@ -53,35 +56,35 @@ namespace Client.ViewModels
 
         public string UserNotFoundErrorVisibility {
             get {
-                if (lastInvitationStatus == InvitationStatus.USER_NOT_FOUND) return "Visible";
+                if (lastInvitationStatus == InvitationStatuses.USER_NOT_FOUND) return "Visible";
                 else return "Collapsed";
             }
         }
 
         public string UserAlreadyAFriendErrorVisibility {
             get {
-                if (lastInvitationStatus == InvitationStatus.USER_ALREADY_A_FRIEND) return "Visible";
+                if (lastInvitationStatus == InvitationStatuses.USER_ALREADY_A_FRIEND) return "Visible";
                 else return "Collapsed";
             }
         }
 
         public string InvitationAlredyExistErrorVisibility {
             get {
-                if (lastInvitationStatus == InvitationStatus.INVITATION_ALREADY_EXIST) return "Visible";
+                if (lastInvitationStatus == InvitationStatuses.INVITATION_ALREADY_EXIST) return "Visible";
                 else return "Collapsed";
             }
         }
 
         public string SelfInvitationErrorVisibility {
             get {
-                if (lastInvitationStatus == InvitationStatus.SELF_INVITATION) return "Visible";
+                if (lastInvitationStatus == InvitationStatuses.SELF_INVITATION) return "Visible";
                 else return "Collapsed";
             }
         }
 
         public string InvitationSentInfoVisibility {
             get {
-                if (lastInvitationStatus == InvitationStatus.INVITATION_SENT) return "Visible";
+                if (lastInvitationStatus == InvitationStatuses.INVITATION_SENT) return "Visible";
                 else return "Collapsed";
             }
         }
@@ -149,7 +152,7 @@ namespace Client.ViewModels
                         invitationUsername = "";
                         OnPropertyChanged(nameof(InvitationUsername));
                     }, _ => {
-                        if (lastInvitationStatus == InvitationStatus.NO_INVITATION && model.CheckUsernameText(invitationUsername)) return true;
+                        if (lastInvitationStatus == InvitationStatuses.NO_INVITATION && model.CheckUsernameText(invitationUsername)) return true;
                         else return false;
                     });
                 }
@@ -206,16 +209,43 @@ namespace Client.ViewModels
             }
         }
 
-        public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey) : base(connection, navigator) {
-            Log.SetLogFileName("log_" + username + ".log");
+        public ICommand LogoutCommand {
+            get {
+                if (logoutCommand == null) {
+                    logoutCommand = new RelayCommand(_ => {
+                        keepUpdating = false;
+                        WaitForThreadsToEnd();
+                        model.Logout();
+                        navigator.CurrentViewModel = new LoginViewModel(connection, navigator);
+                    }, _ => true);
+                }
+                return logoutCommand;
+            }
+        }
 
+        public ICommand DeleteAccountCommand {
+            get {
+                if (deleteAccountCommand == null) {
+                    deleteAccountCommand = new RelayCommand(_ => {
+                        keepUpdating = false;
+                        WaitForThreadsToEnd();
+                        model.DeleteAccount();
+                        navigator.CurrentViewModel = new LoginViewModel(connection, navigator);
+                    }, _ => true);
+                }
+                return deleteAccountCommand;
+            }
+        }
+
+        public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey) : base(connection, navigator) {
             this.model = new ChatModel(connection, username, userKey);
-            this.lastInvitationStatus = InvitationStatus.NO_INVITATION;
+            this.lastInvitationStatus = InvitationStatuses.NO_INVITATION;
             this.lastRecivedInvitation = null;
             this.selectedFriend = null;
             this.invitationUsername = "";
             this.messageToSendText = "";
             this.activeConversation = false;
+            this.keepUpdating = true;
             updateThread = new Thread(UpdateAsync);
             updateThread.Start();
         }
@@ -229,72 +259,55 @@ namespace Client.ViewModels
         }
 
         private void SendInvitationAndGenerateDHKeysAsync(string invitationUsernameCopy) {
-            lastInvitationStatus = InvitationStatus.WAITING_FOR_RESPONSE;
+            lastInvitationStatus = InvitationStatuses.WAITING_FOR_RESPONSE;
 
             bool userExists = model.CheckUserExist(invitationUsernameCopy);
 
-            if (!userExists) lastInvitationStatus = InvitationStatus.USER_NOT_FOUND;
+            if (!userExists) lastInvitationStatus = InvitationStatuses.USER_NOT_FOUND;
             else {
                 bool userAlredyAFriend = false;
                 foreach (FriendItem f in model.Friends) {
                     if (f.Name == invitationUsernameCopy) userAlredyAFriend = true;
                 }
-                if (userAlredyAFriend) lastInvitationStatus = InvitationStatus.USER_ALREADY_A_FRIEND;
+                if (userAlredyAFriend) lastInvitationStatus = InvitationStatuses.USER_ALREADY_A_FRIEND;
                 else {
-                    (InvitationStatus invitationStatus, string g, string p, string invitationID) = model.SendInvitation(invitationUsernameCopy);
-                    Log.LogText("1sender p: " + p);
-                    Log.LogText("1sender g: " + g);
-                    Log.LogText("1sender invitationID: " + invitationID);
+                    (InvitationStatuses invitationStatus, string g, string p, string invitationID) = model.SendInvitation(invitationUsernameCopy);
                     lastInvitationStatus = invitationStatus;
-                    if (lastInvitationStatus == InvitationStatus.INVITATION_SENT) {
+                    if (lastInvitationStatus == InvitationStatuses.INVITATION_SENT) {
                         RefreshFriendInvitationMessage();
                         (string publicDHKey, byte[] privateDHKey) = model.GenerateDHKeys(p, g);
-                        Log.LogText("1sender publicDHKey: " + publicDHKey);
-                        Log.LogText("1sender privateDHKey: " + Security.ByteArrayToHexString(privateDHKey));
                         byte[] iv = Security.GenerateIV();
                         byte[] encryptedPrivateDHKey = Security.AESEncrypt(privateDHKey, model.UserKey, iv);
                         string IVHexString = Security.ByteArrayToHexString(iv);
-                        Log.LogText("1sender iv: " + IVHexString);
                         string encryptedPrivateDHKeyHexString = Security.ByteArrayToHexString(encryptedPrivateDHKey);
-                        Log.LogText("1sender encryptedPrivateDHKey: " + encryptedPrivateDHKeyHexString);
                         model.SendPublicDHKey(invitationID, publicDHKey, encryptedPrivateDHKeyHexString, IVHexString);
                     }
                 }
             }
 
-            if (lastInvitationStatus != InvitationStatus.INVITATION_SENT) RefreshFriendInvitationMessage();
+            if (lastInvitationStatus != InvitationStatuses.INVITATION_SENT) RefreshFriendInvitationMessage();
 
             Thread.Sleep(3000);
 
-            lastInvitationStatus = InvitationStatus.NO_INVITATION;
+            lastInvitationStatus = InvitationStatuses.NO_INVITATION;
 
             RefreshFriendInvitationMessage();
         }
 
         private void AcceptFriendAsync() {
             string invitingPublicDHKey = lastRecivedInvitation.publicKeySender;
-            Log.LogText("1reciver invitingPublicDHKey: " + invitingPublicDHKey);
             string p = lastRecivedInvitation.p;
-            Log.LogText("1reciver p: " + p);
             string g = lastRecivedInvitation.g;
-            Log.LogText("1reciver g: " + g);
             string invitationID = lastRecivedInvitation.invitationId.ToString();
-            Log.LogText("1reciver invitationID: " + invitationID);
             model.ReceivedInvitations.RemoveAt(model.ReceivedInvitations.Count - 1);
             lastRecivedInvitation = null;
             OnPropertyChanged(nameof(InvitationsBoxVisibility));
             OnPropertyChanged(nameof(LastInvitationUsername));
 
             (string publicDHKey, byte[] privateDHKey) = model.GenerateDHKeys(p, g);
-            Log.LogText("1reciver publicDHKey: " + publicDHKey);
-            Log.LogText("1reciver privateDHKey: " + Security.ByteArrayToHexString(privateDHKey));
             byte[] conversationKey = model.GenerateConversationKey(invitingPublicDHKey, p, g, privateDHKey);
-            Log.LogText("1reciver conversationKey: " + Security.ByteArrayToHexString(conversationKey));
             (string conversationID, byte[] conversationIV) = model.AcceptFriendInvitation(invitationID, publicDHKey);
-            Log.LogText("1reciver conversationID: " + conversationID);
-            Log.LogText("1reciver conversationIV: " + Security.ByteArrayToHexString(conversationIV));
             byte[] encryptedConversationKey = Security.AESEncrypt(conversationKey, model.UserKey, conversationIV); //Using userKey to encrypt conversationKey
-            Log.LogText("1reciver encryptedConversationKey: " + Security.ByteArrayToHexString(encryptedConversationKey));
             model.SendEncryptedConversationKey(conversationID, encryptedConversationKey);
 
             if (model.ReceivedInvitations.Count > 0) lastRecivedInvitation = model.ReceivedInvitations[^1];
@@ -319,18 +332,12 @@ namespace Client.ViewModels
         private void ManageAcceptedFriends(List<ExtendedInvitation> acceptedInvitations) {
             if (acceptedInvitations != null && acceptedInvitations.Count > 0) {
                 foreach (ExtendedInvitation inv in acceptedInvitations) {
-                    Log.LogText("2sender encryptedSenderPrivateKey: " + inv.encryptedSenderPrivateKey);
                     byte[] encryptedPrivateDHKey = Security.HexStringToByteArray(inv.encryptedSenderPrivateKey);
-                    Log.LogText("2sender IVToDecyptPrivateDHKey: " + inv.ivToDecryptSenderPrivateKey);
                     byte[] IVToDecyptPrivateDHKey = Security.HexStringToByteArray(inv.ivToDecryptSenderPrivateKey);
-                    Log.LogText("2sender conversationIV: " + inv.conversationIv);
                     byte[] conversationIV = Security.HexStringToByteArray(inv.conversationIv);
                     byte[] privateDHKey = Security.AESDecrypt(encryptedPrivateDHKey, model.UserKey, IVToDecyptPrivateDHKey);
-                    Log.LogText("2sender privateDHKey: " + Security.ByteArrayToHexString(privateDHKey));
                     byte[] conversationKey = model.GenerateConversationKey(inv.publicKeyReciver, inv.p, inv.g, privateDHKey);
-                    Log.LogText("2sender conversationKey: " + Security.ByteArrayToHexString(conversationKey));
                     byte[] encryptedConversationKey = Security.AESEncrypt(conversationKey, model.UserKey, conversationIV); //Using userKey to encrypt conversationKey
-                    Log.LogText("2sender encryptedConversationKey: " + Security.ByteArrayToHexString(encryptedConversationKey));
                     model.SendEncryptedConversationKey(inv.conversationId, encryptedConversationKey);
                 }
             }
@@ -347,15 +354,27 @@ namespace Client.ViewModels
         }
 
         private void SendMessageAsync(string friendUsernameCopy, string messageToSendTextCopy) {
-            model.AddUserMessageToConversation(friendUsernameCopy, messageToSendTextCopy);
+            int lastMessageIndex = model.AddUserMessageToConversation(friendUsernameCopy, messageToSendTextCopy);
+            model.Conversations[friendUsernameCopy].Messages[lastMessageIndex].MessageStatus = MessageStatuses.MESSAGE_SENT;
             OnPropertyChanged(nameof(Messages));
             string encryptedMessageToSendJSON = model.CreateEncryptedMessageToSendJSON(friendUsernameCopy, messageToSendTextCopy);
             model.SendMessage(friendUsernameCopy, encryptedMessageToSendJSON);
+            model.Conversations[friendUsernameCopy].Messages[lastMessageIndex].MessageStatus = MessageStatuses.MESSAGE_RECEIVED_SERVER;
+            OnPropertyChanged(nameof(Messages));
+        }
+
+        public void WaitForThreadsToEnd() {
+            if (sendInvitationThread != null && sendInvitationThread.IsAlive) sendInvitationThread.Join();
+            if (acceptFriendThread != null && acceptFriendThread.IsAlive) acceptFriendThread.Join();
+            if (declineFriendThread != null && declineFriendThread.IsAlive) declineFriendThread.Join();
+            if (loadConversationThread != null && loadConversationThread.IsAlive) loadConversationThread.Join();
+            if (sendInvitationThread != null && sendInvitationThread.IsAlive) sendInvitationThread.Join();
+            if (updateThread != null && updateThread.IsAlive) updateThread.Join();
         }
 
         private void UpdateAsync() {
             int i = 1;
-            while (true) {
+            while (keepUpdating) {
                 if (i == 5) {
                     model.GetFriends();
                     OnPropertyChanged(nameof(Friends));
@@ -369,7 +388,9 @@ namespace Client.ViewModels
                     ManageAcceptedFriends(model.GetAcceptedInvitations());
                 }
                 if (activeConversation) {
-                    if (model.GetMessages(selectedFriend.Name)) OnPropertyChanged(nameof(Messages));
+                    if (model.GetMessages(selectedFriend.Name)) {
+                        OnPropertyChanged(nameof(Messages));
+                    }
                 }
 
                 Thread.Sleep(baseRefreshRate);

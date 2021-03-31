@@ -8,12 +8,14 @@ namespace Client
         public string MessageText { get; set; }
         public DateTime DateTime { get; set; }
         public bool MyMessage { get; set; }
+        public MessageStatuses MessageStatus { get; set; }
 
-        public MessageItem(string username, string messageText, DateTime dateTime, bool myMessage) {
+        public MessageItem(string username, string messageText, DateTime dateTime, bool myMessage, MessageStatuses messageStatus = MessageStatuses.NOT_LAST_MESSAGE) {
             Username = username;
             MessageText = messageText;
             DateTime = dateTime;
             MyMessage = myMessage;
+            MessageStatus = messageStatus;
         }
     }
 }

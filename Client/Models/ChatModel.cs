@@ -42,7 +42,7 @@ namespace Client.Models
             else return false;
         }
 
-        public void LogoutUser() {
+        public void Logout() {
             int error = ServerCommands.LogoutCommand(ref connection);
             if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
         }
@@ -54,12 +54,12 @@ namespace Client.Models
             else throw new Exception(GetErrorCodeName(error));
         }
 
-        public (InvitationStatus invitationStatus, string g, string p, string invitationID) SendInvitation(string username) {
+        public (InvitationStatuses invitationStatus, string g, string p, string invitationID) SendInvitation(string username) {
             var response = ServerCommands.SendInvitationCommand(ref connection, username);
-            if (response.error == (int)ErrorCodes.SELF_INVITE_ERROR) return (InvitationStatus.SELF_INVITATION, "", "", "");
-            if (response.error == (int)ErrorCodes.INVITATION_ALREADY_EXIST) return (InvitationStatus.INVITATION_ALREADY_EXIST, "", "", "");
+            if (response.error == (int)ErrorCodes.SELF_INVITE_ERROR) return (InvitationStatuses.SELF_INVITATION, "", "", "");
+            if (response.error == (int)ErrorCodes.INVITATION_ALREADY_EXIST) return (InvitationStatuses.INVITATION_ALREADY_EXIST, "", "", "");
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
-            return (InvitationStatus.INVITATION_SENT, response.g, response.p, response.invitationID);
+            return (InvitationStatuses.INVITATION_SENT, response.g, response.p, response.invitationID);
         }
 
         public (string publicDHKey, byte[] privateDHKey) GenerateDHKeys(string p, string g) {
@@ -166,8 +166,9 @@ namespace Client.Models
             return JsonConvert.SerializeObject(messageToSend);
         }
 
-        public void AddUserMessageToConversation(string friendUsername, string messageToSendText) {
+        public int AddUserMessageToConversation(string friendUsername, string messageToSendText) {
             conversations[friendUsername].Messages.Add(new MessageItem(username, messageToSendText, DateTime.Now, true));
+            return conversations[friendUsername].Messages.Count - 1;
         }
 
         public void GetConversation(string friendUsername) {
@@ -198,6 +199,11 @@ namespace Client.Models
 
         public void SendMessage(string friendUsername, string messageJSON) {
             int error = ServerCommands.SendMessageCommand(ref connection, conversations[friendUsername].ConversationID, messageJSON);
+            if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
+        }
+
+        public void DeleteAccount() {
+            int error = ServerCommands.DeleteAccountCommand(ref connection);
             if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
         }
 

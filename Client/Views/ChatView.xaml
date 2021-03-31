@@ -5,119 +5,147 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:behaviors="clr-namespace:Client.Behaviors"
+             xmlns:components="clr-namespace:Client.Components"
              mc:Ignorable="d" 
              Height="680" Width="600"
-             Background="White"
              >
     <UserControl.Resources>
         <local:TestViewModel x:Key="testViewModel"/>
     </UserControl.Resources>
 
-    <Border Padding="5 5 5 5">
+    <Border >
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="2.5*"/>
-            </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0 0 1 0">
-                <Grid VerticalAlignment="Center" MinHeight="670">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="28"/>
-                        <RowDefinition Height="7*"/>
-                        <RowDefinition Height="88"/>
-                        <RowDefinition Height="18"/>
-                    </Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="22"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Background="#293c67">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="8.5*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" TextAlignment="Center" HorizontalAlignment="Center" FontSize="14" Text="Zalogowano jako:"/>
+                <TextBlock Grid.Column="1" Margin="3 0 0 0" TextAlignment="Center" HorizontalAlignment="Left" FontSize="14" Text="{Binding Username}" d:Text="test1"/>
+                <components:ButtonWithConfirmation Grid.Column="2" Background="#B30000" BorderBrush="#B30000" Question="Na pewno chcesz usunąć swoje konto?" Command="{Binding DeleteAccountCommand}">
+                    <Button.Content>
+                        <TextBlock FontSize="10" Foreground="Black" Text="Usuń konto"/>
+                    </Button.Content>
+                </components:ButtonWithConfirmation>
+                <Button Grid.Column="3" Padding="0 0 0 1" FontSize="12" Content="Wyloguj" Command="{Binding LogoutCommand}"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2.5*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Background="#1e2c4b">
+                    <Grid Height="658">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="28"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="88"/>
+                            <RowDefinition Height="18"/>
+                        </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Row="0" Margin="0 0 5 0" Orientation="Vertical" Visibility="{Binding InvitationsBoxVisibility}" d:Visibility="Visible">
-                        <TextBlock HorizontalAlignment="Center" FontSize="18">Nowe zaproszenie</TextBlock>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 3 0 0">
-                            <TextBlock FontSize="18" Text="od: "/>
-                            <TextBlock FontSize="18" Text="{Binding LastInvitationUsername}" d:Text="test2"/>
+                        <StackPanel Grid.Row="0" Margin="0 0 0 0" Orientation="Vertical" Visibility="{Binding InvitationsBoxVisibility}" d:Visibility="Visible">
+                            <TextBlock HorizontalAlignment="Center" FontSize="18">Nowe zaproszenie</TextBlock>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 3 0 0">
+                                <TextBlock FontSize="18" Text="od: "/>
+                                <TextBlock FontSize="18" Text="{Binding LastInvitationUsername}" d:Text="test2"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 3 0 0">
+                                <Button Padding="2" Width="77" FontSize="14" Content="Zaakceptuj" Command="{Binding AcceptInvitationCommand}"/>
+                                <Button Margin="5 0 0 0" Padding="2" Width="77" FontSize="14" Content="Odrzuć" Command="{Binding DeclineInvitationCommand}"/>
+                            </StackPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 3 0 0">
-                            <Button Padding="2" Width="77" FontSize="14" Content="Zaakceptuj" Command="{Binding AcceptInvitationCommand}"/>
-                            <Button Margin="5 0 0 0" Padding="2" Width="77" FontSize="14" Content="Odrzuć" Command="{Binding DeclineInvitationCommand}"/>
+                        <TextBlock Grid.Row="1" Margin="0 0 0 0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18">Znajomi</TextBlock>
+                        <ListBox Grid.Row="2" Margin="5 0 5 0" ItemsSource="{Binding Friends}" SelectedItem="{Binding SelectedFriend, Mode=OneWayToSource}" d:DataContext="{StaticResource testViewModel}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="15"/>
+                                            <ColumnDefinition Width="112"/>
+                                            <ColumnDefinition Width="10"/>
+                                            <ColumnDefinition Width="10"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" FontSize="14" TextAlignment="Center" Text="&#x25CF;" Foreground="{Binding Active, Converter={StaticResource boolToColorConverter}}"/>
+                                        <TextBlock Grid.Column="1" FontSize="14" TextAlignment="Left" Text="{Binding Name}"/>
+                                        <TextBlock Grid.Column="2" FontSize="14" TextAlignment="Center" Text="&#x25CF;" Foreground="#66b3ff" Visibility="{Binding NotificationsAmount, Converter={StaticResource intToVisibilityConverter}}"/>
+                                        <TextBlock Grid.Column="3" FontSize="14" TextAlignment="Center" Text="{Binding NotificationsAmount}" Foreground="#66b3ff" Visibility="{Binding NotificationsAmount, Converter={StaticResource intToVisibilityConverter}}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Grid.Row="3">
+                            <TextBlock Margin="0 5 0 0" HorizontalAlignment="Center" FontSize="16">Dodaj znajomego</TextBlock>
+                            <TextBox Margin="5 5 5 0" Padding="2" FontSize="14" Text="{Binding InvitationUsername, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Margin="15 5 15 0" Padding="2" FontSize="14" Content="Wyślij zaproszenie" Command="{Binding SendInvitationCommand}"/>
                         </StackPanel>
-                    </StackPanel>
-                    <TextBlock Grid.Row="1" Margin="0 0 5 0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18">Znajomi</TextBlock>
-                    <ListBox Grid.Row="2" Margin="0 0 5 0" ItemsSource="{Binding Friends}" SelectedItem="{Binding SelectedFriend, Mode=OneWayToSource}" d:DataContext="{StaticResource testViewModel}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="15"/>
-                                        <ColumnDefinition Width="112"/>
-                                        <ColumnDefinition Width="10"/>
-                                        <ColumnDefinition Width="10"/>
-                                    </Grid.ColumnDefinitions>
-                                    
-                                    <TextBlock Grid.Column="0" FontSize="14" TextAlignment="Center" Text="&#x25CF;" Foreground="{Binding Active, Converter={StaticResource boolToColorConverter}}"/>
-                                    <TextBlock Grid.Column="1" FontSize="14" TextAlignment="Left" Text="{Binding Name}"/>
-                                    <TextBlock Grid.Column="2" FontSize="14" TextAlignment="Center" Text="&#x25CF;" Foreground="#66b3ff" Visibility="{Binding NotificationsAmount, Converter={StaticResource intToVisibilityConverter}}"/>
-                                    <TextBlock Grid.Column="3" FontSize="14" TextAlignment="Center" Text="{Binding NotificationsAmount}" Foreground="#66b3ff" Visibility="{Binding NotificationsAmount, Converter={StaticResource intToVisibilityConverter}}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                    <StackPanel Grid.Row="3">
-                        <TextBlock Margin="0 5 5 0" HorizontalAlignment="Center" FontSize="16">Dodaj znajomego</TextBlock>
-                        <TextBox Margin="0 5 5 0" Padding="2" FontSize="14" Text="{Binding InvitationUsername, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Margin="10 5 15 0" Padding="2" FontSize="14" Content="Wyślij zaproszenie" Command="{Binding SendInvitationCommand}"/>
-                    </StackPanel>
-                    <TextBlock Grid.Row="4" Margin="0 0 5 0" FontSize="14" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding UserNotFoundErrorVisibility}" d:Visibility="Hidden">Nie znaleziono</TextBlock>
-                    <TextBlock Grid.Row="4" Margin="0 2 5 0" FontSize="10.5" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding UserAlreadyAFriendErrorVisibility}" d:Visibility="Hidden">Użytkownik jest już znajomym</TextBlock>
-                    <TextBlock Grid.Row="4" Margin="0 2 5 0" FontSize="10.5" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding InvitationAlredyExistErrorVisibility}" d:Visibility="Hidden">Zaproszenie zostało już wysłane</TextBlock>
-                    <TextBlock Grid.Row="4" Margin="0 2 5 0" FontSize="10.5" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding SelfInvitationErrorVisibility}" d:Visibility="Hidden">Nie możesz zaprosić samego siebie</TextBlock>
-                    <TextBlock Grid.Row="4" Margin="0 0 5 0" FontSize="14" HorizontalAlignment="Center" Visibility="{Binding InvitationSentInfoVisibility}" d:Visibility="Hidden">Wysłano zaproszenie</TextBlock>
-                </Grid>
-            </Border>
-            <Grid Grid.Column="1" Visibility="{Binding ConversationBoxVisibility}" d:Visibility="Visible">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="15*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <ScrollViewer Grid.Row="0" behaviors:AutoScrollBehavior.AutoScroll="True">
-                    <ItemsControl ItemsSource="{Binding Messages}" d:DataContext="{StaticResource testViewModel}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Grid Grid.Column="{Binding MyMessage, Converter={StaticResource boolToIntConverter}}" HorizontalAlignment="{Binding MyMessage, Converter={StaticResource boolToSideConverter}}" Margin="5 5 5 5">
+                        <TextBlock Grid.Row="4" Margin="0 0 0 0" FontSize="14" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding UserNotFoundErrorVisibility}" d:Visibility="Hidden">Nie znaleziono</TextBlock>
+                        <TextBlock Grid.Row="4" Margin="0 2 0 0" FontSize="10.6" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding UserAlreadyAFriendErrorVisibility}" d:Visibility="Hidden">Użytkownik jest już znajomym</TextBlock>
+                        <TextBlock Grid.Row="4" Margin="0 2 0 0" FontSize="10.6" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding InvitationAlredyExistErrorVisibility}" d:Visibility="Hidden">Zaproszenie zostało już wysłane</TextBlock>
+                        <TextBlock Grid.Row="4" Margin="0 2 0 0" FontSize="10.6" HorizontalAlignment="Center" Foreground="Crimson" Visibility="{Binding SelfInvitationErrorVisibility}" d:Visibility="Visible">Nie możesz zaprosić samego siebie</TextBlock>
+                        <TextBlock Grid.Row="4" Margin="0 0 0 0" FontSize="14" HorizontalAlignment="Center" Visibility="{Binding InvitationSentInfoVisibility}" d:Visibility="Hidden">Wysłano zaproszenie</TextBlock>
+                    </Grid>
+                </Border>
+                <Grid Grid.Column="1" Visibility="{Binding ConversationBoxVisibility}" d:Visibility="Visible">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="15*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <ScrollViewer Grid.Row="0" behaviors:AutoScrollBehavior.AutoScroll="True">
+                        <ItemsControl ItemsSource="{Binding Messages}" d:DataContext="{StaticResource testViewModel}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="14"/>
-                                        </Grid.RowDefinitions>
-                                        <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Padding="10" CornerRadius="10" Background="#28507B">
-                                            <!-- Message text -->
-                                            <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" FontSize="14" Text="{Binding MessageText}"/>
-                                        </Border>
-                                        <TextBlock Grid.Column="0" Grid.Row="1" Padding="5 0 0 0" TextAlignment="Left" FontSize="12" Text="{Binding Username}"/>
-                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5 0 0 0" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding DateTime, Converter={StaticResource dateTimeToTimeStringConverter}}">
-                                            <TextBlock.ToolTip>
-                                                <ToolTip Background="#2F4475" BorderBrush="#2F4475" Content="{Binding DateTime, Converter={StaticResource dateTimeToDateStringConverter}}"/>
-                                            </TextBlock.ToolTip>
-                                        </TextBlock>
+                                        <Grid Grid.Column="{Binding MyMessage, Converter={StaticResource boolToIntConverter}}" HorizontalAlignment="{Binding MyMessage, Converter={StaticResource boolToSideConverter}}" Margin="5 5 5 5">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="38"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="14"/>
+                                            </Grid.RowDefinitions>
+                                            <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Padding="10" CornerRadius="10" Background="#28507B">
+                                                <!-- Message text -->
+                                                <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" FontSize="14" Text="{Binding MessageText}"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="0" Grid.Row="1" Padding="5 0 0 0" TextAlignment="Left" FontSize="12" Text="{Binding Username}"/>
+                                            <TextBlock Grid.Column="1" Grid.Row="1" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding DateTime, Converter={StaticResource dateTimeToTimeStringConverter}}">
+                                                <TextBlock.ToolTip>
+                                                    <ToolTip Background="#2F4475" BorderBrush="#2F4475" Content="{Binding DateTime, Converter={StaticResource dateTimeToDateStringConverter}}"/>
+                                                </TextBlock.ToolTip>
+                                            </TextBlock>
+                                            <TextBlock Grid.Column="2" Grid.Row="1" Width="15" Padding="0 0 5 0" TextAlignment="Center" FontSize="12" Foreground="{Binding MessageStatus, Converter={StaticResource messageStatusToSymbolColorConverter}}" Text="{Binding MessageStatus, Converter={StaticResource messageStatusToSymbolConverter}}" Visibility="{Binding MessageStatus, Converter={StaticResource messageStatusToVisibilityConverter}}">
+                                                <TextBlock.ToolTip>
+                                                    <ToolTip Background="#2F4475" BorderBrush="#2F4475" Content="{Binding MessageStatus, Converter={StaticResource messageStatusToToolTipContentConverter}}"/>
+                                                </TextBlock.ToolTip>
+                                            </TextBlock>
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="6*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Disabled" FontSize="14" Text="{Binding MessageToSendText, UpdateSourceTrigger=PropertyChanged}" d:Text="Testowy tekst 12345 żółć"/>
-                    <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="&#8250;" Command="{Binding SendMessageCommand}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="6*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Disabled" MaxLength="1023" FontSize="14" Text="{Binding MessageToSendText, UpdateSourceTrigger=PropertyChanged}" d:Text="Testowy tekst 12345 żółć"/>
+                        <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="&#8250;" Background="#405d9f" Command="{Binding SendMessageCommand}"/>
+                    </Grid>
                 </Grid>
             </Grid>
         </Grid>
