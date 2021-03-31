@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:behaviors="clr-namespace:Client.Behaviors"
+             xmlns:components="clr-namespace:Client.Components"
              mc:Ignorable="d" 
              Height="680" Width="600"
              >
@@ -21,12 +22,18 @@
             <Grid Grid.Row="0" Background="#293c67">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="10*"/>
+                    <ColumnDefinition Width="8.5*"/>
+                    <ColumnDefinition Width="1.5*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" TextAlignment="Center" HorizontalAlignment="Center" FontSize="14" Text="Zalogowano jako:"/>
                 <TextBlock Grid.Column="1" Margin="3 0 0 0" TextAlignment="Center" HorizontalAlignment="Left" FontSize="14" Text="{Binding Username}" d:Text="test1"/>
-                <Button Grid.Column="2" Padding="0 0 0 1" FontSize="12" Content="Wyloguj" Command="{Binding LogoutCommand}"/>
+                <components:ButtonWithConfirmation Grid.Column="2" Background="#B30000" BorderBrush="#B30000" Question="Na pewno chcesz usunąć swoje konto?" Command="{Binding DeleteAccountCommand}">
+                    <Button.Content>
+                        <TextBlock FontSize="10" Foreground="Black" Text="Usuń konto"/>
+                    </Button.Content>
+                </components:ButtonWithConfirmation>
+                <Button Grid.Column="3" Padding="0 0 0 1" FontSize="12" Content="Wyloguj" Command="{Binding LogoutCommand}"/>
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
@@ -103,20 +110,26 @@
                                         <Grid Grid.Column="{Binding MyMessage, Converter={StaticResource boolToIntConverter}}" HorizontalAlignment="{Binding MyMessage, Converter={StaticResource boolToSideConverter}}" Margin="5 5 5 5">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="38"/>
+                                                <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="*"/>
                                                 <RowDefinition Height="14"/>
                                             </Grid.RowDefinitions>
-                                            <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Padding="10" CornerRadius="10" Background="#28507B">
+                                            <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Padding="10" CornerRadius="10" Background="#28507B">
                                                 <!-- Message text -->
                                                 <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" FontSize="14" Text="{Binding MessageText}"/>
                                             </Border>
                                             <TextBlock Grid.Column="0" Grid.Row="1" Padding="5 0 0 0" TextAlignment="Left" FontSize="12" Text="{Binding Username}"/>
-                                            <TextBlock Grid.Column="1" Grid.Row="1" Margin="5 0 0 0" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding DateTime, Converter={StaticResource dateTimeToTimeStringConverter}}">
+                                            <TextBlock Grid.Column="1" Grid.Row="1" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding DateTime, Converter={StaticResource dateTimeToTimeStringConverter}}">
                                                 <TextBlock.ToolTip>
                                                     <ToolTip Background="#2F4475" BorderBrush="#2F4475" Content="{Binding DateTime, Converter={StaticResource dateTimeToDateStringConverter}}"/>
+                                                </TextBlock.ToolTip>
+                                            </TextBlock>
+                                            <TextBlock Grid.Column="2" Grid.Row="1" Width="15" Padding="0 0 5 0" TextAlignment="Center" FontSize="12" Foreground="{Binding MessageStatus, Converter={StaticResource messageStatusToSymbolColorConverter}}" Text="{Binding MessageStatus, Converter={StaticResource messageStatusToSymbolConverter}}" Visibility="{Binding MessageStatus, Converter={StaticResource messageStatusToVisibilityConverter}}">
+                                                <TextBlock.ToolTip>
+                                                    <ToolTip Background="#2F4475" BorderBrush="#2F4475" Content="{Binding MessageStatus, Converter={StaticResource messageStatusToToolTipContentConverter}}"/>
                                                 </TextBlock.ToolTip>
                                             </TextBlock>
                                         </Grid>

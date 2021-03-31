@@ -116,7 +116,11 @@
         <converters:BoolToSideConverter x:Key="boolToSideConverter"/>
         <converters:DateTimeToDateStringConverter x:Key="dateTimeToDateStringConverter"/>
         <converters:DateTimeToTimeStringConverter x:Key="dateTimeToTimeStringConverter"/>
-        
+        <converters:MessageStatusToSymbolConverter x:Key="messageStatusToSymbolConverter"/>
+        <converters:MessageStatusToSymbolColorConverter x:Key="messageStatusToSymbolColorConverter"/>
+        <converters:MessageStatusToToolTipContentConverter x:Key="messageStatusToToolTipContentConverter"/>
+        <converters:MessageStatusToVisibilityConverter x:Key="messageStatusToVisibilityConverter"/>
+
     </Application.Resources>
     
 </Application>
