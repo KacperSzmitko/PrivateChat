@@ -376,7 +376,15 @@ namespace Client.ViewModels
             int i = 1;
             while (keepUpdating) {
                 if (i == 5) {
-                    model.GetFriends();
+                    List<string> deletedFriendsNames = model.GetFriends();
+                    if (deletedFriendsNames != null && deletedFriendsNames.Contains(selectedFriend.Name)) {
+                        selectedFriend = null;
+                        activeConversation = false;
+                        messageToSendText = "";
+                        OnPropertyChanged(nameof(ConversationBoxVisibility));
+                        OnPropertyChanged(nameof(Messages));
+                        OnPropertyChanged(nameof(MessageToSendText));
+                    }
                     OnPropertyChanged(nameof(Friends));
                     if (model.GetNotifications()) OnPropertyChanged(nameof(Friends));
                     if (model.GetInvitations()) {

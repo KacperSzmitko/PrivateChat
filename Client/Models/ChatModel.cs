@@ -77,10 +77,12 @@ namespace Client.Models
             if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
         }
 
-        public void GetFriends() {
+        public List<string> GetFriends() {
             var response = ServerCommands.GetFriendsCommand(ref connection);
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             List<Friend> dirtyFriends = JsonConvert.DeserializeObject<List<Friend>>(response.friendsJSON);
+
+            //Adding to list
             foreach (Friend dirtyFriend in dirtyFriends) {
                 bool newFriend = true;
                 for (int i = 0; i < friends.Count; i++) {
@@ -91,6 +93,23 @@ namespace Client.Models
                 }
                 if (newFriend) friends.Add(new FriendItem(dirtyFriend.username, Convert.ToBoolean(dirtyFriend.active)));
             }
+
+            //Removing from the list
+            List<string> deletedFriendsNames = new List<string>();
+            for (int i = 0; i < friends.Count; i++) {
+                bool deletedFriend = true;
+                foreach (Friend dirtyFriend in dirtyFriends) {
+                    if (friends[i].Name == dirtyFriend.username) deletedFriend = false;
+                }
+                if (deletedFriend) {
+                    deletedFriendsNames.Add(friends[i].Name);
+                    friends[i] = null;
+                }
+            }
+            friends.RemoveAll(f => f == null);
+
+            if (deletedFriendsNames.Count > 0) return deletedFriendsNames;
+            else return null;
         }
 
         public bool GetNotifications() {
