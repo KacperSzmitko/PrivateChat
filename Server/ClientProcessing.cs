@@ -148,7 +148,7 @@ namespace Server
             {
                 if (activeConversations.ContainsKey(activeUsers[clientId].userId)) activeConversations.Remove(activeUsers[clientId].userId);
             }
-            if (DeleteActiveUser(clientId))
+            if (DeleteActiveUser(clientId,true))
                 return "";
             return TransmisionProtocol.CreateServerMessage(ErrorCodes.DISCONNECT_ERROR, Options.DISCONNECT);
         }
@@ -576,7 +576,7 @@ namespace Server
             List<int> userConversationsIds = activeUsers[clientId].dbConnection.GetAllUserConversations(activeUsers[clientId].userId);
             activeUsers[clientId].redis.DeleteConversations(userConversationsIds);
             if (!activeUsers[clientId].dbConnection.DeleteUser(activeUsers[clientId].userId)) return TransmisionProtocol.CreateServerMessage(ErrorCodes.DELETING_ACCOUNT_ERROR, Options.DELETE_ACCOUNT);
-            if(!DeleteActiveUser(clientId)) return TransmisionProtocol.CreateServerMessage(ErrorCodes.DELETING_ACCOUNT_ERROR, Options.DELETE_ACCOUNT);
+            if(!DeleteActiveUser(clientId,false)) return TransmisionProtocol.CreateServerMessage(ErrorCodes.DELETING_ACCOUNT_ERROR, Options.DELETE_ACCOUNT);
             return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.DELETE_ACCOUNT);
 
         }
@@ -607,7 +607,7 @@ namespace Server
             invitations[index] = ei;
         }
 
-        public bool DeleteActiveUser(int clientId)
+        public bool DeleteActiveUser(int clientId,bool isDisconnection)
         {
             try {
                 lock (activeUsers[clientId])
@@ -619,7 +619,14 @@ namespace Server
                     activeUsers[clientId].dbConnection.CloseConnection();
                     activeUsers[clientId].redis.redis.Close();
                     activeConversations.Remove(activeUsers[clientId].userId);
-                    activeUsers[clientId] = null;                
+                    if (isDisconnection)
+                    {
+                        activeUsers[clientId] = null;
+                    }
+                    else
+                    {
+                        activeUsers[clientId] = new User();
+                    }
                 }
             }
             catch

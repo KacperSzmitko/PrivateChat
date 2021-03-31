@@ -24,5 +24,6 @@ namespace Server
             activeConversation = -1;
             logged = false;
         }
+
     }
 }

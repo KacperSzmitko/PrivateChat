@@ -444,7 +444,6 @@ namespace DbLibrary
             {
                 dataReader.Close();
             }
-            return "";
         }
 
         public int GetUserId(string username)
