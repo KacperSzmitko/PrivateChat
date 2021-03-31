@@ -23,15 +23,15 @@ namespace Server
         public List<Functions> functions { get; set; }
         public List<User> activeUsers { get; set; }
 
-        public Dictionary<int,ExtendedInvitation> invitations { get; set; }
+        public Dictionary<int, ExtendedInvitation> invitations { get; set; }
 
         //D(recvUserId:Dict(convId:List<message>))
-        public Dictionary<int,Dictionary<int,List<Message>>> messagesToSend { get; set; }
+        public Dictionary<int, Dictionary<int, List<Message>>> messagesToSend { get; set; }
 
         // D(recvUserId:Dict(convId:notification))
         public Dictionary<int, Dictionary<int, Notification>> notifications { get; set; }
         // userId:convId
-        public Dictionary<int,int> activeConversations { get; set; }
+        public Dictionary<int, int> activeConversations { get; set; }
 
         public DbMethods dbMethods { get; set; }
 
@@ -57,7 +57,7 @@ namespace Server
             }
         }
 
-        public string Logout(string msg,int clientId)
+        public string Logout(string msg, int clientId)
         {
             lock (activeUsers[clientId])
                 activeUsers[clientId].logged = false;
@@ -72,7 +72,7 @@ namespace Server
 
                 }
             }
-            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.LOGOUT);
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.LOGOUT);
         }
 
         public string Login(string msg, int clientId)
@@ -84,10 +84,10 @@ namespace Server
             string passwordHash = "";
             DbMethods dbConnection = new DbMethods();
             lock (activeUsers[clientId]) { dbConnection = activeUsers[clientId].dbConnection; }
-            try { passwordHash = dbConnection.GetFromUser("password_hash",username); }
+            try { passwordHash = dbConnection.GetFromUser("password_hash", username); }
             catch { return TransmisionProtocol.CreateServerMessage(ErrorCodes.USER_NOT_FOUND, Options.LOGIN); }
 
-            
+
             if (Security.VerifyPassword(passwordHash, password))
             {
                 lock (activeUsers)
@@ -108,7 +108,7 @@ namespace Server
                     sendedConversationIds[activeUsers[clientId].userId] = new List<int>();
 
                 }
-                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.LOGIN,dbConnection.GetFromUser("iv_to_decrypt_user_key",username),dbConnection.GetFromUser("user_key_hash", username));
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.LOGIN, dbConnection.GetFromUser("iv_to_decrypt_user_key", username), dbConnection.GetFromUser("user_key_hash", username));
             }
             else return TransmisionProtocol.CreateServerMessage(ErrorCodes.INCORRECT_PASSWORD, Options.LOGIN);
         }
@@ -127,7 +127,7 @@ namespace Server
                 return TransmisionProtocol.CreateServerMessage(ErrorCodes.USER_ALREADY_EXISTS, Options.CREATE_USER);
 
             password = Security.HashPassword(password);
-            if (dbConnection.AddNewUser(username, password,IV,keyHash)) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.CREATE_USER);
+            if (dbConnection.AddNewUser(username, password, IV, keyHash)) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.CREATE_USER);
             else return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.CREATE_USER);
         }
 
@@ -148,7 +148,7 @@ namespace Server
             {
                 if (activeConversations.ContainsKey(activeUsers[clientId].userId)) activeConversations.Remove(activeUsers[clientId].userId);
             }
-            if (DeleteActiveUser(clientId,true))
+            if (DeleteActiveUser(clientId, true))
                 return "";
             return TransmisionProtocol.CreateServerMessage(ErrorCodes.DISCONNECT_ERROR, Options.DISCONNECT);
         }
@@ -159,20 +159,20 @@ namespace Server
             string username;
             List<string> activeUsersNames = new List<string>();
 
-            lock (activeUsers[clientId]) 
-            { 
+            lock (activeUsers[clientId])
+            {
                 if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
                 dbConnection = activeUsers[clientId].dbConnection;
                 username = activeUsers[clientId].userName;
-                foreach(User user in activeUsers)
+                foreach (User user in activeUsers)
                 {
-                    if (user != null)
+                    if (user != null && user.logged)
                     {
                         activeUsersNames.Add(user.userName);
                     }
                 }
             }
-            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.GET_FRIENDS,dbConnection.GetFriends(username,activeUsersNames));
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_FRIENDS, dbConnection.GetFriends(username, activeUsersNames));
         }
 
         // Tested TODO Make errors
@@ -180,9 +180,9 @@ namespace Server
         {
             string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
             string secondUserName = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
-            
 
-            lock(activeUsers[clientId])
+
+            lock (activeUsers[clientId])
             {
                 if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
                 string username = activeUsers[clientId].userName;
@@ -191,7 +191,7 @@ namespace Server
                 string conversationKey = activeUsers[clientId].dbConnection.GetConversationKey(conversationId, username);
                 string conversationIv = activeUsers[clientId].dbConnection.GetConversationIv(conversationId);
                 sendedConversationIds[activeUsers[clientId].userId].Add(conversationId);
-                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR,Options.GET_CONVERSATION, conversationId.ToString(), conversationKey, conversationIv, conversation);
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_CONVERSATION, conversationId.ToString(), conversationKey, conversationIv, conversation);
             }
 
         }
@@ -200,9 +200,9 @@ namespace Server
 
         public string AddFriend(string msg, int clientId)
         {
-            lock(activeUsers[clientId])
+            lock (activeUsers[clientId])
             {
-                if(!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
+                if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
             }
             string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
             string userName = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
@@ -217,28 +217,26 @@ namespace Server
                 ei.sender = activeUsers[clientId].userName;
             }
 
-            lock(invitations)
+            lock (invitations)
             {
-                foreach(var i in invitations.Values)
+                foreach (var i in invitations.Values)
                 {
-                    if((i.sender == userName && i.reciver == activeUsers[clientId].userName) || ((i.reciver == userName && i.sender == activeUsers[clientId].userName)))
+                    if ((i.sender == userName && i.reciver == activeUsers[clientId].userName) || ((i.reciver == userName && i.sender == activeUsers[clientId].userName)))
                         return TransmisionProtocol.CreateServerMessage(ErrorCodes.INVITATION_ALREADY_EXIST, Options.SEND_FRIEND_INVITATION);
                 }
             }
 
             var param = Security.GenerateParameters();
-            ei.g = Security.GetG(param); 
+            ei.g = Security.GetG(param);
             ei.p = Security.GetP(param);
-            Console.WriteLine("P: " + ei.p);
-            Console.WriteLine("G: " + ei.g);
             ei.reciver = userName;
             ei.invitationId = activeUsers[clientId].dbConnection.CreateNewInvitation(ei.sender, ei.reciver, ei.p, ei.g);
-            
+
             lock (invitations)
             {
-                AddFriend(ei,ei.invitationId);
-            }         
-            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_FRIEND_INVITATION, ei.p,ei.g,ei.invitationId.ToString());
+                AddFriend(ei, ei.invitationId);
+            }
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_FRIEND_INVITATION, ei.p, ei.g, ei.invitationId.ToString());
         }
 
         // Errors
@@ -250,10 +248,6 @@ namespace Server
             string encryptedSenderPrivateKey = fields[2].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
             string ivToDecryptSenderPrivateKey = fields[3].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
 
-            Console.WriteLine("Sender Public Key: " + publicKeySender);
-            Console.WriteLine("Sender Encrypted Private Key: " + encryptedSenderPrivateKey);
-            Console.WriteLine("Sender IV to decrypt Private Key: " + ivToDecryptSenderPrivateKey);
-
             try
             {
                 lock (invitations[invId])
@@ -261,9 +255,9 @@ namespace Server
                     invitations[invId].publicKeySender = publicKeySender;
                     invitations[invId].encryptedSenderPrivateKey = encryptedSenderPrivateKey;
                     invitations[invId].ivToDecryptSenderPrivateKey = ivToDecryptSenderPrivateKey;
-                    if (activeUsers[clientId].dbConnection.InsertDHKeysToInvitation(invitations[invId].invitationId, invitations[invId].publicKeySender, 
+                    if (activeUsers[clientId].dbConnection.InsertDHKeysToInvitation(invitations[invId].invitationId, invitations[invId].publicKeySender,
                         invitations[invId].encryptedSenderPrivateKey, invitations[invId].ivToDecryptSenderPrivateKey))
-                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_DH_PK_INVITING);
+                        return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_DH_PK_INVITING);
                     else return TransmisionProtocol.CreateServerMessage(ErrorCodes.DH_EXCHANGE_ERROR, Options.SEND_DH_PK_INVITING);
                 }
             }
@@ -302,8 +296,6 @@ namespace Server
             int invId = Int32.Parse(fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1]);
             string reciverPk = fields[1].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
 
-            Console.WriteLine("Reciver Public Key: " + reciverPk);
-
             string conversationId = "";
             var conversationIv = "";
             lock (activeUsers[clientId])
@@ -314,7 +306,7 @@ namespace Server
                     try
                     {
                         conversationId = activeUsers[clientId].dbConnection.AddFriends(activeUsers[clientId].userId, invitations[invId].sender, conversationIv);
-                        if(conversationId == "") return TransmisionProtocol.CreateServerMessage(ErrorCodes.ADDING_FRIENDS_ERROR, Options.ACCPET_FRIEND_INVITATION);
+                        if (conversationId == "") return TransmisionProtocol.CreateServerMessage(ErrorCodes.ADDING_FRIENDS_ERROR, Options.ACCPET_FRIEND_INVITATION);
                         if (activeUsers[clientId].dbConnection.InsertDHPublicReciverKey(invId, reciverPk))
                         {
                             invitations[invId].publicKeyReciver = reciverPk;
@@ -329,7 +321,7 @@ namespace Server
                     {
                         return TransmisionProtocol.CreateServerMessage(ErrorCodes.WRONG_INVATATION_ID, Options.ACCPET_FRIEND_INVITATION);
                     }
-                    
+
                 }
             }
 
@@ -343,8 +335,7 @@ namespace Server
             string conversationId = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
             string conversationKey = fields[1].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
 
-            Console.WriteLine("Conversation Key: " + conversationKey);
-            lock(activeUsers[clientId])
+            lock (activeUsers[clientId])
             {
                 activeUsers[clientId].dbConnection.SetUserConversationKey(activeUsers[clientId].userId, conversationKey, int.Parse(conversationId));
             }
@@ -355,7 +346,7 @@ namespace Server
         public string SendInvitations(string msg, int clientId)
         {
             string username;
-            lock(activeUsers[clientId])
+            lock (activeUsers[clientId])
             {
                 if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
                 username = activeUsers[clientId].userName;
@@ -363,11 +354,11 @@ namespace Server
             List<Invitation> invs = new List<Invitation>();
             int[] keys = new int[invitations.Count];
             invitations.Keys.CopyTo(keys, 0);
-            lock(invitations)
+            lock (invitations)
             {
-                foreach(var i in keys)
+                foreach (var i in keys)
                 {
-                    if(invitations[i].reciver == username && !invitations[i].sended)
+                    if (invitations[i].reciver == username && !invitations[i].sended)
                     {
                         invs.Add(invitations[i]);
                         invitations[i].sended = true;
@@ -390,11 +381,11 @@ namespace Server
 
             int[] t = new int[invitations.Count];
             invitations.Keys.CopyTo(t, 0);
-            lock(invitations)
+            lock (invitations)
             {
-                foreach(int i in t)
+                foreach (int i in t)
                 {
-                    if(invitations[i].sender == username && invitations[i].accepted)
+                    if (invitations[i].sender == username && invitations[i].accepted)
                     {
                         invs.Add(invitations[i]);
                         if (activeUsers[clientId].dbConnection.DeleteInvitation(invitations[i].invitationId))
@@ -402,8 +393,8 @@ namespace Server
                         else return TransmisionProtocol.CreateServerMessage(ErrorCodes.DB_DELETE_INVITATION_ERROR, Options.GET_ACCEPTED_FRIENDS);
                     }
                 }
-                if(invs.Count > 0)
-                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_ACCEPTED_FRIENDS, JsonConvert.SerializeObject(invs));
+                if (invs.Count > 0)
+                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_ACCEPTED_FRIENDS, JsonConvert.SerializeObject(invs));
 
                 return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOTHING_TO_SEND, Options.GET_ACCEPTED_FRIENDS);
             }
@@ -421,7 +412,7 @@ namespace Server
                 {
                     string notify = JsonConvert.SerializeObject(notifications[userId].Values);
                     notifications[userId].Clear();
-                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_NOTIFICATIONS,notify );
+                    return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_NOTIFICATIONS, notify);
                 }
                 catch
                 {
@@ -442,7 +433,7 @@ namespace Server
             int userId = activeUsers[clientId].userId;
             try
             {
-                lock(activeConversations)
+                lock (activeConversations)
                 {
                     activeConversations[userId] = conversationId;
                     activeUsers[clientId].activeConversation = conversationId;
@@ -452,7 +443,7 @@ namespace Server
             catch
             {
                 return TransmisionProtocol.CreateServerMessage(ErrorCodes.CANNOT_ACTIVATE_CONVERSATION, Options.ACTIVATE_CONVERSATION);
-            }   
+            }
         }
 
 
@@ -461,7 +452,7 @@ namespace Server
         {
             string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
             int conversationId = int.Parse(fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1]);
-            string message = fields[1].Split(":", 2,StringSplitOptions.RemoveEmptyEntries)[1];
+            string message = fields[1].Split(":", 2, StringSplitOptions.RemoveEmptyEntries)[1];
             int userId = activeUsers[clientId].dbConnection.GetSecondUserId(conversationId, activeUsers[clientId].userId);
 
 
@@ -473,9 +464,9 @@ namespace Server
             bool isActive = false;
             lock (messagesToSend)
             {
-                foreach(var aUser in activeUsers)
+                foreach (var aUser in activeUsers)
                 {
-                    if(aUser != null && aUser.userId == userId)
+                    if (aUser != null && aUser.userId == userId)
                     {
                         isActive = true;
                         break;
@@ -535,7 +526,7 @@ namespace Server
                             notifications.Add(userId, new Dictionary<int, Notification>()
                             {
                                 [conversationId] =
-                                new Notification { numberOfMessages = 1, username = activeUsers[clientId].userName}
+                                new Notification { numberOfMessages = 1, username = activeUsers[clientId].userName }
                             });
                         }
                     }
@@ -554,14 +545,14 @@ namespace Server
                 activeConversationId = activeConversations[id];
             }
             try
-            {               
+            {
                 lock (messagesToSend[id])
                 {
                     var messages = JsonConvert.SerializeObject(messagesToSend[id][activeConversationId]);
                     messagesToSend[id][activeConversationId].Clear();
                     return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_NEW_MESSAGES,
                         messages);
-                }                
+                }
             }
             catch
             {
@@ -576,7 +567,7 @@ namespace Server
             List<int> userConversationsIds = activeUsers[clientId].dbConnection.GetAllUserConversations(activeUsers[clientId].userId);
             activeUsers[clientId].redis.DeleteConversations(userConversationsIds);
             if (!activeUsers[clientId].dbConnection.DeleteUser(activeUsers[clientId].userId)) return TransmisionProtocol.CreateServerMessage(ErrorCodes.DELETING_ACCOUNT_ERROR, Options.DELETE_ACCOUNT);
-            if(!DeleteActiveUser(clientId,false)) return TransmisionProtocol.CreateServerMessage(ErrorCodes.DELETING_ACCOUNT_ERROR, Options.DELETE_ACCOUNT);
+            if (!DeleteActiveUser(clientId, false)) return TransmisionProtocol.CreateServerMessage(ErrorCodes.DELETING_ACCOUNT_ERROR, Options.DELETE_ACCOUNT);
             return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.DELETE_ACCOUNT);
 
         }
@@ -590,9 +581,9 @@ namespace Server
 
         public int AddActiveUser()
         {
-            for(int i=0;i<activeUsers.Count;i++)
+            for (int i = 0; i < activeUsers.Count; i++)
             {
-                if(activeUsers[i] == null)
+                if (activeUsers[i] == null)
                 {
                     activeUsers[i] = new User();
                     return i;
@@ -602,17 +593,18 @@ namespace Server
             return activeUsers.Count - 1;
         }
 
-        public void AddFriend(ExtendedInvitation ei,int index)
+        public void AddFriend(ExtendedInvitation ei, int index)
         {
             invitations[index] = ei;
         }
 
-        public bool DeleteActiveUser(int clientId,bool isDisconnection)
+        public bool DeleteActiveUser(int clientId, bool isDisconnection)
         {
-            try {
+            try
+            {
                 lock (activeUsers[clientId])
                 {
-                    lock(sendedConversationIds)
+                    lock (sendedConversationIds)
                     {
                         sendedConversationIds.Remove(activeUsers[clientId].userId);
                     }
@@ -640,7 +632,7 @@ namespace Server
 
         public ClientProcessing()
         {
-            functions = new List<Functions>();        
+            functions = new List<Functions>();
             functions.Add(new Functions(Logout));
             functions.Add(new Functions(Login));
             functions.Add(new Functions(CreateUser));
