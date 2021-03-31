@@ -503,6 +503,7 @@ namespace DbLibrary
             {
                 res.Add(dataReader.GetInt32(0));
             }
+            dataReader.Close();
             return res;
         }
 

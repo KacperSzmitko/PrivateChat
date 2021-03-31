@@ -47,15 +47,11 @@ namespace Server
                     StringBuilder messageData = new StringBuilder();
                     int bytes = -1;
                     do {
-
-
                         bytes = await stream.ReadAsync(buffer, 0, buffer.Length);
-
                         //Decode message
                         char[] chars = new char[decoder.GetCharCount(buffer, 0, bytes)];
                         decoder.GetChars(buffer, 0, bytes, chars, 0);
                         messageData.Append(chars);
-
                     } while (stream.DataAvailable);
 
                     //Prepare response
