@@ -57,6 +57,7 @@ namespace Client.ViewModels
             get {
                 if (goChatCommand == null) {
                     goChatCommand = new RelayCommand(_ => {
+                        model.SaveEncryptedUserKey();
                         navigator.CurrentViewModel = new ChatViewModel(connection, navigator, model.Username, model.UserKey);
                     }, _ => {
                         if (userKeyIsGood) return true;

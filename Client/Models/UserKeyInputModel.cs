@@ -1,5 +1,6 @@
 ﻿using Shared;
 using System;
+using System.IO;
 using System.Text;
 
 namespace Client.Models
@@ -39,6 +40,21 @@ namespace Client.Models
                 return true;
             }
             else return false;
+        }
+
+        public void SaveEncryptedUserKey() {
+            //Przypisz do zmiennej ścieżke do folderu użytkownika
+            string userPath = Path.Combine(appLocalDataFolderPath, username);
+            //Przypisz do zmiennej ścieżke do pliku w którym ma być umieszczony zaszyfrowany klucz użytkownika
+            string encryptedUserKeyFilePath = Path.Combine(userPath, encryptedUserKeyFileName);
+            //Zaszyfruj klucz użytkownika
+            byte[] encryptedUserKey = Security.AESEncrypt(userKey, credentialsHash, userIV);
+            //Zamień zaszyfrowane bajty klucza użytkownika na tekstowy zapis szesnastkowy
+            string encryptedUserKeyHexString = Security.ByteArrayToHexString(encryptedUserKey);
+            //Jeśli folder użytkownika nie istnieje, utwórz go
+            Directory.CreateDirectory(userPath);
+            //Zapisz zawartość zmiennej "encryptedUserKeyHexString" do pliku o ścieżce "encryptedUserKeyFilePath"
+            File.WriteAllText(encryptedUserKeyFilePath, encryptedUserKeyHexString);
         }
     }
 }

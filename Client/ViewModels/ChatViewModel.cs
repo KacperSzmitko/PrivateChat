@@ -192,19 +192,29 @@ namespace Client.ViewModels
 
         public ICommand SendMessageCommand {
             get {
+                //Jeśli komenda jest równa null
                 if (sendMessageCommand == null) {
+                    //Ustaw komendę na nowy obiekt RelayCommand
                     sendMessageCommand = new RelayCommand(_ => {
+                        //Przypisz do zmiennej wiadomość wpisaną w polu tekstowym
                         string messageToSendTextCopy = messageToSendText;
+                        //Przypisz do zmiennej nazwę znajomego z którym rozmawiasz
                         string friendUsername = selectedFriend.Name;
+                        //Utwórz nowy wątek, który zaszyfruje i wyślę wiadomość do serwera
                         sendMessageThread = new Thread(() => SendMessageAsync(friendUsername, messageToSendTextCopy));
+                        //Uruchom wątek
                         sendMessageThread.Start();
+                        //Usuń tekst z pola tekstowego
                         messageToSendText = "";
+                        //Powiadom widok, o zmianie zawartości pola tekstowego
                         OnPropertyChanged(nameof(MessageToSendText));
                     }, _ => {
+                        //Pozwól na wysłanie wiadomości jedynie jeśli jej długość jest większa niż 0
                         if (messageToSendText.Length > 0) return true;
                         else return false;
                     });
                 }
+                //Zwróć obiekt RelayCommand
                 return sendMessageCommand;
             }
         }
@@ -330,14 +340,23 @@ namespace Client.ViewModels
         }
 
         private void ManageAcceptedFriends(List<ExtendedInvitation> acceptedInvitations) {
+            //Sprawdź czy lista znajomych którzy zaakceptowali zaproszenie nie jest pusta
             if (acceptedInvitations != null && acceptedInvitations.Count > 0) {
+                //Dla każdego znajomego który zaakceptował zaprszenie...
                 foreach (ExtendedInvitation inv in acceptedInvitations) {
+                    //Pobierz z listy swój zaszyfrowany klucz prywatny i zamień go na tablicę bajtów
                     byte[] encryptedPrivateDHKey = Security.HexStringToByteArray(inv.encryptedSenderPrivateKey);
+                    //Pobierz z listy IV potrzebne do odszyfrowania klucza prywatnego i zamień je na tablicę bajtów
                     byte[] IVToDecyptPrivateDHKey = Security.HexStringToByteArray(inv.ivToDecryptSenderPrivateKey);
+                    //Pobierz z listy IV potrzebne do zaszyfrowania klucza konwersacji i zamień je na tablicę bajtów
                     byte[] conversationIV = Security.HexStringToByteArray(inv.conversationIv);
+                    //Odszyfruj swój klucz prywatny
                     byte[] privateDHKey = Security.AESDecrypt(encryptedPrivateDHKey, model.UserKey, IVToDecyptPrivateDHKey);
+                    //Wygeneruj klucz konwersacji
                     byte[] conversationKey = model.GenerateConversationKey(inv.publicKeyReciver, inv.p, inv.g, privateDHKey);
-                    byte[] encryptedConversationKey = Security.AESEncrypt(conversationKey, model.UserKey, conversationIV); //Using userKey to encrypt conversationKey
+                    //Zaszyfruj klucz konwersacji
+                    byte[] encryptedConversationKey = Security.AESEncrypt(conversationKey, model.UserKey, conversationIV);
+                    //Wyślij zaszyfrowany klucz konwersacji do serwera
                     model.SendEncryptedConversationKey(inv.conversationId, encryptedConversationKey);
                 }
             }
