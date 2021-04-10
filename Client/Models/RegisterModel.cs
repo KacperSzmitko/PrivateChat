@@ -19,7 +19,7 @@ namespace Client.Models
         public RegisterModel(ServerConnection connection) : base(connection) { }
 
         public bool CheckUsernameText() {
-            if (Regex.Match(username, @"^[\w]{3,}$").Success) return true;
+            if (Regex.Match(username, "^[\\w]{3,}$").Success) return true;
             else return false;
         }
 
@@ -31,7 +31,7 @@ namespace Client.Models
         }
 
         public bool CheckPasswordText() {
-            if (pass1.Length >= 8) return true;
+            if (Regex.Match(pass1, "(?=.*[!\"#%&'()*+,\\-\\./:<>=?@\\[\\]\\^_{}|~])(?=.*[A-Z])(?!.*\\$).{8,255}").Success) return true;
             else return false;
         }
 

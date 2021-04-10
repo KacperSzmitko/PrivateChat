@@ -7,40 +7,38 @@
              Height="680" Width="600"
              Background="White">
     
-    <Border Padding="90 0 90 0">
+    <Border Padding="110 0 110 0">
         <StackPanel VerticalAlignment="Center">
             <TextBlock FontWeight="Bold" FontSize="30" TextAlignment="Center" Text="Zarejestruj się"/>
-            <Grid Margin="0 25 0 0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="1.5*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="0.5*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="0.5*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="0.5*" />
-                </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Padding="2" FontWeight="Bold" FontSize="22" Text="Login"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Padding="2" FontSize="22" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Background="{Binding UsernameBoxColor}" d:Background="#28507B"/>
-                <TextBlock Grid.Row="1" Grid.Column="1" Padding="2" FontSize="14" Text="Minimum 3 zwykłe znaki" Visibility="{Binding UsernameInfoVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
-                <TextBlock Grid.Row="1" Grid.Column="1" Padding="2" FontSize="14" Text="Nazwa zajęta" Visibility="{Binding UsernameInfoAvailabilityVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
+            <TextBlock Margin="0 5 0 0" Padding="2" FontWeight="Bold" FontSize="14" Text="LOGIN"/>
+            <TextBox Margin="0 2 0 0" Padding="2" FontSize="22" MaxLength="16" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Background="{Binding UsernameBoxColor}" d:Background="#28507B"/>
+            <TextBlock Padding="2" FontSize="13.7" Text="Minimum 3 zwykłe znaki" Visibility="{Binding UsernameInfoVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
+            <TextBlock Padding="2" FontSize="13.7" Text="Nazwa zajęta" Visibility="{Binding UsernameInfoAvailabilityVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
 
-                <TextBlock Grid.Row="2" Grid.Column="0" Margin="0 10 0 0" Padding="2" FontWeight="Bold" FontSize="22" Text="Hasło"/>
-                <PasswordBox Grid.Row="2" Grid.Column="1" Margin="0 10 0 0" Padding="2" FontSize="22" PasswordChanged="PasswordBox1_PasswordChanged" Background="{Binding Pass1BoxColor}" d:Background="#28507B"/>
-                <TextBlock Grid.Row="3" Grid.Column="1" Padding="2" FontSize="14" Text="Minimum 8 znaków" Visibility="{Binding Pass1InfoVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
-
-                <TextBlock  Grid.Row="4" Grid.Column="0" Margin="0 10 0 0" Padding="2" FontWeight="Bold" FontSize="22" Text="Powtórz hasło"/>
-                <PasswordBox  Grid.Row="4" Grid.Column="1" Margin="0 10 0 0" Padding="2" FontSize="22" PasswordChanged="PasswordBox2_PasswordChanged" Background="{Binding Pass2BoxColor}" d:Background="#28507B"/>
-                <TextBlock Grid.Row="5" Grid.Column="1" Padding="2" FontSize="14" Text="Hasła muszą być identyczne" Visibility="{Binding Pass2InfoVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
+            <TextBlock Margin="0 15 0 0" Padding="2" FontWeight="Bold" FontSize="14" Text="HASŁO"/>
+            <PasswordBox Margin="0 2 0 0" Grid.ColumnSpan="2" Padding="2" MaxLength="255" FontSize="22" PasswordChanged="PasswordBox1_PasswordChanged" Background="{Binding Pass1BoxColor}" d:Background="#28507B"/>
+            <TextBlock Padding="2" FontSize="13.7" Text="Minimum 8 znaków, 1 znak specjalny (nie $) i 1 wielka litera" Visibility="{Binding Pass1InfoVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
+            
+            <TextBlock Margin="0 15 0 0" Padding="2" FontWeight="Bold" FontSize="14" Text="POWTÓRZ HASŁO"/>
+            <PasswordBox Margin="0 2 0 0" Padding="2" FontSize="22" PasswordChanged="PasswordBox2_PasswordChanged" Background="{Binding Pass2BoxColor}" d:Background="#28507B"/>
+            <TextBlock Padding="2" FontSize="13.7" Text="Hasła muszą być identyczne" Visibility="{Binding Pass2InfoVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
                 
-            </Grid>
-            <Button Margin="65 25 65 0" Padding="3" FontWeight="Bold" FontSize="22" Content="Zarejestruj się" Command="{Binding RegisterCommand}"/>
-            <Button Margin="95 10 95 0" Padding="2" FontWeight="Bold" FontSize="18" Content="Powrót do logowania" Command="{Binding GoLoginCommand}"/>
-
+            <Button Margin="0 25 0 0" Padding="3" FontWeight="Bold" FontSize="22" Content="Zarejestruj się" Command="{Binding RegisterCommand}"/>
+            <TextBlock Margin="0 4 0 0" FontSize="16" Foreground="#b0bbd3" FontFamily="{StaticResource OpenSans}" Text="Powrót do logowania">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="TextBlock.TextDecorations" Value="Underline" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+                <TextBlock.InputBindings>
+                    <MouseBinding Command="{Binding GoLoginCommand}" MouseAction="LeftClick"/>
+                </TextBlock.InputBindings>
+            </TextBlock>
 
         </StackPanel>
     </Border>

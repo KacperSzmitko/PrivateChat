@@ -65,7 +65,7 @@ namespace Client.ViewModels
             get {
                 if (String.IsNullOrEmpty(Username)) return "#28507B";
                 else if (!goodUsername || !usernameAvailable) return "#B30000";
-                else return "#009900";
+                else return "#008900";
             }
         }
 
@@ -73,7 +73,7 @@ namespace Client.ViewModels
             get {
                 if (String.IsNullOrEmpty(Pass1)) return "#28507B";
                 else if (!goodPass1) return "#B30000";
-                else return "#009900";
+                else return "#008900";
             }
         }
 
@@ -81,7 +81,7 @@ namespace Client.ViewModels
             get {
                 if (String.IsNullOrEmpty(Pass2)) return "#28507B";
                 else if (!goodPass2) return "#B30000";
-                else return "#009900";
+                else return "#008900";
             }
         }
 

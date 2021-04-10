@@ -13,11 +13,14 @@
 
     <Application.Resources>
 
+        <FontFamily x:Key="OpenSans">pack://application:,,,/Resources/Fonts/#Open Sans</FontFamily>
+        
         <Style TargetType="Border">
             <Setter Property="Background" Value="#0F1E2E"/>
         </Style>
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="#DADDE7"/>
+            <Setter Property="FontFamily" Value="{StaticResource OpenSans}" />
         </Style>
         <Style TargetType="TextBox">
             <Setter Property="Background" Value="#28507B"/>
@@ -48,8 +51,8 @@
         <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#4767b2"/>
         <SolidColorBrush x:Key="Button.Pressed.Background" Color="#4767b2"/>
         <SolidColorBrush x:Key="Button.Pressed.Border" Color="#4767b2"/>
-        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#2F4475"/>
-        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#2F4475"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#5a5f6e"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#5a5f6e"/>
         <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#747ea4"/>
         <Style TargetType="{x:Type Button}">
             <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>

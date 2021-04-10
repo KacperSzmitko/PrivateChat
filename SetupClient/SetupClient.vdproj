@@ -19,6 +19,12 @@
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_E35C7C6872D2473FB05BB88B0B8A4CC7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -44,6 +50,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -113,6 +127,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E35C7C6872D2473FB05BB88B0B8A4CC7"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\Desktop\\Studia\\semestr_6\\PT projekt\\icon.ico"
+            "TargetName" = "8:icon.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_4220673232E04305B419C491AB469DEF"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -170,7 +204,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Private Chat"
         "ProductCode" = "8:{E792DA31-E2BD-41CF-BF12-9B291CD35980}"
-        "PackageCode" = "8:{86227114-1926-457B-99BB-49FB4C1F6334}"
+        "PackageCode" = "8:{9244EB3B-CCC8-47E4-BFF5-B08EF50101EA}"
         "UpgradeCode" = "8:{A99E5C65-6EE0-433D-B01F-A7677CCDC399}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -302,6 +336,20 @@
             "Folder" = "8:_E70BCB339629420FB88F6DA459486EE3"
             "WorkingFolder" = "8:_4220673232E04305B419C491AB469DEF"
             "Icon" = "8:"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_D043CE7755E44C20A17C617D29CFE8C5"
+            {
+            "Name" = "8:Private Chat"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_1437911168004D1DA9591F7ED8123DCA"
+            "Folder" = "8:_B1A49604075B425DB56799135B3BD3B5"
+            "WorkingFolder" = "8:_4220673232E04305B419C491AB469DEF"
+            "Icon" = "8:_E35C7C6872D2473FB05BB88B0B8A4CC7"
             "Feature" = "8:"
             }
         }
@@ -705,7 +753,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_1437911168004D1DA9591F7ED8123DCA"
             {
-            "SourcePath" = "8:..\\Client\\obj\\Release\\netcoreapp3.1\\apphost.exe"
+            "SourcePath" = "8:..\\Client\\obj\\Debug\\netcoreapp3.1\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_4220673232E04305B419C491AB469DEF"
