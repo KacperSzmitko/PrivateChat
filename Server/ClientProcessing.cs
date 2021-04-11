@@ -59,8 +59,12 @@ namespace Server
 
         public string Logout(string msg, int clientId)
         {
-            lock (activeUsers[clientId])
+            lock (activeUsers[clientId]) {
                 activeUsers[clientId].logged = false;
+            }
+
+            activeConversations[clientId] = -1;
+
             lock (invitations)
             {
                 int[] a = new int[invitations.Count];

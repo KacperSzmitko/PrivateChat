@@ -58,7 +58,7 @@ namespace Server
 
                     //Disconnection
                     if (sendMessage == "") {
-                        message = Encoding.ASCII.GetBytes("Response:0$$");
+                        message = Encoding.ASCII.GetBytes("Error:0$$");
                         stream.Write(message);
                         Thread.Sleep(1000);
                         break;
@@ -69,6 +69,7 @@ namespace Server
                     stream.Write(message);
                 }
                 catch (Exception e) {
+                    menager.Disconnect("", clientId);
                     Console.WriteLine(e.Message);
                     break;
                 }

@@ -21,7 +21,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_E35C7C6872D2473FB05BB88B0B8A4CC7"
+        "MsmKey" = "8:_4EA1D50648934F2CBCD56DB886D6CB28"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -127,7 +127,7 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E35C7C6872D2473FB05BB88B0B8A4CC7"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4EA1D50648934F2CBCD56DB886D6CB28"
             {
             "SourcePath" = "8:..\\..\\..\\..\\Desktop\\Studia\\semestr_6\\PT projekt\\icon.ico"
             "TargetName" = "8:icon.ico"
@@ -335,7 +335,7 @@
             "Target" = "8:_1437911168004D1DA9591F7ED8123DCA"
             "Folder" = "8:_E70BCB339629420FB88F6DA459486EE3"
             "WorkingFolder" = "8:_4220673232E04305B419C491AB469DEF"
-            "Icon" = "8:"
+            "Icon" = "8:_4EA1D50648934F2CBCD56DB886D6CB28"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_D043CE7755E44C20A17C617D29CFE8C5"
@@ -349,7 +349,7 @@
             "Target" = "8:_1437911168004D1DA9591F7ED8123DCA"
             "Folder" = "8:_B1A49604075B425DB56799135B3BD3B5"
             "WorkingFolder" = "8:_4220673232E04305B419C491AB469DEF"
-            "Icon" = "8:_E35C7C6872D2473FB05BB88B0B8A4CC7"
+            "Icon" = "8:_4EA1D50648934F2CBCD56DB886D6CB28"
             "Feature" = "8:"
             }
         }
@@ -753,7 +753,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_1437911168004D1DA9591F7ED8123DCA"
             {
-            "SourcePath" = "8:..\\Client\\obj\\Debug\\netcoreapp3.1\\apphost.exe"
+            "SourcePath" = "8:..\\Client\\obj\\Release\\netcoreapp3.1\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_4220673232E04305B419C491AB469DEF"
