@@ -58,7 +58,7 @@ namespace Server
 
                     //Disconnection
                     if (sendMessage == "") {
-                        message = Encoding.ASCII.GetBytes("Error:0$$");
+                        message = Encoding.ASCII.GetBytes("Error:0$$$");
                         stream.Write(message);
                         Thread.Sleep(1000);
                         break;
