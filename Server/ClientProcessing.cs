@@ -63,7 +63,9 @@ namespace Server
                 activeUsers[clientId].logged = false;
             }
 
-            activeConversations[clientId] = -1;
+            lock (activeConversations) {
+                if (activeConversations.ContainsKey(activeUsers[clientId].userId)) activeConversations.Remove(activeUsers[clientId].userId);
+            }
 
             lock (invitations)
             {
