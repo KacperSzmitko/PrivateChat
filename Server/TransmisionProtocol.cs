@@ -53,6 +53,7 @@ namespace Server
             {
                 AddFields(new[] { "Error" }, ref result,((int)errorCode).ToString());
             }
+            result = result + "$";
             return result;
 
         }

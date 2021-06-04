@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Client 
 {
@@ -36,9 +37,9 @@ namespace Client
                 char[] chars = new char[decoder.GetCharCount(buffer, 0, bytesRead)];
                 decoder.GetChars(buffer, 0, bytesRead, chars, 0);
                 messageString += new string(chars);
-            } while (stream.DataAvailable);
+            } while (messageString.Substring(messageString.Length - 3) != "$$$");
 
-            return messageString;
+            return messageString.Substring(0, messageString.Length - 1);
         }
 
         public void CloseConnection() {
