@@ -472,7 +472,7 @@ namespace Server
             {
                 foreach (var aUser in activeUsers)
                 {
-                    if (aUser != null && aUser.userId == userId)
+                    if (aUser != null && aUser.userId == userId && aUser.logged)
                     {
                         isActive = true;
                         break;
