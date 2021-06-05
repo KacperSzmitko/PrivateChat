@@ -18,10 +18,10 @@ namespace Client
             return true;
         }
 
-        public ServerConnection(string serverAddress, ushort serverPort) {
+        public ServerConnection(string serverAddress, ushort serverPort, string certServerName) {
             this.tcpClient = new TcpClient(serverAddress, serverPort);
             this.stream = new SslStream(tcpClient.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
-            stream.AuthenticateAsClient("localhost");
+            stream.AuthenticateAsClient(certServerName);
         }
 
         public void SendMessage(string message) {
