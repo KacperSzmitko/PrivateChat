@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using System.Net.Sockets;
 using System.Threading;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 namespace Client 
 {
@@ -10,19 +12,20 @@ namespace Client
         private const int bufferSize = 1024;
 
         private readonly TcpClient tcpClient;
-        private readonly NetworkStream stream;
+        private readonly SslStream stream;
 
-        public bool DataAvailable {
-            get { return stream.DataAvailable; }
+        public static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) {
+            return true;
         }
 
         public ServerConnection(string serverAddress, ushort serverPort) {
             this.tcpClient = new TcpClient(serverAddress, serverPort);
-            this.stream = tcpClient.GetStream();
+            this.stream = new SslStream(tcpClient.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
+            stream.AuthenticateAsClient("localhost");
         }
 
         public void SendMessage(string message) {
-            byte[] messageBytes = Encoding.ASCII.GetBytes(message);
+            byte[] messageBytes = Encoding.ASCII.GetBytes(message + "$");
             this.stream.Write(messageBytes);
             this.stream.Flush();
         }
@@ -31,13 +34,15 @@ namespace Client
             byte[] buffer = new byte[bufferSize];
             Decoder decoder = Encoding.ASCII.GetDecoder();
             string messageString = "";
+            int bytesRead = 0;
 
             do {
-                int bytesRead = stream.Read(buffer, 0, bufferSize);
+                bytesRead = stream.Read(buffer, 0, bufferSize);
                 char[] chars = new char[decoder.GetCharCount(buffer, 0, bytesRead)];
                 decoder.GetChars(buffer, 0, bytesRead, chars, 0);
                 messageString += new string(chars);
-            } while (messageString.Substring(messageString.Length - 3) != "$$$");
+                if (messageString.IndexOf("$$$") != -1) break;
+            } while (bytesRead != 0);
 
             return messageString.Substring(0, messageString.Length - 1);
         }
