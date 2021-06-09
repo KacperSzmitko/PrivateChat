@@ -46,12 +46,15 @@ namespace Server
                 try {
                     //Read message
                     string sendMessage = "";
+                    //Utworzenie bufora do przechowywania otrzymanych od klienta danych
                     byte[] buffer = new byte[2048];
                     StringBuilder messageData = new StringBuilder();
+                    //Informacja o liczbie odebranych bajtów
                     int bytes = -1;
                     do {
+                        //Oczekiwanie na wiadomość od klienta
                         bytes = await stream.ReadAsync(buffer, 0, buffer.Length);
-                        //Decode message
+                        //Zdekodowanie otrzymanych bajtów na tekst
                         char[] chars = new char[decoder.GetCharCount(buffer, 0, bytes)];
                         decoder.GetChars(buffer, 0, bytes, chars, 0);
                         messageData.Append(chars);

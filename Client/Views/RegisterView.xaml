@@ -25,7 +25,7 @@
             <TextBlock Padding="2" FontSize="13.7" Text="Hasła muszą być identyczne" Visibility="{Binding Pass2InfoVisibility}" Foreground="Crimson" d:Visibility="Collapsed"/>
                 
             <Button Margin="0 25 0 0" Padding="3" FontWeight="Bold" FontSize="22" Content="Zarejestruj się" Command="{Binding RegisterCommand}"/>
-            <TextBlock Margin="0 4 0 0" FontSize="16" Foreground="#b0bbd3" FontFamily="{StaticResource OpenSans}" Text="Powrót do logowania">
+            <TextBlock Margin="0 4 0 0" FontSize="16" Foreground="#b0bbd3" FontFamily="{StaticResource OpenSans}" Text="Zaloguj się">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Style.Triggers>
