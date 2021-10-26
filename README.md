@@ -6,11 +6,4 @@ Private Chat is a system consisting of a server, two databases (MySQL, Redis) an
 * **C#**
 * **BouncyCastle** for cryptographic functions
 * **MySQL**
-* **Redis**
 * **OpenVPN** for testing 
-
-# Full documentation
-https://drive.google.com/file/d/1ka-BB0gsXztUYGojr-Yi4Ll1YjV-5P9l/view?usp=sharing
-
-# Download
-https://drive.google.com/file/d/15aJz6HV9imOPOX7nDA0FqB_xsdNJeb_z/view
