@@ -88,9 +88,8 @@ namespace Server
             string p = Security.GetP(Tpar);
             string g = Security.GetG(Tpar);
 
-
             // Tworzysz nowe parametry podając 16 jako drugi argument konstruktora
-            var par = new Org.BouncyCastle.Crypto.Parameters.DHParameters(new Org.BouncyCastle.Math.BigInteger(p,16), new Org.BouncyCastle.Math.BigInteger(g,16));
+            var par = new Org.BouncyCastle.Crypto.Parameters.DHParameters(new Org.BouncyCastle.Math.BigInteger(p, 16), new Org.BouncyCastle.Math.BigInteger(g, 16));
             
             var Akeys = Security.GenerateKeys(par);
             var Bkeys = Security.GenerateKeys(par);
@@ -100,10 +99,9 @@ namespace Server
             string y = Security.GetPrivateKey(Bkeys);
 
             // Ta funkcja jakos PublicKey przyjmuje stringa reprezentującego liczbę 16-stkową, a funkcja GetPublic/PrivateKey to zwraca
-            Console.WriteLine(Security.ByteArrayToHexString(Security.ComputeSharedSecret(Security.GetPublicKey(Akeys), Security.GetPrivateKey(Bkeys), p,g)));
+            Console.WriteLine(Security.ByteArrayToHexString(Security.ComputeSharedSecret(Security.GetPublicKey(Akeys), Security.GetPrivateKey(Bkeys), p, g)));
 
             Console.WriteLine(Security.ByteArrayToHexString(Security.ComputeSharedSecret(Security.GetPublicKey(Bkeys), Security.GetPrivateKey(Akeys), p, g)));
-
         }
     }
 }

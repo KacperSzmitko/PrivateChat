@@ -55,11 +55,13 @@ namespace DbLibrary
 
         public List<T> GetFromRedis<T>(string key) where T: ExtendedInvitation
         {
+            //Wybieranie odpowiedniej bazy danych
             db = redis.GetDatabase(1);
-
             try
             {
+                //Pobieranie wartości znajdującej się pod danym kluczem
                 var data = db.StringGet(key);
+                //Zwrócenie danych w postaci listy obiektów typu T
                 return JsonConvert.DeserializeObject<List<T>>(data);
             }
             catch

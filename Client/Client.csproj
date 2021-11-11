@@ -8,6 +8,10 @@
     <AssemblyOriginatorKeyFile>key.pfx</AssemblyOriginatorKeyFile>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <ApplicationIcon>Resources\Images\icon.ico</ApplicationIcon>
+    <Version>1.1.2</Version>
+    <Authors>Marcin Tajsner, Kacper Szmitko</Authors>
+    <Product>Private Chat</Product>
+    <PackageId>Client</PackageId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
