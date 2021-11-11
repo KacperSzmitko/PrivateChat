@@ -97,7 +97,7 @@ namespace DbLibrary
 
         public Redis()
         {
-            redis = ConnectionMultiplexer.Connect("localhost:6379,password=5fUwXohpL6rh5xvK");
+            redis = ConnectionMultiplexer.Connect("localhost:7637,password=5fUwXohpL6rh5xvK");
 
         }
     }

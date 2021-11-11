@@ -8,7 +8,7 @@ namespace Client
     {
         public MainWindow() {
             InitializeComponent();
-            ServerConnection connection = new ServerConnection("bd-projekt.ddns.net", 13579, "bd-projekt.ddns.net");
+            ServerConnection connection = new ServerConnection("m14.pl", 13579, "m14.pl");
             Navigator navigator = new Navigator();
             MainViewModel viewModel = new MainViewModel(connection, navigator);
             navigator.ViewChanged += viewModel.OnViewChanged;

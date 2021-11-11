@@ -11,10 +11,10 @@ namespace DbLibrary
         protected string password;
         public DbConnection()
         {
-            server = "localhost";
-            database = "projekt_pt";
-            uid = "user_io";
-            password = "DN8OHj8mUkNmXBRm";
+            server = "37.187.107.7";
+            database = "PUT_INF_OD";
+            uid = "PUT_INF_OD";
+            password = "kjXZefuStZBj9tHG";
             string connectionString;
             connectionString = "SERVER=" + server + ";" + "DATABASE=" +
             database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
