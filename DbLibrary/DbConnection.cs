@@ -1,4 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
+using System.Configuration;
+using System.Collections.Specialized;
 
 namespace DbLibrary
 {
@@ -11,10 +13,11 @@ namespace DbLibrary
         protected string password;
         public DbConnection()
         {
-            server = "37.187.107.7";
-            database = "PUT_INF_OD";
-            uid = "PUT_INF_OD";
-            password = "kjXZefuStZBj9tHG";
+            System.Configuration.Configuration config = System.Configuration.ConfigurationManager.OpenExeConfiguration("Server.config");
+            server = config.AppSettings.Settings["db-ip"].Value;
+            database = config.AppSettings.Settings["db-name"].Value;
+            uid = config.AppSettings.Settings["db-username"].Value;
+            password = config.AppSettings.Settings["db-password"].Value;
             string connectionString;
             connectionString = "SERVER=" + server + ";" + "DATABASE=" +
             database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";

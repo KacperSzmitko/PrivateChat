@@ -3,6 +3,7 @@ using Shared;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Text;
 
 namespace DbLibrary
@@ -97,7 +98,9 @@ namespace DbLibrary
 
         public Redis()
         {
-            redis = ConnectionMultiplexer.Connect("37.187.107.7:7637,password=5fUwXohpL6rh5xvK");
+            System.Configuration.Configuration config = System.Configuration.ConfigurationManager.OpenExeConfiguration("Server.config");
+            String connectionString = String.Format("{0}:{1},password={2}", config.AppSettings.Settings["redis-ip"].Value, config.AppSettings.Settings["redis-port"].Value, config.AppSettings.Settings["redis-password"].Value);
+            redis = ConnectionMultiplexer.Connect(connectionString);
 
         }
     }

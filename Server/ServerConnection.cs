@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -16,9 +17,9 @@ namespace Server
 
 
         public void RunServer() {
-            serverCertificate = new X509Certificate2("/home/put-inf-7-od/cert.pfx", "+kTQ2U_MG[((3}dM", X509KeyStorageFlags.MachineKeySet);
+            serverCertificate = new X509Certificate2(ConfigurationManager.AppSettings.Get("server-cert-location"), ConfigurationManager.AppSettings.Get("server-cert-password"), X509KeyStorageFlags.MachineKeySet);
             // Create a TCP/IP (IPv4) socket and listen for incoming connections.
-            TcpListener listener = new TcpListener(IPAddress.Any, 13579);
+            TcpListener listener = new TcpListener(IPAddress.Any, Convert.ToUInt16(ConfigurationManager.AppSettings.Get("server-port")));
             listener.Start();
             while (true) {
                 TcpClient client = listener.AcceptTcpClient();

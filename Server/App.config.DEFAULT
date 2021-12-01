@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+    <add key="db-addr" value="MYSQL_IP_PORT" />
+    <add key="db-username" value="MYSQL_USERNAME" />
+    <add key="db-password" value="MYSQL_PASSWORD" />
+    <add key="db-name" value="MYSQL_DATABASE_NAME" />
+    <add key="redis-ip" value="REDIS_IP" />
+    <add key="redis-port" value="REDIS_PORT" />
+    <add key="redis-password" value="REDIS_PASSWORD" />
+    <add key="server-port" value="12345" />
+    <add key="server-cert-location" value="cert.pfx" />
+    <add key="server-cert-password" value="password" />
+  </appSettings>
+</configuration>

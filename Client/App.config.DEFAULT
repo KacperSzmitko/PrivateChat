@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+    <add key="server-ip" value="SERVER_IP" />
+    <add key="server-port" value="SERVER_PORT" />
+    <add key="server-certname" value="SERVER_CERTNAME" />
+  </appSettings>
+</configuration>

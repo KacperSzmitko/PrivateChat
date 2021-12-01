@@ -4,9 +4,10 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Platforms>AnyCPU;x64;x86</Platforms>
-    <Version>1.1.2</Version>
-    <Authors>Marcin Tajsner, Kacper Szmitko</Authors>
+    <Version>1.1.3</Version>
+    <Authors>Marcin Tajsner, Kacper Szmitko, Kacper Modelski, Kacper Buczko</Authors>
     <Product>Private Chat</Product>
+    <Company>Marcin Tajsner, Kacper Szmitko, Kacper Modelski, Kacper Buczko</Company>
   </PropertyGroup>
 
   <ItemGroup>
