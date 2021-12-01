@@ -98,8 +98,7 @@ namespace DbLibrary
 
         public Redis()
         {
-            System.Configuration.Configuration config = System.Configuration.ConfigurationManager.OpenExeConfiguration("Server.config");
-            String connectionString = String.Format("{0}:{1},password={2}", config.AppSettings.Settings["redis-ip"].Value, config.AppSettings.Settings["redis-port"].Value, config.AppSettings.Settings["redis-password"].Value);
+            String connectionString = String.Format("{0}:{1},password={2}", ConfigurationManager.AppSettings.Get("redis-ip"), ConfigurationManager.AppSettings.Get("redis-port"), ConfigurationManager.AppSettings.Get("redis-password"));
             redis = ConnectionMultiplexer.Connect(connectionString);
 
         }

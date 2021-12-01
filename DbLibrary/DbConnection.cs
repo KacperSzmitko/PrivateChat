@@ -13,11 +13,10 @@ namespace DbLibrary
         protected string password;
         public DbConnection()
         {
-            System.Configuration.Configuration config = System.Configuration.ConfigurationManager.OpenExeConfiguration("Server.config");
-            server = config.AppSettings.Settings["db-ip"].Value;
-            database = config.AppSettings.Settings["db-name"].Value;
-            uid = config.AppSettings.Settings["db-username"].Value;
-            password = config.AppSettings.Settings["db-password"].Value;
+            server = ConfigurationManager.AppSettings.Get("db-ip");
+            database = ConfigurationManager.AppSettings.Get("db-name");
+            uid = ConfigurationManager.AppSettings.Get("db-username");
+            password = ConfigurationManager.AppSettings.Get("db-password");
             string connectionString;
             connectionString = "SERVER=" + server + ";" + "DATABASE=" +
             database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
