@@ -190,7 +190,8 @@ namespace Client.Models
             return conversations[friendUsername].Messages.Count - 1;
         }
 
-        public void GetConversation(string friendUsername) {
+        public void GetConversation(string friendUsername)
+        {
             var response = ServerCommands.GetConversationCommand(ref connection, friendUsername);
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             byte[] encryptedConversationKey = Security.HexStringToByteArray(response.conversationKey);
@@ -199,6 +200,20 @@ namespace Client.Models
             List<Message> dirtyMessages = new List<Message>();
             if (response.messagesJSON != null && response.messagesJSON != "" && response.messagesJSON != "[{}]") dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.messagesJSON);
             conversations[friendUsername] = new Conversation(response.conversationID, conversationKey, conversationIV, DecryptMessages(dirtyMessages, conversationKey));
+        }
+
+        public void GetLastConversation(string friendUsername, int amount)
+        {
+            var response = ServerCommands.GetLastConversationCommand(ref connection, friendUsername, amount);
+            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
+            byte[] encryptedConversationKey = Security.HexStringToByteArray(response.conversationKey);
+            byte[] conversationIV = Security.HexStringToByteArray(response.conversationIV);
+            byte[] conversationKey = Security.AESDecrypt(encryptedConversationKey, userKey, conversationIV);
+            List<Message> dirtyMessages = new List<Message>();
+            if (response.messagesJSON != null && response.messagesJSON != "" && response.messagesJSON != "[{}]") dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.messagesJSON);
+            List<Message> msg = new List<Message>();
+            conversations[friendUsername] = new Conversation(response.conversationID, conversationKey, conversationIV, response.fullMsgAmount, DecryptMessages(dirtyMessages, conversationKey));
+            //TODO: arg 4 and 5
         }
 
         public void ActivateConversation(string friendUsername) {

@@ -136,7 +136,7 @@ namespace Client.ViewModels
                     selectedFriend = value;
                     if (loadConversationThread != null) loadConversationThread.Join();
                     string friendUsernameCopy = selectedFriend.Name;
-                    loadConversationThread = new Thread(() => LoadConversationAsync(friendUsernameCopy));
+                    loadConversationThread = new Thread(() => LoadLastConversationAsync(friendUsernameCopy));
                     loadConversationThread.Start();
                 }
             }
@@ -362,8 +362,20 @@ namespace Client.ViewModels
             }
         }
 
-        private void LoadConversationAsync(string friendUsernameCopy) {
+        private void LoadConversationAsync(string friendUsernameCopy)
+        {
             if (!model.Conversations.ContainsKey(friendUsernameCopy)) model.GetConversation(friendUsernameCopy);
+            model.ActivateConversation(friendUsernameCopy);
+            activeConversation = true;
+            model.RemoveNotification(friendUsernameCopy);
+            OnPropertyChanged(nameof(Friends));
+            OnPropertyChanged(nameof(ConversationBoxVisibility));
+            OnPropertyChanged(nameof(Messages));
+        }
+
+        private void LoadLastConversationAsync(string friendUsernameCopy)
+        {
+            if (!model.Conversations.ContainsKey(friendUsernameCopy)) model.GetLastConversation(friendUsernameCopy, 15);
             model.ActivateConversation(friendUsernameCopy);
             activeConversation = true;
             model.RemoveNotification(friendUsernameCopy);

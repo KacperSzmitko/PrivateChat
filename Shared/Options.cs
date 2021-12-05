@@ -11,6 +11,7 @@ namespace Shared
         DISCONNECT = 4,                     //                                                              Error:<>$$
         GET_FRIENDS = 5,                    //                                                              Error:<>$$Data:<JSONFriend>$$
         GET_CONVERSATION = 6,               //  SecondUserName:<>                                           Error:<>$$ConversationID:<>$$ConversationKey:<>$$ConversationIV:<>$$Data:<JSONMessage>$$
+        GET_LAST_CONVERSATION = 19,         //  SecondUserName:<>$$Amount:<>                                Error:<>$$ConversationID:<>$$ConversationKey:<>$$ConversationIV:<>$$FullMsgAmount:<>$$Data:<JSONMessage>$$
         DELETE_ACCOUNT = 18,                //                                                              Error:<>$$
         // Conversation process
         ACTIVATE_CONVERSATION = 7,          //  ConversationID:<>$$                                         Error:<>$$

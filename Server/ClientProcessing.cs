@@ -202,6 +202,41 @@ namespace Server
 
         }
 
+        public (string messages, int fullMsgAmount) getSomeMessages(string allMsg, int amount, int offset)
+        {
+            List<Message> dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(allMsg);
+            List<Message> newMessage = new List<Message>();
+            for(int i=(dirtyMessages.Count - 1 - offset); i>(dirtyMessages.Count-amount-1); i--)
+            {
+                newMessage.Add(dirtyMessages[i]);
+            }
+            return (JsonConvert.SerializeObject(newMessage), dirtyMessages.Count);
+        }
+
+        public string SendLastConversation(string msg, int clientId)
+        {
+            string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
+            string secondUserName = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+            string amount = fields[1].Split(':', StringSplitOptions.RemoveEmptyEntries)[1];
+
+
+            lock (activeUsers[clientId])
+            {
+                if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
+                string username = activeUsers[clientId].userName;
+                int conversationId = activeUsers[clientId].dbConnection.GetConversationId(username, secondUserName);
+                string conversation = activeUsers[clientId].redis.GetConversation(conversationId); //TODO: Get only last
+                var partConv = getSomeMessages(conversation, Int32.Parse(amount), 0);
+                int fullMsgAmount = partConv.fullMsgAmount;
+
+                string conversationKey = activeUsers[clientId].dbConnection.GetConversationKey(conversationId, username);
+                string conversationIv = activeUsers[clientId].dbConnection.GetConversationIv(conversationId);
+                sendedConversationIds[activeUsers[clientId].userId].Add(conversationId);
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_LAST_CONVERSATION, conversationId.ToString(), conversationKey, conversationIv, fullMsgAmount.ToString(), partConv.messages);
+            }
+
+        }
+
 
 
         public string AddFriend(string msg, int clientId)
@@ -658,6 +693,7 @@ namespace Server
             functions.Add(new Functions(SendConversationKey));
             functions.Add(new Functions(SendAcceptedFriends));
             functions.Add(new Functions(DeleteAccount));
+            functions.Add(new Functions(SendLastConversation));
 
             dbMethods = new DbMethods();
             activeUsers = new List<User>();

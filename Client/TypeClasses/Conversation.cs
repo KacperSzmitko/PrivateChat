@@ -8,12 +8,24 @@ namespace Client
         public byte[] ConversationKey { get; set; }
         public byte[] ConversationIV { get; set; }
         public List<MessageItem> Messages { get; set; }
+        public int FullMsgAmount { get; set; }
 
-        public Conversation(string conversationID, byte[] conversationKey, byte[] conversationIV, List<MessageItem> messages) {
+        public Conversation(string conversationID, byte[] conversationKey, byte[] conversationIV, int fullMsgAmount, List<MessageItem> messages)
+        {
             ConversationID = conversationID;
             ConversationKey = conversationKey;
             ConversationIV = conversationIV;
             Messages = messages;
+            FullMsgAmount = fullMsgAmount;
+        }
+
+        public Conversation(string conversationID, byte[] conversationKey, byte[] conversationIV, List<MessageItem> messages)
+        {
+            ConversationID = conversationID;
+            ConversationKey = conversationKey;
+            ConversationIV = conversationIV;
+            Messages = messages;
+            FullMsgAmount = messages.Count;
         }
     }
 }
