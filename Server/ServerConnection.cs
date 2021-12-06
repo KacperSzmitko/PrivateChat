@@ -37,8 +37,13 @@ namespace Server
             TcpClient client = obj as TcpClient;
             SslStream stream = new SslStream(
                 client.GetStream(), false);
-
-            stream.AuthenticateAsServer(serverCertificate, clientCertificateRequired: false, checkCertificateRevocation: false);
+            try
+            {
+                stream.AuthenticateAsServer(serverCertificate, clientCertificateRequired: false, checkCertificateRevocation: false);
+            } catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
             int clientId = menager.AddActiveUser();
             byte[] message;
