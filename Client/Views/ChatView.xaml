@@ -144,7 +144,8 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBox Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Disabled" MaxLength="1023" FontSize="14" Text="{Binding MessageToSendText, UpdateSourceTrigger=PropertyChanged}" d:Text="Testowy tekst 12345 żółć"/>
-                        <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="&#8250;" Background="#405d9f" Command="{Binding SendMessageCommand}"/>
+                        <Button Padding="0 -13 0 0" FontSize="40" Content="&#128206;" Background="#405d9f" Command="{Binding SendMessageCommand}" Grid.ColumnSpan="2" Margin="367,0,31,0"/>
+                        <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="&#8250;" Background="#405d9f" Command="{Binding SendMessageCommand}" Margin="31,0,0,0"/>
                     </Grid>
                 </Grid>
             </Grid>
