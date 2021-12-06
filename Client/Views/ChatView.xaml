@@ -98,45 +98,59 @@
                         <RowDefinition Height="15*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <ScrollViewer Grid.Row="0" behaviors:AutoScrollBehavior.AutoScroll="True">
-                        <ItemsControl ItemsSource="{Binding Messages}" d:DataContext="{StaticResource testViewModel}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid Grid.Column="{Binding MyMessage, Converter={StaticResource boolToIntConverter}}" HorizontalAlignment="{Binding MyMessage, Converter={StaticResource boolToSideConverter}}" Margin="5 5 5 5">
+                    <ScrollViewer Grid.Row="0" behaviors:AutoScrollBehavior.AutoScroll="True" ScrollChanged="onScrollChanged" DataContextChanged="onDataChanged">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Border x:Name="LoadingBorder" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="0" Padding="10" CornerRadius="10" Width="100" Margin="10" Background="#28507B">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" FontSize="10" Text="Wczytywanie..."/>
+                            </Border>
+
+                            <ItemsControl ItemsSource="{Binding Messages}" Grid.Column="0" Grid.Row="1" d:DataContext="{StaticResource testViewModel}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="38"/>
-                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="14"/>
-                                            </Grid.RowDefinitions>
-                                            <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Padding="10" CornerRadius="10" Background="#28507B">
-                                                <!-- Message text -->
-                                                <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" FontSize="14" Text="{Binding MessageText}"/>
-                                            </Border>
-                                            <TextBlock Grid.Column="0" Grid.Row="1" Padding="5 0 0 0" TextAlignment="Left" FontSize="12" Text="{Binding Username}"/>
-                                            <TextBlock Grid.Column="1" Grid.Row="1" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding DateTime, Converter={StaticResource dateTimeToTimeStringConverter}}">
-                                                <TextBlock.ToolTip>
-                                                    <ToolTip Background="#2F4475" BorderBrush="#2F4475" Content="{Binding DateTime, Converter={StaticResource dateTimeToDateStringConverter}}"/>
-                                                </TextBlock.ToolTip>
-                                            </TextBlock>
-                                            <TextBlock Grid.Column="2" Grid.Row="1" Width="15" Padding="0 0 5 0" TextAlignment="Center" FontSize="12" Foreground="{Binding MessageStatus, Converter={StaticResource messageStatusToSymbolColorConverter}}" Text="{Binding MessageStatus, Converter={StaticResource messageStatusToSymbolConverter}}" Visibility="{Binding MessageStatus, Converter={StaticResource messageStatusToVisibilityConverter}}">
-                                                <TextBlock.ToolTip>
-                                                    <ToolTip Background="#2F4475" BorderBrush="#2F4475" Content="{Binding MessageStatus, Converter={StaticResource messageStatusToToolTipContentConverter}}"/>
-                                                </TextBlock.ToolTip>
-                                            </TextBlock>
+                                            <Grid Grid.Column="{Binding MyMessage, Converter={StaticResource boolToIntConverter}}" HorizontalAlignment="{Binding MyMessage, Converter={StaticResource boolToSideConverter}}" Margin="5 5 5 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="38"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="14"/>
+                                                </Grid.RowDefinitions>
+                                                <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Padding="10" CornerRadius="10" Background="#28507B">
+                                                    <!-- Message text -->
+                                                    <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" FontSize="14" Text="{Binding MessageText}"/>
+                                                </Border>
+                                                <TextBlock Grid.Column="0" Grid.Row="1" Padding="5 0 0 0" TextAlignment="Left" FontSize="12" Text="{Binding Username}"/>
+                                                <TextBlock Grid.Column="1" Grid.Row="1" Padding="0 0 5 0" TextAlignment="Right" FontSize="12" Text="{Binding DateTime, Converter={StaticResource dateTimeToTimeStringConverter}}">
+                                                    <TextBlock.ToolTip>
+                                                        <ToolTip Background="#2F4475" BorderBrush="#2F4475" Content="{Binding DateTime, Converter={StaticResource dateTimeToDateStringConverter}}"/>
+                                                    </TextBlock.ToolTip>
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="2" Grid.Row="1" Width="15" Padding="0 0 5 0" TextAlignment="Center" FontSize="12" Foreground="{Binding MessageStatus, Converter={StaticResource messageStatusToSymbolColorConverter}}" Text="{Binding MessageStatus, Converter={StaticResource messageStatusToSymbolConverter}}" Visibility="{Binding MessageStatus, Converter={StaticResource messageStatusToVisibilityConverter}}">
+                                                    <TextBlock.ToolTip>
+                                                        <ToolTip Background="#2F4475" BorderBrush="#2F4475" Content="{Binding MessageStatus, Converter={StaticResource messageStatusToToolTipContentConverter}}"/>
+                                                    </TextBlock.ToolTip>
+                                                </TextBlock>
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
                     </ScrollViewer>
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>

@@ -204,9 +204,20 @@ namespace Server
 
         public (string messages, int fullMsgAmount) getSomeMessages(string allMsg, int amount, int offset)
         {
+            if (allMsg == null || allMsg == "" || allMsg == "[{}]")
+            {
+                return (allMsg, 0);
+            }
             List<Message> dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(allMsg);
+            //TODO add check for empty string
+            if(dirtyMessages.Count<amount&&offset==0)
+            {
+                return (allMsg, dirtyMessages.Count);
+            }
             List<Message> newMessage = new List<Message>();
-            for(int i=(dirtyMessages.Count - 1 - offset); i>(dirtyMessages.Count-amount-1); i--)
+            int lastIndex = (dirtyMessages.Count - amount - offset);
+            if (lastIndex < 0) lastIndex = 0;
+            for (int i=(dirtyMessages.Count - 1 - offset); i>(lastIndex-1); i--)
             {
                 newMessage.Add(dirtyMessages[i]);
             }
@@ -225,7 +236,7 @@ namespace Server
                 if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
                 string username = activeUsers[clientId].userName;
                 int conversationId = activeUsers[clientId].dbConnection.GetConversationId(username, secondUserName);
-                string conversation = activeUsers[clientId].redis.GetConversation(conversationId); //TODO: Get only last
+                string conversation = activeUsers[clientId].redis.GetConversation(conversationId);
                 var partConv = getSomeMessages(conversation, Int32.Parse(amount), 0);
                 int fullMsgAmount = partConv.fullMsgAmount;
 
@@ -237,7 +248,29 @@ namespace Server
 
         }
 
+        public string SendPartConversation(string msg, int clientId)
+        {
+            string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
+            string secondUserName = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+            string amount = fields[1].Split(':', StringSplitOptions.RemoveEmptyEntries)[1];
+            string offset = fields[2].Split(':', StringSplitOptions.RemoveEmptyEntries)[1];
 
+            lock (activeUsers[clientId])
+            {
+                if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.LOGIN);
+                string username = activeUsers[clientId].userName;
+                int conversationId = activeUsers[clientId].dbConnection.GetConversationId(username, secondUserName);
+                string conversation = activeUsers[clientId].redis.GetConversation(conversationId);
+                var partConv = getSomeMessages(conversation, Int32.Parse(amount), Int32.Parse(offset));
+                int fullMsgAmount = partConv.fullMsgAmount;
+
+                string conversationKey = activeUsers[clientId].dbConnection.GetConversationKey(conversationId, username);
+                string conversationIv = activeUsers[clientId].dbConnection.GetConversationIv(conversationId);
+                //sendedConversationIds[activeUsers[clientId].userId].Add(conversationId);
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_PART_CONVERSATION, conversationId.ToString(), conversationKey, conversationIv, fullMsgAmount.ToString(), partConv.messages);
+            }
+
+        }
 
         public string AddFriend(string msg, int clientId)
         {
@@ -694,6 +727,7 @@ namespace Server
             functions.Add(new Functions(SendAcceptedFriends));
             functions.Add(new Functions(DeleteAccount));
             functions.Add(new Functions(SendLastConversation));
+            functions.Add(new Functions(SendPartConversation));
 
             dbMethods = new DbMethods();
             activeUsers = new List<User>();

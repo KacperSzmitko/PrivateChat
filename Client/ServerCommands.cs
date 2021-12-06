@@ -79,6 +79,11 @@ namespace Client
                         result += AddField("SecondUserName", fields[0]);
                         result += AddField("Amount", fields[1]);
                         break;
+                    case 20:
+                        result += AddField("SecondUserName", fields[0]);
+                        result += AddField("Amount", fields[1]);
+                        result += AddField("Offset", fields[2]);
+                        break;
 
                     default: throw new ArgumentException("Invalid option!");
                 }
@@ -236,6 +241,14 @@ namespace Client
         public static (int error, string conversationID, string conversationKey, string conversationIV, int fullMsgAmount, string messagesJSON) GetLastConversationCommand(ref ServerConnection connection, string username, int amount)
         {
             string command = CreateClientMessage((int)Options.GET_LAST_CONVERSATION, username, amount.ToString());
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "", "", "", 0, "");
+            return (Int32.Parse(args[0]), args[1], args[2], args[3], Int32.Parse(args[4]), args[5]);
+        }
+
+        public static (int error, string conversationID, string conversationKey, string conversationIV, int fullMsgAmount, string messagesJSON) GetMoreConversationCommand(ref ServerConnection connection, string username, int amount, int offset)
+        {
+            string command = CreateClientMessage((int)Options.GET_PART_CONVERSATION, username, amount.ToString(), offset.ToString());
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "", "", "", 0, "");
             return (Int32.Parse(args[0]), args[1], args[2], args[3], Int32.Parse(args[4]), args[5]);

@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Client.Behaviors;
+using Client.ViewModels;
+using Client.Views;
+using Newtonsoft.Json;
 using Org.BouncyCastle.Crypto.Parameters;
 using Shared;
 using System;
@@ -6,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Client.Models
 {
@@ -187,6 +191,7 @@ namespace Client.Models
 
         public int AddUserMessageToConversation(string friendUsername, string messageToSendText) {
             conversations[friendUsername].Messages.Add(new MessageItem(username, messageToSendText, DateTime.Now, true));
+            conversations[friendUsername].FullMsgAmount++;
             return conversations[friendUsername].Messages.Count - 1;
         }
 
@@ -199,6 +204,7 @@ namespace Client.Models
             byte[] conversationKey = Security.AESDecrypt(encryptedConversationKey, userKey, conversationIV);
             List<Message> dirtyMessages = new List<Message>();
             if (response.messagesJSON != null && response.messagesJSON != "" && response.messagesJSON != "[{}]") dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.messagesJSON);
+            dirtyMessages.Reverse();
             conversations[friendUsername] = new Conversation(response.conversationID, conversationKey, conversationIV, DecryptMessages(dirtyMessages, conversationKey));
         }
 
@@ -211,9 +217,37 @@ namespace Client.Models
             byte[] conversationKey = Security.AESDecrypt(encryptedConversationKey, userKey, conversationIV);
             List<Message> dirtyMessages = new List<Message>();
             if (response.messagesJSON != null && response.messagesJSON != "" && response.messagesJSON != "[{}]") dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.messagesJSON);
-            List<Message> msg = new List<Message>();
+            
+            if (response.fullMsgAmount == dirtyMessages.Count)
+                ChatView.showLoadMoreSet(false);
+            else
+                ChatView.showLoadMoreSet(true);
+            dirtyMessages.Reverse();
             conversations[friendUsername] = new Conversation(response.conversationID, conversationKey, conversationIV, response.fullMsgAmount, DecryptMessages(dirtyMessages, conversationKey));
-            //TODO: arg 4 and 5
+        }
+
+        public void GetMoreConversation(string friendUsername, int amount) //TODO finish
+        {
+            int amountOfMsgNow = conversations[friendUsername].Messages.Count;
+            var response = ServerCommands.GetMoreConversationCommand(ref connection, friendUsername, amount, amountOfMsgNow);
+            if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
+            byte[] encryptedConversationKey = Security.HexStringToByteArray(response.conversationKey);
+            byte[] conversationIV = Security.HexStringToByteArray(response.conversationIV);
+            byte[] conversationKey = Security.AESDecrypt(encryptedConversationKey, userKey, conversationIV);
+            List<Message> dirtyMessages = new List<Message>();
+            if (response.messagesJSON != null && response.messagesJSON != "" && response.messagesJSON != "[{}]") dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.messagesJSON);
+            
+            if (response.fullMsgAmount == (conversations[friendUsername].Messages.Count+dirtyMessages.Count))
+                ChatView.showLoadMoreSet(false);
+            else
+                ChatView.showLoadMoreSet(true);
+
+            //Thread.Sleep(500);
+
+            dirtyMessages.Reverse();
+            AutoScrollBehavior.disableAutoScrollForOneOp();
+            conversations[friendUsername].Messages.InsertRange(0, DecryptMessages(dirtyMessages, conversationKey));
+            ChatViewModel.loadingMoreConversationFinished();
         }
 
         public void ActivateConversation(string friendUsername) {
@@ -227,6 +261,7 @@ namespace Client.Models
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             List<Message> dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.newMessegesJSON);
             byte[] conversationKey = conversations[friendUsername].ConversationKey;
+            conversations[friendUsername].FullMsgAmount = conversations[friendUsername].FullMsgAmount + dirtyMessages.Count;
             conversations[friendUsername].Messages.AddRange(DecryptMessages(dirtyMessages, conversationKey));
             return true;
         }

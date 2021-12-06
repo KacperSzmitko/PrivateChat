@@ -13,7 +13,7 @@ namespace DbLibrary
         protected string password;
         public DbConnection()
         {
-            server = ConfigurationManager.AppSettings.Get("db-ip");
+            server = ConfigurationManager.AppSettings.Get("db-addr");
             database = ConfigurationManager.AppSettings.Get("db-name");
             uid = ConfigurationManager.AppSettings.Get("db-username");
             password = ConfigurationManager.AppSettings.Get("db-password");

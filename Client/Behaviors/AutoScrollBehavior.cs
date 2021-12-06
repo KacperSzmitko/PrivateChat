@@ -5,6 +5,8 @@ namespace Client.Behaviors
 {
     public static class AutoScrollBehavior
     {
+        private static bool disableOnce = false;
+
         public static readonly DependencyProperty AutoScrollProperty = DependencyProperty.RegisterAttached("AutoScroll", typeof(bool), typeof(AutoScrollBehavior), new PropertyMetadata(false, AutoScrollPropertyChanged));
 
         public static void AutoScrollPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args) {
@@ -18,8 +20,18 @@ namespace Client.Behaviors
             }
         }
 
+        public static void disableAutoScrollForOneOp()
+        {
+            disableOnce = true;
+        }
+
         private static void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e) {
-            if (e.ExtentHeightChange != 0) {
+            if(disableOnce)
+            {
+                disableOnce = false;
+                return;
+            }
+            if (e.ExtentHeightChange != 0 && ((e.ExtentHeight - e.ViewportHeight - 300) < e.VerticalOffset)) {
                 var scrollViewer = sender as ScrollViewer;
                 scrollViewer?.ScrollToBottom();
             }

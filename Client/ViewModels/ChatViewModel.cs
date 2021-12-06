@@ -1,5 +1,6 @@
 ﻿using Client.Commands;
 using Client.Models;
+using Client.Views;
 using Newtonsoft.Json;
 using Shared;
 using System;
@@ -12,7 +13,11 @@ namespace Client.ViewModels
 {
     public class ChatViewModel : BaseViewModel
     {
+        private static Boolean loadMoreConversation = false;
+        private static Boolean loadingMoreConversation = false;
+
         private const int baseRefreshRate = 200;
+        private const int messageLoadingAmount = 15;
 
         private ChatModel model;
 
@@ -375,13 +380,48 @@ namespace Client.ViewModels
 
         private void LoadLastConversationAsync(string friendUsernameCopy)
         {
-            if (!model.Conversations.ContainsKey(friendUsernameCopy)) model.GetLastConversation(friendUsernameCopy, 15);
+            if (!model.Conversations.ContainsKey(friendUsernameCopy)) {
+                model.GetLastConversation(friendUsernameCopy, messageLoadingAmount);
+                var actConv = model.Conversations[friendUsernameCopy];
+                if (actConv.Messages.Count == actConv.FullMsgAmount)
+                    ChatView.showLoadMoreSet(false);
+                else
+                    ChatView.showLoadMoreSet(true);
+            } else
+            {
+                var actConv = model.Conversations[friendUsernameCopy];
+                if (actConv.Messages.Count == actConv.FullMsgAmount)
+                    ChatView.showLoadMoreSet(false);
+                else
+                    ChatView.showLoadMoreSet(true);
+            }
             model.ActivateConversation(friendUsernameCopy);
             activeConversation = true;
             model.RemoveNotification(friendUsernameCopy);
             OnPropertyChanged(nameof(Friends));
             OnPropertyChanged(nameof(ConversationBoxVisibility));
             OnPropertyChanged(nameof(Messages));
+
+            //TODO: Scroll to bottom
+        }
+
+        public static void setLoadMore()
+        {
+            loadMoreConversation = true;
+        }
+
+        public void LoadMoreConversationAsync() //TODO Execute when reach up
+        {
+            string friendUsernameCopy = selectedFriend.Name;
+            model.GetMoreConversation(friendUsernameCopy, messageLoadingAmount);
+            OnPropertyChanged(nameof(Friends));
+            OnPropertyChanged(nameof(ConversationBoxVisibility));
+            OnPropertyChanged(nameof(Messages));
+        }
+
+        public static void loadingMoreConversationFinished()
+        {
+            loadingMoreConversation = false;
         }
 
         private void SendMessageAsync(string friendUsernameCopy, string messageToSendTextCopy) {
@@ -429,6 +469,15 @@ namespace Client.ViewModels
                 if (activeConversation) {
                     if (model.GetMessages(selectedFriend.Name)) {
                         OnPropertyChanged(nameof(Messages));
+                    }
+                }
+                if(loadMoreConversation)
+                {
+                    if (!loadingMoreConversation)
+                    {
+                        loadingMoreConversation = true;
+                        loadMoreConversation = false;
+                        LoadMoreConversationAsync();
                     }
                 }
 

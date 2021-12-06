@@ -28,7 +28,7 @@ namespace Server
                     {
                         AddFields(new[] { "ConversationKey", "ConversationID", "ConversationIv", "Data" }, ref result, fields);
                     }
-                    else if (option == Options.GET_LAST_CONVERSATION)
+                    else if (option == Options.GET_LAST_CONVERSATION || option == Options.GET_PART_CONVERSATION)
                     {
                         AddFields(new[] { "ConversationKey", "ConversationID", "ConversationIv", "FullMsgAmount", "Data" }, ref result, fields);
                     }
