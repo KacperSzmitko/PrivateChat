@@ -19,9 +19,15 @@ namespace Client.Views
     {
         private static Boolean showLoadMore = false;
         private static Boolean loadingMore = false;
+        private static Boolean showNewMessageInform = false;
         private static double actualFullHeight = 0;
         public ChatView() {
             InitializeComponent();
+        }
+
+        public static void showNewMessageInfo(Boolean show)
+        {
+            showNewMessageInform = show;
         }
 
         private void ScrollViewer_Scroll(object sender, System.Windows.Controls.Primitives.ScrollEventArgs e) {
@@ -36,7 +42,6 @@ namespace Client.Views
         private void onScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             ScrollViewer sv = (ScrollViewer)sender;
-
 
             if (showLoadMore)
             {
@@ -78,6 +83,18 @@ namespace Client.Views
             {
                 sv.ScrollToVerticalOffset(sv.ExtentHeight - actualFullHeight);
                 loadingMore = false;
+            }
+
+            if((e.ExtentHeight - e.ViewportHeight - 300) < e.VerticalOffset)
+            {
+                showNewMessageInform = false;
+                NewMessages.Visibility = Visibility.Collapsed;
+            } else
+            {
+                if (showNewMessageInform)
+                {
+                    NewMessages.Visibility = Visibility.Visible;
+                }
             }
             
         }

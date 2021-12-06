@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Client.Views;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Client.Behaviors
@@ -34,6 +35,9 @@ namespace Client.Behaviors
             if (e.ExtentHeightChange != 0 && ((e.ExtentHeight - e.ViewportHeight - 300) < e.VerticalOffset)) {
                 var scrollViewer = sender as ScrollViewer;
                 scrollViewer?.ScrollToBottom();
+            } else
+            {
+                //ChatView.showNewMessageInfo(true);
             }
         }
 

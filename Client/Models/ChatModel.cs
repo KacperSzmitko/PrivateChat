@@ -261,6 +261,8 @@ namespace Client.Models
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             List<Message> dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.newMessegesJSON);
             byte[] conversationKey = conversations[friendUsername].ConversationKey;
+            if(dirtyMessages.Count>0)
+                ChatView.showNewMessageInfo(true);
             conversations[friendUsername].FullMsgAmount = conversations[friendUsername].FullMsgAmount + dirtyMessages.Count;
             conversations[friendUsername].Messages.AddRange(DecryptMessages(dirtyMessages, conversationKey));
             return true;
