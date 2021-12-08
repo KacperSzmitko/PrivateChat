@@ -209,15 +209,14 @@ namespace Server
                 return (allMsg, 0);
             }
             List<Message> dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(allMsg);
-            //TODO add check for empty string
-            if(dirtyMessages.Count<amount&&offset==0)
+            if (dirtyMessages.Count<amount&&offset==0)
             {
                 return (allMsg, dirtyMessages.Count);
             }
             List<Message> newMessage = new List<Message>();
             int lastIndex = (dirtyMessages.Count - amount - offset);
             if (lastIndex < 0) lastIndex = 0;
-            for (int i=(dirtyMessages.Count - 1 - offset); i>(lastIndex-1); i--)
+            for (int i= (lastIndex); i<(dirtyMessages.Count - offset); i++)
             {
                 newMessage.Add(dirtyMessages[i]);
             }

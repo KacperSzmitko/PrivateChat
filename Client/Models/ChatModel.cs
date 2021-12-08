@@ -204,7 +204,6 @@ namespace Client.Models
             byte[] conversationKey = Security.AESDecrypt(encryptedConversationKey, userKey, conversationIV);
             List<Message> dirtyMessages = new List<Message>();
             if (response.messagesJSON != null && response.messagesJSON != "" && response.messagesJSON != "[{}]") dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.messagesJSON);
-            dirtyMessages.Reverse();
             conversations[friendUsername] = new Conversation(response.conversationID, conversationKey, conversationIV, DecryptMessages(dirtyMessages, conversationKey));
         }
 
@@ -222,7 +221,6 @@ namespace Client.Models
                 ChatView.showLoadMoreSet(false);
             else
                 ChatView.showLoadMoreSet(true);
-            dirtyMessages.Reverse();
             conversations[friendUsername] = new Conversation(response.conversationID, conversationKey, conversationIV, response.fullMsgAmount, DecryptMessages(dirtyMessages, conversationKey));
         }
 
@@ -241,10 +239,6 @@ namespace Client.Models
                 ChatView.showLoadMoreSet(false);
             else
                 ChatView.showLoadMoreSet(true);
-
-            //Thread.Sleep(500);
-
-            dirtyMessages.Reverse();
             AutoScrollBehavior.disableAutoScrollForOneOp();
             conversations[friendUsername].Messages.InsertRange(0, DecryptMessages(dirtyMessages, conversationKey));
             ChatViewModel.loadingMoreConversationFinished();
