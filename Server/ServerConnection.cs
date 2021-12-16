@@ -16,7 +16,7 @@ namespace Server
 
 
         public void RunServer() {
-            serverCertificate = new X509Certificate2("certServer.pfx", "+kTQ2U_MG[((3}dM", X509KeyStorageFlags.MachineKeySet);
+            serverCertificate = new X509Certificate2("D:/Pobrane/certServer.pfx", "+kTQ2U_MG[((3}dM", X509KeyStorageFlags.MachineKeySet);
             // Create a TCP/IP (IPv4) socket and listen for incoming connections.
             TcpListener listener = new TcpListener(IPAddress.Any, 13579);
             listener.Start();

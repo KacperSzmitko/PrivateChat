@@ -1,5 +1,6 @@
 ﻿using Client.Commands;
 using Client.Models;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using Shared;
 using System;
@@ -29,6 +30,7 @@ namespace Client.ViewModels
         private RelayCommand sendMessageCommand;
         private RelayCommand logoutCommand;
         private RelayCommand deleteAccountCommand;
+        private RelayCommand openAttachmentCommand;
 
         private InvitationStatuses lastInvitationStatus;
         private Invitation lastRecivedInvitation;
@@ -187,6 +189,24 @@ namespace Client.ViewModels
                     });
                 }
                 return declineInvitationCommand;
+            }
+        }
+
+        public ICommand OpenAttachmentCommand
+        {
+            get
+            {
+                //Jeśli komenda jest równa null
+                if (openAttachmentCommand == null)
+                {
+                    openAttachmentCommand = new RelayCommand(_ => {
+                        OpenFileDialog openFileDialog = new OpenFileDialog();
+                        if (openFileDialog.ShowDialog() == true) Console.WriteLine("TEST");
+                            
+                    });
+                }
+                //Zwróć obiekt RelayCommand
+                return openAttachmentCommand;
             }
         }
 
