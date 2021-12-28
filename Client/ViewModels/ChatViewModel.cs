@@ -42,20 +42,6 @@ namespace Client.ViewModels
         private string messageToSendText;
         private bool activeConversation;
         private bool keepUpdating;
-        private Image Image1;
-        public string imageURI;
-        public string ImageURI
-        {
-            get
-            {
-                return imageURI;
-            }
-            set
-            {
-                imageURI = value;
-                this.OnPropertyChanged("ImageURI");
-            }
-        }
 
         public string Username { get { return model.Username; } }
 
@@ -216,12 +202,7 @@ namespace Client.ViewModels
                 if (openAttachmentCommand == null)
                 {
                     openAttachmentCommand = new RelayCommand(_ => {
-                        OpenFileDialog openFileDialog = new OpenFileDialog();
-                        if (openFileDialog.ShowDialog() == true) {
-                            imageURI = openFileDialog.FileName;
-                            OnPropertyChanged(nameof(imageURI));
-                        };
-                            
+                        navigator.CurrentViewModel = new AttachmentViewModel(connection,navigator);  
                     });
                 }
                 //Zwróć obiekt RelayCommand
@@ -286,12 +267,12 @@ namespace Client.ViewModels
             }
         }
 
-        public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey) : base(connection, navigator) {
+        public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey) : base(connection, navigator)
+        {
             this.model = new ChatModel(connection, username, userKey);
             this.lastInvitationStatus = InvitationStatuses.NO_INVITATION;
             this.lastRecivedInvitation = null;
             this.selectedFriend = null;
-            this.imageURI = "";
             this.invitationUsername = "";
             this.messageToSendText = "";
             this.activeConversation = false;

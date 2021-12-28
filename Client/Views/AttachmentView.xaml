@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="Client.Views.AttachmentView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Height="680" Width="600"
+             Background="White">
+    
+    <Border Padding="110 0 110 0">
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock FontWeight="Bold" FontSize="30" TextAlignment="Center" Text="Załączniki"/>
+
+
+            <Image Margin="0 25 0 0"  Name="Image1" Source="{Binding ImageURI, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left"/>
+            <Button Margin="0 25 0 0" Padding="3" FontWeight="Bold" FontSize="22" Content="Otwórz" Command="{Binding OpenAttachmentCommand}"/>
+            <Button Margin="0 25 0 0" Padding="3" FontWeight="Bold" FontSize="22" Content="Powrót" Command="{Binding GoBackCommand}"/>
+
+        </StackPanel>
+    </Border>
+</UserControl>
