@@ -6,15 +6,37 @@
              mc:Ignorable="d" 
              Height="680" Width="600"
              Background="White">
-    
+
     <Border Padding="110 0 110 0">
         <StackPanel VerticalAlignment="Center">
-            <TextBlock FontWeight="Bold" FontSize="30" TextAlignment="Center" Text="Załączniki"/>
+            <TextBlock FontWeight="Bold" FontSize="30" TextAlignment="Center" Text="Załączniki" Height="89"/>
+            <Grid Margin="10">
+                <ListBox Name="lbUsers" ItemsSource="{Binding SampleFiles}"/>
+            </Grid>
 
 
-            <Image Margin="0 25 0 0"  Name="Image1" Source="{Binding ImageURI, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left"/>
-            <Button Margin="0 25 0 0" Padding="3" FontWeight="Bold" FontSize="22" Content="Otwórz" Command="{Binding OpenAttachmentCommand}"/>
-            <Button Margin="0 25 0 0" Padding="3" FontWeight="Bold" FontSize="22" Content="Powrót" Command="{Binding GoBackCommand}"/>
+
+            <Image Margin="0 25 0 0"  x:Name="Image1" Source="{Binding ImageURI, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left"/>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="6*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="📎" Background="#405d9f" Command="{Binding OpenAttachmentCommand}" Margin="11,22,46,-23" RenderTransformOrigin="0.525,0.957" Grid.ColumnSpan="2"/>
+                <Button Grid.Column="2" Padding="0 -13 0 0" FontSize="40" Content="›" Background="#405d9f" Command="{Binding SendMessageCommand}" Margin="2,22,-2,-23"/>
+                <TextBox Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Disabled" MaxLength="1023" FontSize="14" Text="{Binding MessageToSendText, UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2" Margin="0,22,36,-23"/>
+            </Grid>
+            <Button Margin="0 25 0 0" Padding="3" FontWeight="Bold" FontSize="22" Content="Powrót" Command="{Binding GoBackCommand}" Width="112" RenderTransformOrigin="0.5,0.5">
+                <Button.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform Angle="-0.607"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Button.RenderTransform>
+            </Button>
 
         </StackPanel>
     </Border>

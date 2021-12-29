@@ -1,9 +1,7 @@
 ﻿using Client.Commands;
-using Client.Models;
 using Microsoft.Win32;
-using Shared;
-using System;
-using System.Threading;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows.Input;
 
 namespace Client.ViewModels
@@ -12,6 +10,20 @@ namespace Client.ViewModels
     {
         private RelayCommand goLoginCommand;
         private RelayCommand openAttachmentCommand;
+        ObservableCollection<string> files = new ObservableCollection<string>();
+        public ObservableCollection<string> SampleFiles
+        {
+            get
+            {
+                if (files.Count <= 0)
+                {
+                    files.Add("File #1");
+                    files.Add("File #2");
+                    files.Add("File #3");
+                }
+                return files;
+            }
+        }
 
         public string imageURI;
         public string ImageURI
@@ -45,12 +57,12 @@ namespace Client.ViewModels
                 if (openAttachmentCommand == null)
                 {
                     openAttachmentCommand = new RelayCommand(_ => {
-                        navigator.CurrentViewModel = new AttachmentViewModel(connection, navigator);
                         OpenFileDialog openFileDialog = new OpenFileDialog();
                         if (openFileDialog.ShowDialog() == true)
                         {
                             imageURI = openFileDialog.FileName;
                             OnPropertyChanged(nameof(imageURI));
+                            files.Add(openFileDialog.FileName);
                         };
 
                     });
