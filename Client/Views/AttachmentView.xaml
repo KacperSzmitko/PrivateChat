@@ -11,7 +11,7 @@
         <StackPanel VerticalAlignment="Center" Height="500">
             <TextBlock FontWeight="Bold" FontSize="30" TextAlignment="Center" Text="Załączniki" Height="100"/>
 
-            <ListBox Name="lbUsers" Height="200"  ItemsSource="{Binding SampleFiles}">
+            <ListBox Name="lbUsers" Height="200"  ItemsSource="{Binding Attachments}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>

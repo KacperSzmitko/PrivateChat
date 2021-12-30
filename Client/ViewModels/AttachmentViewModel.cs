@@ -10,9 +10,19 @@ namespace Client.ViewModels
     public class AttachmentViewModel : BaseViewModel
     {
         private LoginModel model;
+        private AttachmentModel attachmentModel;
+
         private RelayCommand goLoginCommand;
         private RelayCommand openAttachmentCommand;
         ObservableCollection<Attachment> attachments = new ObservableCollection<Attachment>();
+
+        public ObservableCollection<Attachment> Attachments
+        {
+            get
+            {
+                return new ObservableCollection<Attachment>(attachmentModel.Attachments);
+            }
+        }
         public ObservableCollection<Attachment> SampleFiles
         {
             get
@@ -58,7 +68,8 @@ namespace Client.ViewModels
                         {
                             imageURI = openFileDialog.FileName;
                             OnPropertyChanged(nameof(imageURI));
-                            attachments.Add(new Attachment(openFileDialog.FileName));
+                            attachmentModel.Attachments.Add(new Attachment(openFileDialog.FileName));
+                            OnPropertyChanged("Attachments");
                         };
 
                     });
@@ -70,6 +81,7 @@ namespace Client.ViewModels
 
         public AttachmentViewModel(ServerConnection connection, Navigator navigator) : base(connection, navigator) {
             this.imageURI = "";
+            this.attachmentModel = new AttachmentModel(connection);
         }
     }
 }
