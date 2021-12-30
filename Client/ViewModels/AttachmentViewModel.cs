@@ -1,4 +1,5 @@
 ﻿using Client.Commands;
+using Client.Models;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,20 +9,15 @@ namespace Client.ViewModels
 {
     public class AttachmentViewModel : BaseViewModel
     {
+        private LoginModel model;
         private RelayCommand goLoginCommand;
         private RelayCommand openAttachmentCommand;
-        ObservableCollection<string> files = new ObservableCollection<string>();
-        public ObservableCollection<string> SampleFiles
+        ObservableCollection<Attachment> attachments = new ObservableCollection<Attachment>();
+        public ObservableCollection<Attachment> SampleFiles
         {
             get
             {
-                if (files.Count <= 0)
-                {
-                    files.Add("File #1");
-                    files.Add("File #2");
-                    files.Add("File #3");
-                }
-                return files;
+                return attachments;
             }
         }
 
@@ -62,7 +58,7 @@ namespace Client.ViewModels
                         {
                             imageURI = openFileDialog.FileName;
                             OnPropertyChanged(nameof(imageURI));
-                            files.Add(openFileDialog.FileName);
+                            attachments.Add(new Attachment(openFileDialog.FileName));
                         };
 
                     });

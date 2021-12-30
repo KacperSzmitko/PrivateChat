@@ -9,6 +9,8 @@ namespace Client
         public byte[] ConversationIV { get; set; }
         public List<MessageItem> Messages { get; set; }
 
+        public List<Attachment> Attachments { get; set; }
+
         public Conversation(string conversationID, byte[] conversationKey, byte[] conversationIV, List<MessageItem> messages) {
             ConversationID = conversationID;
             ConversationKey = conversationKey;
