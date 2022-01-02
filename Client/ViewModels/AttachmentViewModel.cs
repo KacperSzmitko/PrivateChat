@@ -9,7 +9,7 @@ namespace Client.ViewModels
 {
     public class AttachmentViewModel : BaseViewModel
     {
-        private LoginModel model;
+        private ChatModel model;
         private AttachmentModel attachmentModel;
 
         private RelayCommand goLoginCommand;
@@ -21,13 +21,6 @@ namespace Client.ViewModels
             get
             {
                 return new ObservableCollection<Attachment>(attachmentModel.Attachments);
-            }
-        }
-        public ObservableCollection<Attachment> SampleFiles
-        {
-            get
-            {
-                return attachments;
             }
         }
 
@@ -48,7 +41,7 @@ namespace Client.ViewModels
             get {
                 if (goLoginCommand == null) {
                     goLoginCommand = new RelayCommand(_ => {
-                        navigator.CurrentViewModel = new LoginViewModel(connection, navigator);
+                        navigator.CurrentViewModel = new ChatViewModel(connection, navigator, model.Username, model.UserKey);
                     }, _ => true);
                 }
                 return goLoginCommand;
@@ -79,9 +72,10 @@ namespace Client.ViewModels
             }
         }
 
-        public AttachmentViewModel(ServerConnection connection, Navigator navigator) : base(connection, navigator) {
+        public AttachmentViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey) : base(connection, navigator) {
             this.imageURI = "";
             this.attachmentModel = new AttachmentModel(connection);
+            this.model = new ChatModel(connection, username, userKey);
         }
     }
 }

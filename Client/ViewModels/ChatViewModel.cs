@@ -202,7 +202,7 @@ namespace Client.ViewModels
                 if (openAttachmentCommand == null)
                 {
                     openAttachmentCommand = new RelayCommand(_ => {
-                        navigator.CurrentViewModel = new AttachmentViewModel(connection,navigator);  
+                        navigator.CurrentViewModel = new AttachmentViewModel(connection,navigator, model.Username, model.UserKey);  
                     });
                 }
                 //Zwróć obiekt RelayCommand
