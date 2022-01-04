@@ -129,14 +129,16 @@ namespace Client.ViewModels
                 {
                     downloadFileCommand = new RelayCommand(_ =>
                     {
-                        SaveFileDialog saveFileDialog = new SaveFileDialog();
-                        saveFileDialog.FileName = selectedAttachment.Name;
-                        if (saveFileDialog.ShowDialog() == true)
+                        if (!(selectedAttachment == null || selectedAttachment.Name.Length < 1))
                         {
-                            sendAttachmentThread = new Thread(() => GetAttachmentAsync(selectedAttachment.attachmentID.ToString(), saveFileDialog.FileName));
-                            sendAttachmentThread.Start();
-                        };
-
+                            SaveFileDialog saveFileDialog = new SaveFileDialog();
+                            saveFileDialog.FileName = selectedAttachment.Name;
+                            if (saveFileDialog.ShowDialog() == true)
+                            {
+                                sendAttachmentThread = new Thread(() => GetAttachmentAsync(selectedAttachment.attachmentID.ToString(), saveFileDialog.FileName));
+                                sendAttachmentThread.Start();
+                            };
+                        }
                     });
                 }
                 return downloadFileCommand;
