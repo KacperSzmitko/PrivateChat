@@ -20,7 +20,7 @@ namespace Client.ViewModels
         private const int baseRefreshRate = 150;
 
         private Boolean keepUpdating = true;
-        private const long MAX_FILE_SIZE = 3 * 1024 * 1024;
+        private const long MAX_FILE_SIZE = 512 * 1024;
 
         private Thread sendAttachmentThread;
 
