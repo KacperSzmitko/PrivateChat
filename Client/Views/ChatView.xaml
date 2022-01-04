@@ -98,6 +98,7 @@
                         <RowDefinition Height="15*"/>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <ScrollViewer Grid.Row="0" behaviors:AutoScrollBehavior.AutoScroll="True" ScrollChanged="onScrollChanged" DataContextChanged="onDataChanged">
                         <Grid>
@@ -162,9 +163,20 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="6*"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Disabled" MaxLength="1023" FontSize="14" Text="{Binding MessageToSendText, UpdateSourceTrigger=PropertyChanged}" d:Text="Testowy tekst 12345 żółć"/>
-                        <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="&#8250;" Background="#405d9f" Command="{Binding SendMessageCommand}"/>
+                        <TextBlock Grid.Column="0" Margin="0 0 0 0" FontSize="14" HorizontalAlignment="Center" Visibility="{Binding InvitationSentInfoVisibility}" d:Visibility="Hidden"><Run Text="Wysłano zaproszenie"/></TextBlock>
+                        <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="+" Background="#405d9f" Command="{Binding OpenAttachmentCommand}" Margin="10,0,0,0"/>
+                        <Button Grid.Column="2" Padding="0 -13 0 0" FontSize="40" Content="›" Background="#405d9f" Command="{Binding SendMessageCommand}" Margin="0,0,0,0"/>
+                        <TextBox Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Disabled" MaxLength="1023" FontSize="14" Text="{Binding MessageToSendText, UpdateSourceTrigger=PropertyChanged}" d:Text="Testowy tekst 12345 żółć" Grid.ColumnSpan="2" Margin="0,0,36,0"/>
+                    </Grid>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="6*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Name="Image1" Source="{Binding ImageURI, UpdateSourceTrigger=PropertyChanged}" Grid.Column="0" HorizontalAlignment="Left"/>
                     </Grid>
                 </Grid>
             </Grid>

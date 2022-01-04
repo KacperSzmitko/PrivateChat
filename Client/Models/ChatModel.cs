@@ -30,7 +30,8 @@ namespace Client.Models
         public List<Invitation> ReceivedInvitations { get { return receivedInvitations; } set { receivedInvitations = value; } }
         public Dictionary<string, Conversation> Conversations { get { return conversations; } set { conversations = value; } }
 
-        public ChatModel(ServerConnection connection, string username, byte[] userKey) : base(connection) {
+        public ChatModel(ServerConnection connection, string username, byte[] userKey) : base(connection)
+        {
             this.username = username;
             this.userKey = userKey;
             this.userPath = Path.Combine(appLocalDataFolderPath, username);

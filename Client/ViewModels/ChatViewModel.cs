@@ -1,5 +1,6 @@
 ﻿using Client.Commands;
 using Client.Models;
+using Microsoft.Win32;
 using Client.Views;
 using Newtonsoft.Json;
 using Shared;
@@ -7,7 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 namespace Client.ViewModels
 {
@@ -34,6 +37,7 @@ namespace Client.ViewModels
         private RelayCommand sendMessageCommand;
         private RelayCommand logoutCommand;
         private RelayCommand deleteAccountCommand;
+        private RelayCommand openAttachmentCommand;
 
         private InvitationStatuses lastInvitationStatus;
         private Invitation lastRecivedInvitation;
@@ -195,6 +199,22 @@ namespace Client.ViewModels
             }
         }
 
+        public ICommand OpenAttachmentCommand
+        {
+            get
+            {
+                //Jeśli komenda jest równa null
+                if (openAttachmentCommand == null)
+                {
+                    openAttachmentCommand = new RelayCommand(_ => {
+                        navigator.CurrentViewModel = new AttachmentViewModel(connection,navigator, model.Username, model.UserKey);  
+                    });
+                }
+                //Zwróć obiekt RelayCommand
+                return openAttachmentCommand;
+            }
+        }
+
         public ICommand SendMessageCommand {
             get {
                 //Jeśli komenda jest równa null
@@ -252,7 +272,8 @@ namespace Client.ViewModels
             }
         }
 
-        public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey) : base(connection, navigator) {
+        public ChatViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey) : base(connection, navigator)
+        {
             this.model = new ChatModel(connection, username, userKey);
             this.lastInvitationStatus = InvitationStatuses.NO_INVITATION;
             this.lastRecivedInvitation = null;

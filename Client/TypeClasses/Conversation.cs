@@ -19,8 +19,9 @@ namespace Client
             FullMsgAmount = fullMsgAmount;
         }
 
-        public Conversation(string conversationID, byte[] conversationKey, byte[] conversationIV, List<MessageItem> messages)
-        {
+        public List<Attachment> Attachments { get; set; }
+
+        public Conversation(string conversationID, byte[] conversationKey, byte[] conversationIV, List<MessageItem> messages) {
             ConversationID = conversationID;
             ConversationKey = conversationKey;
             ConversationIV = conversationIV;
