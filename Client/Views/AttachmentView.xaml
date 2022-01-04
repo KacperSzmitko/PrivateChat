@@ -43,9 +43,9 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0" Padding="0 -13 0 0" FontSize="40" Content="📎" Background="#405d9f" Command="{Binding OpenAttachmentCommand}" Margin="11,22,46,-23" RenderTransformOrigin="0.525,0.957" Grid.ColumnSpan="2"/>
-                <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="↑" Background="#405d9f" Command="{Binding UploadFileCommand}" Margin="2,22,-2,-23" Click="Button_Click"/>
-                <Button Grid.Column="2" Padding="0 -13 0 0"  FontWeight="Bold" FontSize="22" Content="Powrót" Command="{Binding GoBackCommand}"  Margin="173,22,0,-23" Grid.ColumnSpan="2"/>
-                <Button Grid.Column="2" Padding="0 -13 0 0" FontSize="40" Content="↓" Background="#405d9f" Command="{Binding DownloadFileCommand}" Margin="10,22,153,-23" Click="Button_Click"/>
+                <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="↑" Background="#405d9f" Command="{Binding UploadFileCommand}" Margin="16,22,201,-23" Click="Button_Click" Grid.ColumnSpan="2"/>
+                <Button Grid.Column="2" Padding="0 -13 0 0"  FontWeight="Bold" FontSize="30" Content="&#171; Wróć" Command="{Binding GoBackCommand}"  Margin="155,22,0,-23" Grid.ColumnSpan="2"/>
+                <Button Grid.Column="2" Padding="0 -13 0 0" FontSize="40" Content="↓" Background="#405d9f" Command="{Binding DownloadFileCommand}" Margin="16,22,147,-23" Click="Button_Click"/>
             </Grid>
 
 
