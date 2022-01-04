@@ -11,5 +11,6 @@
     <add key="server-port" value="12345" />
     <add key="server-cert-location" value="cert.pfx" />
     <add key="server-cert-password" value="password" />
+    <add key="server-attachment-storage" value="attachments" />
   </appSettings>
 </configuration>

@@ -84,7 +84,19 @@ namespace Client
                         result += AddField("Amount", fields[1]);
                         result += AddField("Offset", fields[2]);
                         break;
-
+                    case 21:
+                        result += AddField("ConversationID", fields[0]);
+                        break;
+                    case 22:
+                        result += AddField("AttachmentID", fields[0]);
+                        break;
+                    case 23:
+                        result += AddField("ConversationID", fields[0]);
+                        result += AddField("Attachment", fields[1]);
+                        result += AddField("Filename", fields[2]);
+                        break;
+                    case 24:
+                        break;
                     default: throw new ArgumentException("Invalid option!");
                 }
             }
@@ -267,10 +279,18 @@ namespace Client
             return (Int32.Parse(args[0]), args[1]);
         }
 
-        public static int SendMessageCommand(ref ServerConnection connection, string conversationID, string messageJSON) {
+        public static int SendMessageCommand(ref ServerConnection connection, string conversationID, string messageJSON)
+        {
             string command = CreateClientMessage((int)Options.SEND_MESSAGE, conversationID, messageJSON);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             return Int32.Parse(args[0]);
+        }
+
+        public static (int error, int attachmentID) SendAttachmentCommand(ref ServerConnection connection, string conversationID, string messageJSON, string filename)
+        {
+            string command = CreateClientMessage((int)Options.SEND_ATTACHMENT_FILE, conversationID, messageJSON, filename);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            return (Int32.Parse(args[0]), Int32.Parse(args[1]));
         }
 
         public static int DeleteAccountCommand(ref ServerConnection connection) {

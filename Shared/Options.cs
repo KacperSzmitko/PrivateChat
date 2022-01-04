@@ -28,5 +28,12 @@ namespace Shared
         ACCPET_FRIEND_INVITATION = 15,      //  InvitationID:<>$$PKB:<>$$                                   Error:<>$$ConversationID:<>$$ConversationIV:<>$$
         SEND_CONVERSATION_KEY = 16,         //  ConversationID:<>$$ConversationKey:<>$$                     Error:<>$$ 
         GET_ACCEPTED_FRIENDS = 17,          //                                                              Error:<>$$Data:<JSONExtendedInvatation>$$
+        
+        //Attachments
+        GET_ATTACHMENT_LIST = 21,           //  ConversationID:<>$$                                         Error:<>$$Data:<JSONAttachmentList>$$
+        GET_ATTACHMENT_FILE = 22,           //  AttachmentID:<>$$                                           Error:<>$$Data:<JSONAttachment>$$
+        SEND_ATTACHMENT_FILE = 23,          //  ConversationID:<>$$Attachment:<>$$                          Error:<>$$AttachmentID:<>$$
+        GET_NEW_ATTACHMENTS = 24,           //                                                              Error:<>$$Data:<JSONAttachmentList>$$
+
     }
 }

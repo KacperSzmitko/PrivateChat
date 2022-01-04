@@ -263,9 +263,16 @@ namespace Client.Models
             return true;
         }
 
-        public void SendMessage(string friendUsername, string messageJSON) {
+        public void SendMessage(string friendUsername, string messageJSON)
+        {
             int error = ServerCommands.SendMessageCommand(ref connection, conversations[friendUsername].ConversationID, messageJSON);
             if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
+        }
+
+        public void SendAttachment(string conversationID, string fileBytesBase64, string filename)
+        {
+            var res = ServerCommands.SendAttachmentCommand(ref connection, conversationID, fileBytesBase64, filename);
+            if (res.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(res.error));
         }
 
         public void DeleteAccount() {

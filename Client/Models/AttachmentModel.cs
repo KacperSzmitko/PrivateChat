@@ -16,7 +16,7 @@ namespace Client.Models
         public string Username { get { return username; } set { username = value; } }
 
         public AttachmentModel(ServerConnection connection) : base(connection) {
-            this.attachments = new List<Attachment> { new Attachment("test1"), new Attachment("test2"), new Attachment("test3") };
+            this.attachments = new List<Attachment> { };
         }
 
     }

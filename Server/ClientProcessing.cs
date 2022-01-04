@@ -271,6 +271,101 @@ namespace Server
 
         }
 
+        public string SendAttachmentFile(string msg, int clientId)
+        {
+            string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
+            int conversationId = int.Parse(fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1]);
+            string fileBase64 = fields[1].Split(":", 2, StringSplitOptions.RemoveEmptyEntries)[1];
+            string filename = fields[2].Split(":", 2, StringSplitOptions.RemoveEmptyEntries)[1];
+            int userId = activeUsers[clientId].dbConnection.GetSecondUserId(conversationId, activeUsers[clientId].userId);
+
+            Byte[] fileBytes = Convert.FromBase64String(fileBase64);
+            String newFilename = Guid.NewGuid().ToString();
+            while(AttachmentHandler.checkIfFileExist(newFilename))
+            {
+                newFilename = Guid.NewGuid().ToString();
+            }
+
+            AttachmentHandler.saveFile(newFilename, fileBytes);
+            String attachmentId = activeUsers[clientId].dbConnection.AddAttachment(conversationId, activeUsers[clientId].userId, filename, newFilename);
+
+
+            /*
+            bool isActive = false;
+            lock (messagesToSend)
+            {
+                foreach (var aUser in activeUsers)
+                {
+                    if (aUser != null && aUser.userId == userId && aUser.logged)
+                    {
+                        isActive = true;
+                        break;
+                    }
+                }
+                // Second user is active
+                if (isActive)
+                {
+                    if (sendedConversationIds[userId].Contains(conversationId))
+                    {
+                        if (messagesToSend.ContainsKey(userId))
+                        {
+                            if (messagesToSend[userId].ContainsKey(conversationId))
+                            {
+                                //messagesToSend[userId][conversationId].Add(JsonConvert.DeserializeObject<Message>(message));
+                            }
+                            else
+                            {
+                                //messagesToSend[userId].Add(conversationId, new List<Message>() { JsonConvert.DeserializeObject<Message>(message) });
+                            }
+                        }
+                        else
+                        {
+                            messagesToSend.Add(userId, new Dictionary<int, List<Message>>()
+                            {
+                                //[conversationId] =
+                                //new List<Message> { JsonConvert.DeserializeObject<Message>(message) }
+                            });
+                        }
+                    }
+                }
+
+            }
+            lock (activeConversations)
+            {
+                if (!activeConversations.ContainsKey(userId))
+                {
+                    activeConversations[userId] = -1;
+                }
+                if (!(conversationId == activeConversations[userId]))
+                {
+                    lock (notifications)
+                    {
+                        if (notifications.ContainsKey(userId))
+                        {
+                            if (notifications[userId].ContainsKey(conversationId))
+                            {
+                                notifications[userId][conversationId].numberOfMessages += 1;
+                            }
+                            else
+                            {
+                                notifications[userId].Add(conversationId, new Notification { numberOfMessages = 1, username = activeUsers[clientId].userName });
+                            }
+                        }
+                        else
+                        {
+                            notifications.Add(userId, new Dictionary<int, Notification>()
+                            {
+                                [conversationId] =
+                                new Notification { numberOfMessages = 1, username = activeUsers[clientId].userName }
+                            });
+                        }
+                    }
+                }
+
+            }*/
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_ATTACHMENT_FILE, attachmentId);
+        }
+
         public string AddFriend(string msg, int clientId)
         {
             lock (activeUsers[clientId])
@@ -726,7 +821,11 @@ namespace Server
             functions.Add(new Functions(SendAcceptedFriends));
             functions.Add(new Functions(DeleteAccount));
             functions.Add(new Functions(SendLastConversation));
-            functions.Add(new Functions(SendPartConversation));
+            functions.Add(new Functions(SendPartConversation)); //20
+            functions.Add(null);
+            functions.Add(null);
+            functions.Add(new Functions(SendAttachmentFile));
+            functions.Add(null);
 
             dbMethods = new DbMethods();
             activeUsers = new List<User>();

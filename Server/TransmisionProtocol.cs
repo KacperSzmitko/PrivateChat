@@ -45,6 +45,10 @@ namespace Server
                     {
                         AddFields(new[] { "p","g" ,"InvitationId" }, ref result, fields);
                     }
+                    else if (option == Options.SEND_ATTACHMENT_FILE)
+                    {
+                        AddFields(new[] { "AttachmentID" }, ref result, fields);
+                    }
 
                 }
                 catch (ArgumentOutOfRangeException)

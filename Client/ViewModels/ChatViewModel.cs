@@ -207,7 +207,7 @@ namespace Client.ViewModels
                 if (openAttachmentCommand == null)
                 {
                     openAttachmentCommand = new RelayCommand(_ => {
-                        navigator.CurrentViewModel = new AttachmentViewModel(connection,navigator, model.Username, model.UserKey);  
+                        navigator.CurrentViewModel = new AttachmentViewModel(connection,navigator, model.Username, model.UserKey, model.Conversations[selectedFriend.Name]);  
                     });
                 }
                 //Zwróć obiekt RelayCommand
@@ -215,10 +215,13 @@ namespace Client.ViewModels
             }
         }
 
-        public ICommand SendMessageCommand {
-            get {
+        public ICommand SendMessageCommand
+        {
+            get
+            {
                 //Jeśli komenda jest równa null
-                if (sendMessageCommand == null) {
+                if (sendMessageCommand == null)
+                {
                     //Ustaw komendę na nowy obiekt RelayCommand
                     sendMessageCommand = new RelayCommand(_ => {
                         //Przypisz do zmiennej wiadomość wpisaną w polu tekstowym
@@ -243,6 +246,7 @@ namespace Client.ViewModels
                 return sendMessageCommand;
             }
         }
+
 
         public ICommand LogoutCommand {
             get {
@@ -445,7 +449,8 @@ namespace Client.ViewModels
             loadingMoreConversation = false;
         }
 
-        private void SendMessageAsync(string friendUsernameCopy, string messageToSendTextCopy) {
+        private void SendMessageAsync(string friendUsernameCopy, string messageToSendTextCopy)
+        {
             int lastMessageIndex = model.AddUserMessageToConversation(friendUsernameCopy, messageToSendTextCopy);
             model.Conversations[friendUsernameCopy].Messages[lastMessageIndex].MessageStatus = MessageStatuses.MESSAGE_SENT;
             OnPropertyChanged(nameof(Messages));

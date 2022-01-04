@@ -69,9 +69,34 @@ namespace DbLibrary
             dataReader.Read();
             dataReader.Close();
             return CreateNewConversation(userAId, usernameB,iv);
-            
         }
 
+        public String AddAttachment(int conversationID, int userID, string nameOri, string nameServer)
+        {
+            string userId = userID.ToString();
+            string conversationId = conversationID.ToString();
+            string query = string.Format("INSERT INTO attachments(conversation_id,sent_by_user,attachment_ori_name,attachment_server_name) VALUES({0},{1},\"{2}\",\"{3}\")", conversationId, userId, nameOri, nameServer);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            dataReader.Close();
+
+            query = "SELECT LAST_INSERT_ID()";
+            cmd = new MySqlCommand(query, connection);
+            dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            try
+            {
+                return dataReader.GetString(0);
+            }
+            catch
+            {
+                return "";
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+        }
 
 
         public bool CheckFriends(string usernameA, string usernameB)
@@ -335,7 +360,7 @@ namespace DbLibrary
         }
 
 
-        public string CreateNewConversation(string IdA, string bUsername,string iv)
+        public string CreateNewConversation(string IdA, string bUsername, string iv)
         {
             string IdB = GetUserId(bUsername).ToString();
             string query = string.Format("SELECT * FROM conversations WHERE (user1_id = '{0}' AND user2_id = '{1}') OR (user1_id = '{1}'  AND user2_id = '{0}')", IdA, IdB);
@@ -356,7 +381,7 @@ namespace DbLibrary
             dataReader.Close();
 
 
-            query = string.Format("INSERT INTO conversations(user1_id,user2_id,iv_to_decrypt_converstion_key) VALUES({0},{1},'{2}')", IdA, IdB,iv);
+            query = string.Format("INSERT INTO conversations(user1_id,user2_id,iv_to_decrypt_converstion_key) VALUES({0},{1},'{2}')", IdA, IdB, iv);
             cmd = new MySqlCommand(query, connection);
             dataReader = cmd.ExecuteReader();
             dataReader.Close();
@@ -378,6 +403,8 @@ namespace DbLibrary
                 dataReader.Close();
             }
         }
+
+
 
         public int GetConversationId(string usernameA, string usernameB)
         {

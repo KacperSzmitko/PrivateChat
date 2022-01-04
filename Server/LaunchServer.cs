@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Shared;
 using System;
-
+using System.Configuration;
 
 namespace Server
 {
@@ -9,6 +9,7 @@ namespace Server
     {
         public static void Main(string[] args)
         {
+            AttachmentHandler.CheckAttachmentFolder();
             ServerConnection connection = new ServerConnection();
         }
 

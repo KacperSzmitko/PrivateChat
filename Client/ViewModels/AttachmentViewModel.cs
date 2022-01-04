@@ -1,8 +1,11 @@
 ﻿using Client.Commands;
 using Client.Models;
 using Microsoft.Win32;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
+using System.Threading;
 using System.Windows.Input;
 
 namespace Client.ViewModels
@@ -11,6 +14,11 @@ namespace Client.ViewModels
     {
         private ChatModel model;
         private AttachmentModel attachmentModel;
+        private Conversation actConversation;
+
+        private const long MAX_FILE_SIZE = 3 * 1024 * 1024;
+
+        private Thread sendAttachmentThread;
 
         private RelayCommand goLoginCommand;
         private RelayCommand openAttachmentCommand;
@@ -24,16 +32,16 @@ namespace Client.ViewModels
             }
         }
 
-        public string imageURI;
-        public string ImageURI
+        public string fileURI;
+        public string FileURI
         {
             get
             {
-                return imageURI;
+                return fileURI;
             }
             set
             {
-                imageURI = value;
+                fileURI = value;
                 this.OnPropertyChanged("ImageURI");
             }
         }
@@ -59,10 +67,31 @@ namespace Client.ViewModels
                         OpenFileDialog openFileDialog = new OpenFileDialog();
                         if (openFileDialog.ShowDialog() == true)
                         {
-                            imageURI = openFileDialog.FileName;
-                            OnPropertyChanged(nameof(imageURI));
-                            attachmentModel.Attachments.Add(new Attachment(openFileDialog.FileName));
-                            OnPropertyChanged("Attachments");
+                            fileURI = openFileDialog.FileName;
+                            OnPropertyChanged(nameof(fileURI));
+                            String filename = openFileDialog.SafeFileName;
+
+                            FileInfo file = new FileInfo(fileURI);
+                            if(file.Exists)
+                            {
+                                long size = file.Length;
+
+                                if(size > MAX_FILE_SIZE)
+                                {
+                                    //TODO: zbyt duży plik
+                                } else
+                                {
+                                    attachmentModel.Attachments.Add(new Attachment(fileURI));
+
+                                    Byte[] fileBytes = File.ReadAllBytes(fileURI);
+                                    String fileBase64 = Convert.ToBase64String(fileBytes);
+
+                                    sendAttachmentThread = new Thread(() => SendAttachmentAsync(actConversation.ConversationID, fileBase64, filename));
+                                    sendAttachmentThread.Start();
+
+                                    OnPropertyChanged("Attachments");
+                                }
+                            }
                         };
 
                     });
@@ -72,10 +101,16 @@ namespace Client.ViewModels
             }
         }
 
-        public AttachmentViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey) : base(connection, navigator) {
-            this.imageURI = "";
+        private void SendAttachmentAsync(string conversationID, string fileBytesBase64, string filename)
+        {
+            model.SendAttachment(conversationID, fileBytesBase64, filename);
+        }
+
+        public AttachmentViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey, Conversation conv) : base(connection, navigator) {
+            this.fileURI = "";
             this.attachmentModel = new AttachmentModel(connection);
             this.model = new ChatModel(connection, username, userKey);
+            this.actConversation = conv;
         }
     }
 }
