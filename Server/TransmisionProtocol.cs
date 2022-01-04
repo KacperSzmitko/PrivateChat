@@ -53,6 +53,10 @@ namespace Server
                     {
                         AddFields(new[] { "AttachmentsList" }, ref result, fields);
                     }
+                    else if (option == Options.GET_ATTACHMENT_FILE)
+                    {
+                        AddFields(new[] { "FileBase64" }, ref result, fields);
+                    }
 
                 }
                 catch (ArgumentOutOfRangeException)

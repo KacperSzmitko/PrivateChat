@@ -31,5 +31,15 @@ namespace Server
             File.WriteAllBytes(attachmentFolder + Path.DirectorySeparatorChar + name, fileBytes);
             return true;
         }
+
+        public static (Boolean readOk, Byte[] fileBytes) readFile(String name)
+        {
+            if(!File.Exists(attachmentFolder + Path.DirectorySeparatorChar + name))
+            {
+                return (false, null);
+            }
+            Byte[] fileBytes = File.ReadAllBytes(attachmentFolder + Path.DirectorySeparatorChar + name);
+            return (true, fileBytes);
+        }
     }
 }

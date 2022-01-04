@@ -281,7 +281,7 @@ namespace Server
 
             Byte[] fileBytes = Convert.FromBase64String(fileBase64);
             String newFilename = Guid.NewGuid().ToString();
-            while(AttachmentHandler.checkIfFileExist(newFilename))
+            while (AttachmentHandler.checkIfFileExist(newFilename))
             {
                 newFilename = Guid.NewGuid().ToString();
             }
@@ -364,6 +364,24 @@ namespace Server
 
             }*/
             return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.SEND_ATTACHMENT_FILE, attachmentId);
+        }
+
+        public string GetAttachmentFile(string msg, int clientId)
+        {
+            //TODO: check if user have permission for this file
+            string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
+            int attachmentId = int.Parse(fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1]);
+
+            Attachment at = activeUsers[clientId].dbConnection.GetAttachment(attachmentId);
+
+            var res = AttachmentHandler.readFile(at.FileNameOnServer);
+            if(!res.readOk)
+            {
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_MESSAGES, Options.GET_ATTACHMENT_FILE);
+            }
+            String fileBase64 = Convert.ToBase64String(res.fileBytes);
+
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_ATTACHMENT_FILE, fileBase64);
         }
 
         public string AddFriend(string msg, int clientId)
@@ -853,7 +871,7 @@ namespace Server
             functions.Add(new Functions(SendLastConversation));
             functions.Add(new Functions(SendPartConversation)); //20
             functions.Add(new Functions(GetAttachmentList));
-            functions.Add(null);
+            functions.Add(new Functions(GetAttachmentFile));
             functions.Add(new Functions(SendAttachmentFile));
             functions.Add(new Functions(GetNewAttachmentList));
 

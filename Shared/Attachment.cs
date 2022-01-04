@@ -14,6 +14,9 @@ namespace Shared
     public class Attachment
     {
         public string Name { get; set; }
+        public String FileNameOnServer { get; set; }
+        public int sentByUserId { get; set; }
+        public int conversationId { get; set; }
         public FILE_STATUS fStatus { get; set; }
 
         public UInt32 attachmentID { get; set; }

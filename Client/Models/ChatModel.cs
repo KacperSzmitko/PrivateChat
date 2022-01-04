@@ -277,6 +277,13 @@ namespace Client.Models
             return res;
         }
 
+        public (int error, String fileBase64) GetAttachment(string attachmentID)
+        {
+            var res = ServerCommands.GetAttachmentCommand(ref connection, attachmentID);
+            if (res.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(res.error));
+            return res;
+        }
+
         public void DeleteAccount() {
             int error = ServerCommands.DeleteAccountCommand(ref connection);
             if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));

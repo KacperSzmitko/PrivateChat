@@ -310,6 +310,16 @@ namespace Client
             return (Int32.Parse(args[0]), UInt32.Parse(args[1]));
         }
 
+        public static (int error, String fileBase64) GetAttachmentCommand(ref ServerConnection connection, string attachmentID)
+        {
+            string command = CreateClientMessage((int)Options.GET_ATTACHMENT_FILE, attachmentID);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if(args.Length>1)
+                return (Int32.Parse(args[0]), args[1]);
+            else
+                return (Int32.Parse(args[0]), null);
+        }
+
         public static int DeleteAccountCommand(ref ServerConnection connection) {
             string command = CreateClientMessage((int)Options.DELETE_ACCOUNT);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));

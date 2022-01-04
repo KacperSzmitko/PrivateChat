@@ -11,7 +11,7 @@
         <StackPanel VerticalAlignment="Center" Height="500">
             <TextBlock FontWeight="Bold" FontSize="30" TextAlignment="Center" Text="Załączniki" Height="100"/>
 
-            <ListBox Name="lbUsers" Height="200"  ItemsSource="{Binding Attachments}">
+            <ListBox Name="lbUsers" Height="200"  ItemsSource="{Binding Attachments}" SelectedItem="{Binding SelectedAttachment, Mode=OneWayToSource}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
@@ -19,9 +19,22 @@
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
-             </ListBox>
+            </ListBox>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="25"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" Content="Wybrany plik: "/>
+                <Label Grid.Row="0" Grid.Column="1" Name="SelectedFileName" Content="{Binding FileName}" Foreground="White"/>
+            </Grid>
+            <Label Name="SelectedFilePath" Content="{Binding FileURI}" Foreground="White"/>
 
-                <Image Margin="0 25 0 0"  x:Name="Image1" Source="{Binding ImageURI, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left"/>
+            <!--<Image Margin="0 25 0 0"  x:Name="Image1" Source="{Binding ImageURI, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left"/>-->
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -30,8 +43,9 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0" Padding="0 -13 0 0" FontSize="40" Content="📎" Background="#405d9f" Command="{Binding OpenAttachmentCommand}" Margin="11,22,46,-23" RenderTransformOrigin="0.525,0.957" Grid.ColumnSpan="2"/>
-                <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="›" Background="#405d9f" Command="{Binding SendMessageCommand}" Margin="2,22,-2,-23" Click="Button_Click"/>
+                <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="↑" Background="#405d9f" Command="{Binding UploadFileCommand}" Margin="2,22,-2,-23" Click="Button_Click"/>
                 <Button Grid.Column="2" Padding="0 -13 0 0"  FontWeight="Bold" FontSize="22" Content="Powrót" Command="{Binding GoBackCommand}"  Margin="173,22,0,-23" Grid.ColumnSpan="2"/>
+                <Button Grid.Column="2" Padding="0 -13 0 0" FontSize="40" Content="↓" Background="#405d9f" Command="{Binding DownloadFileCommand}" Margin="10,22,153,-23" Click="Button_Click"/>
             </Grid>
 
 

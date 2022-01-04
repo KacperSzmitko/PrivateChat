@@ -22,6 +22,7 @@ namespace Client.Models
             this.attachments = new List<Attachment> { };
         }
 
+
         public bool GetNewAttachments(string conversationID)
         {
             if (lockNewAttachments)

@@ -24,9 +24,14 @@ namespace Client.ViewModels
 
         private Thread sendAttachmentThread;
 
+        private Attachment selectedAttachment;
+
         private RelayCommand goLoginCommand;
         private RelayCommand openAttachmentCommand;
+        private RelayCommand uploadFileCommand;
+        private RelayCommand downloadFileCommand;
         ObservableCollection<Attachment> attachments = new ObservableCollection<Attachment>();
+
 
         public ObservableCollection<Attachment> Attachments
         {
@@ -46,9 +51,35 @@ namespace Client.ViewModels
             set
             {
                 fileURI = value;
-                this.OnPropertyChanged("ImageURI");
+                this.OnPropertyChanged("FileURI");
             }
         }
+
+        public string fileName;
+        public string FileName
+        {
+            get
+            {
+                return fileName;
+            }
+            set
+            {
+                fileName = value;
+                this.OnPropertyChanged("FileName");
+            }
+        }
+
+        public Attachment SelectedAttachment
+        {
+            set
+            {
+                if (value != null && value != selectedAttachment)
+                {
+                    selectedAttachment = value;
+                }
+            }
+        }
+
         public ICommand GoBackCommand
         {
             get
@@ -78,7 +109,51 @@ namespace Client.ViewModels
                         {
                             fileURI = openFileDialog.FileName;
                             OnPropertyChanged(nameof(fileURI));
-                            String filename = openFileDialog.SafeFileName;
+                            fileName = openFileDialog.SafeFileName;
+                            OnPropertyChanged(nameof(fileName));
+                        };
+
+                    });
+                }
+                //Zwróć obiekt RelayCommand
+                return openAttachmentCommand;
+            }
+        }
+
+        public ICommand DownloadFileCommand
+        {
+            get
+            {
+                //Jeśli komenda jest równa null
+                if (downloadFileCommand == null)
+                {
+                    downloadFileCommand = new RelayCommand(_ =>
+                    {
+                        SaveFileDialog saveFileDialog = new SaveFileDialog();
+                        saveFileDialog.FileName = selectedAttachment.Name;
+                        if (saveFileDialog.ShowDialog() == true)
+                        {
+                            sendAttachmentThread = new Thread(() => GetAttachmentAsync(selectedAttachment.attachmentID.ToString(), saveFileDialog.FileName));
+                            sendAttachmentThread.Start();
+                        };
+
+                    });
+                }
+                return downloadFileCommand;
+            }
+        }
+
+        public ICommand UploadFileCommand
+        {
+            get
+            {
+                //Jeśli komenda jest równa null
+                if (uploadFileCommand == null)
+                {
+                    uploadFileCommand = new RelayCommand(_ =>
+                    {
+                        if (fileURI.Trim().Length >= 1)
+                        {
 
                             FileInfo file = new FileInfo(fileURI);
                             if (file.Exists)
@@ -91,23 +166,30 @@ namespace Client.ViewModels
                                 }
                                 else
                                 {
-                                    attachmentModel.Attachments.Add(new Attachment(filename));
+                                    attachmentModel.Attachments.Add(new Attachment(fileName));
 
                                     Byte[] fileBytes = File.ReadAllBytes(fileURI);
                                     String fileBase64 = Convert.ToBase64String(fileBytes);
 
-                                    sendAttachmentThread = new Thread(() => SendAttachmentAsync(actConversation.ConversationID, fileBase64, filename));
+                                    char[] fileNameTemp = new char[fileName.Length];
+                                    fileName.CopyTo(0, fileNameTemp, 0, fileName.Length);
+
+                                    sendAttachmentThread = new Thread(() => SendAttachmentAsync(actConversation.ConversationID, fileBase64, new string(fileNameTemp)));
                                     sendAttachmentThread.Start();
 
+                                    fileName = "";
+                                    fileURI = "";
+
+                                    OnPropertyChanged("FileName");
+                                    OnPropertyChanged("FileURI");
                                     OnPropertyChanged("Attachments");
                                 }
                             }
-                        };
-
+                        }
                     });
                 }
                 //Zwróć obiekt RelayCommand
-                return openAttachmentCommand;
+                return uploadFileCommand;
             }
         }
 
@@ -125,6 +207,16 @@ namespace Client.ViewModels
                 }
             }
             OnPropertyChanged("Attachments");
+        }
+
+        private void GetAttachmentAsync(string attachmentID, String filepath)
+        {
+            var res = model.GetAttachment(attachmentID);
+            if (res.fileBase64 == null)
+                return;
+
+            Byte[] fileBytes = Convert.FromBase64String(res.fileBase64);
+            File.WriteAllBytes(filepath, fileBytes);
         }
 
         public AttachmentViewModel(ServerConnection connection, Navigator navigator, string username, byte[] userKey, Conversation conv) : base(connection, navigator)

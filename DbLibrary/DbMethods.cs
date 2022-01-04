@@ -191,6 +191,38 @@ namespace DbLibrary
             }
         }
 
+        public Attachment GetAttachment(int attachmentId)
+        {
+            string query = String.Format("SELECT `attachment_id`,`attachment_ori_name`,`attachment_server_name`,`conversation_id`,`sent_by_user` FROM attachments WHERE attachment_id = \"{0}\" LIMIT 1", attachmentId.ToString());
+            //Create Command
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            //Create a data reader and Execute the command
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+
+            try
+            {
+                dataReader.Read();
+
+                Attachment at = new Attachment(dataReader.GetString("attachment_ori_name"));
+                at.fStatus = FILE_STATUS.SENT;
+                at.attachmentID = dataReader.GetUInt32("attachment_id");
+                at.conversationId = dataReader.GetInt32("conversation_id");
+                at.FileNameOnServer = dataReader.GetString("attachment_server_name");
+                at.sentByUserId = dataReader.GetInt32("sent_by_user");
+
+                dataReader.Close();
+                return at;
+            }
+            catch
+            {
+                throw new Exception("Nie ma takiego zalacznika!");
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+        }
+
         public Dictionary<int, ExtendedInvitation> GetInvitations()
         {
             string query = String.Format("SELECT * FROM invitations_view");
