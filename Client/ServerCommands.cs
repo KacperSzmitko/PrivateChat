@@ -272,8 +272,25 @@ namespace Client
             return Int32.Parse(args[0]);
         }
 
-        public static (int error, string newMessegesJSON) GetNewMessagesCommand(ref ServerConnection connection) {
+        public static (int error, string newMessegesJSON) GetNewMessagesCommand(ref ServerConnection connection)
+        {
             string command = CreateClientMessage((int)Options.GET_NEW_MESSAGES);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
+            return (Int32.Parse(args[0]), args[1]);
+        }
+
+        public static (int error, string newMessegesJSON) GetNewAttachmentsCommand(ref ServerConnection connection, string conversationID)
+        {
+            string command = CreateClientMessage((int)Options.GET_NEW_ATTACHMENTS, conversationID);
+            string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
+            if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
+            return (Int32.Parse(args[0]), args[1]);
+        }
+
+        public static (int error, string newMessegesJSON) GetAttachmentsCommand(ref ServerConnection connection, string conversationID)
+        {
+            string command = CreateClientMessage((int)Options.GET_ATTACHMENT_LIST, conversationID);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
             if (Int32.Parse(args[0]) != (int)ErrorCodes.NO_ERROR) return (Int32.Parse(args[0]), "");
             return (Int32.Parse(args[0]), args[1]);
@@ -286,11 +303,11 @@ namespace Client
             return Int32.Parse(args[0]);
         }
 
-        public static (int error, int attachmentID) SendAttachmentCommand(ref ServerConnection connection, string conversationID, string messageJSON, string filename)
+        public static (int error, uint attachmentID) SendAttachmentCommand(ref ServerConnection connection, string conversationID, string messageJSON, string filename)
         {
             string command = CreateClientMessage((int)Options.SEND_ATTACHMENT_FILE, conversationID, messageJSON, filename);
             string[] args = GetArgArrayFromResponse(Communicate(ref connection, command));
-            return (Int32.Parse(args[0]), Int32.Parse(args[1]));
+            return (Int32.Parse(args[0]), UInt32.Parse(args[1]));
         }
 
         public static int DeleteAccountCommand(ref ServerConnection connection) {

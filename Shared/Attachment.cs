@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Client
+namespace Shared
 {
     public enum FILE_STATUS
     {
@@ -15,6 +15,8 @@ namespace Client
     {
         public string Name { get; set; }
         public FILE_STATUS fStatus { get; set; }
+
+        public UInt32 attachmentID { get; set; }
 
         public Attachment(string name)
         {

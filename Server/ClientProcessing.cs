@@ -729,6 +729,36 @@ namespace Server
 
         }
 
+        public string GetAttachmentList(string msg, int clientId)
+        {
+            string[] fields = msg.Split("$$", StringSplitOptions.RemoveEmptyEntries);
+            string conversationId = fields[0].Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+
+            int id = activeUsers[clientId].userId;
+
+            List<int> userConversationsIds = activeUsers[clientId].dbConnection.GetAllUserConversations(activeUsers[clientId].userId);
+            if(!userConversationsIds.Contains(Int32.Parse(conversationId)))
+            {
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_MESSAGES, Options.GET_ATTACHMENT_LIST);
+            }
+
+            try
+            {
+                var attachment = JsonConvert.SerializeObject(activeUsers[clientId].dbConnection.GetAttachments(conversationId));
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_ERROR, Options.GET_ATTACHMENT_LIST, attachment);
+            }
+            catch
+            {
+                return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_MESSAGES, Options.GET_ATTACHMENT_LIST);
+            }
+
+        }
+
+        public string GetNewAttachmentList(string msg, int clientId)
+        { 
+            return TransmisionProtocol.CreateServerMessage(ErrorCodes.NO_MESSAGES, Options.GET_NEW_ATTACHMENTS);
+        }
+
         public string DeleteAccount(string msg, int clientId)
         {
             if (!activeUsers[clientId].logged) return TransmisionProtocol.CreateServerMessage(ErrorCodes.NOT_LOGGED_IN, Options.DELETE_ACCOUNT);
@@ -822,10 +852,10 @@ namespace Server
             functions.Add(new Functions(DeleteAccount));
             functions.Add(new Functions(SendLastConversation));
             functions.Add(new Functions(SendPartConversation)); //20
-            functions.Add(null);
+            functions.Add(new Functions(GetAttachmentList));
             functions.Add(null);
             functions.Add(new Functions(SendAttachmentFile));
-            functions.Add(null);
+            functions.Add(new Functions(GetNewAttachmentList));
 
             dbMethods = new DbMethods();
             activeUsers = new List<User>();

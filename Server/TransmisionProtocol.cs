@@ -49,6 +49,10 @@ namespace Server
                     {
                         AddFields(new[] { "AttachmentID" }, ref result, fields);
                     }
+                    else if (option == Options.GET_ATTACHMENT_LIST)
+                    {
+                        AddFields(new[] { "AttachmentsList" }, ref result, fields);
+                    }
 
                 }
                 catch (ArgumentOutOfRangeException)

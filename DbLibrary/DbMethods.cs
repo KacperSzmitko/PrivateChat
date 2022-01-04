@@ -138,7 +138,7 @@ namespace DbLibrary
 
         public string GetFromUser(string fieldName, string username)
         {
-            string query = String.Format("SELECT {0} FROM users WHERE username = '{1}'",fieldName, username);
+            string query = String.Format("SELECT {0} FROM users WHERE username = '{1}'", fieldName, username);
             //Create Command
             MySqlCommand cmd = new MySqlCommand(query, connection);
             //Create a data reader and Execute the command
@@ -154,12 +154,44 @@ namespace DbLibrary
             {
                 throw new Exception("Nie ma takiego uzytkownika!");
             }
-            finally {
+            finally
+            {
                 dataReader.Close();
             }
         }
 
-        public Dictionary<int,ExtendedInvitation> GetInvitations()
+        public List<Attachment> GetAttachments(string conversationId)
+        {
+            string query = String.Format("SELECT `attachment_id`,`attachment_ori_name`,`attachment_server_name`,`conversation_id`,`sent_by_user` FROM attachments WHERE conversation_id = \"{0}\"", conversationId);
+            //Create Command
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            //Create a data reader and Execute the command
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+
+            try
+            {
+                List<Attachment> result = new List<Attachment>();
+                while (dataReader.Read())
+                {
+                    Attachment at = new Attachment(dataReader.GetString("attachment_ori_name"));
+                    at.fStatus = FILE_STATUS.SENT;
+                    at.attachmentID = dataReader.GetUInt32("attachment_id");
+                    result.Add(at);
+                }
+                dataReader.Close();
+                return result;
+            }
+            catch
+            {
+                throw new Exception("Nie ma takiej konwersacji!");
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+        }
+
+        public Dictionary<int, ExtendedInvitation> GetInvitations()
         {
             string query = String.Format("SELECT * FROM invitations_view");
             //Create Command
@@ -167,7 +199,7 @@ namespace DbLibrary
             //Create a data reader and Execute the command
             MySqlDataReader dataReader = cmd.ExecuteReader();
             Dictionary<int, ExtendedInvitation> result = new Dictionary<int, ExtendedInvitation>();
-            while(dataReader.Read())
+            while (dataReader.Read())
             {
                 ExtendedInvitation ei = new ExtendedInvitation();
                 ei.invitationId = dataReader.GetInt32("invitation_id");
@@ -177,7 +209,7 @@ namespace DbLibrary
                 ei.g = dataReader.GetString("g");
                 ei.sended = dataReader.GetBoolean("sended");
                 ei.accepted = dataReader.GetBoolean("accepted");
-                ei.encryptedSenderPrivateKey = dataReader.GetString("sender_encypted_private_dh_key"); 
+                ei.encryptedSenderPrivateKey = dataReader.GetString("sender_encypted_private_dh_key");
                 ei.ivToDecryptSenderPrivateKey = dataReader.GetString("sender_iv_to_decrypt_private_dh_key");
                 ei.publicKeySender = dataReader.GetString("sender_public_dh_key");
 
@@ -187,10 +219,12 @@ namespace DbLibrary
                 }
 
                 result[ei.invitationId] = ei;
-                }
+            }
             dataReader.Close();
             return result;
         }
+
+
 
         public int CreateNewInvitation(string senderName,string reciverName,string p, string g)
         {

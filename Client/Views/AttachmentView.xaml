@@ -30,7 +30,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0" Padding="0 -13 0 0" FontSize="40" Content="📎" Background="#405d9f" Command="{Binding OpenAttachmentCommand}" Margin="11,22,46,-23" RenderTransformOrigin="0.525,0.957" Grid.ColumnSpan="2"/>
-                <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="›" Background="#405d9f" Command="{Binding SendMessageCommand}" Margin="2,22,-2,-23"/>
+                <Button Grid.Column="1" Padding="0 -13 0 0" FontSize="40" Content="›" Background="#405d9f" Command="{Binding SendMessageCommand}" Margin="2,22,-2,-23" Click="Button_Click"/>
                 <Button Grid.Column="2" Padding="0 -13 0 0"  FontWeight="Bold" FontSize="22" Content="Powrót" Command="{Binding GoBackCommand}"  Margin="173,22,0,-23" Grid.ColumnSpan="2"/>
             </Grid>
 

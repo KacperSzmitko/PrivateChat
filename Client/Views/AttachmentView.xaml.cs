@@ -19,5 +19,10 @@ namespace Client.Views
         public AttachmentView() {
             InitializeComponent();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

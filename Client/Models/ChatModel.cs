@@ -250,13 +250,14 @@ namespace Client.Models
             if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
         }
 
-        public bool GetMessages(string friendUsername) {
+        public bool GetMessages(string friendUsername)
+        {
             var response = ServerCommands.GetNewMessagesCommand(ref connection);
             if (response.error == (int)ErrorCodes.NO_MESSAGES) return false;
             if (response.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(response.error));
             List<Message> dirtyMessages = JsonConvert.DeserializeObject<List<Message>>(response.newMessegesJSON);
             byte[] conversationKey = conversations[friendUsername].ConversationKey;
-            if(dirtyMessages.Count>0)
+            if (dirtyMessages.Count > 0)
                 ChatView.showNewMessageInfo(true);
             conversations[friendUsername].FullMsgAmount = conversations[friendUsername].FullMsgAmount + dirtyMessages.Count;
             conversations[friendUsername].Messages.AddRange(DecryptMessages(dirtyMessages, conversationKey));
@@ -269,10 +270,11 @@ namespace Client.Models
             if (error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(error));
         }
 
-        public void SendAttachment(string conversationID, string fileBytesBase64, string filename)
+        public (int error, uint attachmentID) SendAttachment(string conversationID, string fileBytesBase64, string filename)
         {
             var res = ServerCommands.SendAttachmentCommand(ref connection, conversationID, fileBytesBase64, filename);
             if (res.error != (int)ErrorCodes.NO_ERROR) throw new Exception(GetErrorCodeName(res.error));
+            return res;
         }
 
         public void DeleteAccount() {

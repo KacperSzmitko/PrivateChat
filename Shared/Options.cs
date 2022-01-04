@@ -33,7 +33,7 @@ namespace Shared
         GET_ATTACHMENT_LIST = 21,           //  ConversationID:<>$$                                         Error:<>$$Data:<JSONAttachmentList>$$
         GET_ATTACHMENT_FILE = 22,           //  AttachmentID:<>$$                                           Error:<>$$Data:<JSONAttachment>$$
         SEND_ATTACHMENT_FILE = 23,          //  ConversationID:<>$$Attachment:<>$$                          Error:<>$$AttachmentID:<>$$
-        GET_NEW_ATTACHMENTS = 24,           //                                                              Error:<>$$Data:<JSONAttachmentList>$$
+        GET_NEW_ATTACHMENTS = 24,           //  ConversationID:<>$$                                         Error:<>$$Data:<JSONAttachmentList>$$
 
     }
 }
